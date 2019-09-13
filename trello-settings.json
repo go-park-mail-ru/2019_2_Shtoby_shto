@@ -1,3 +1,5 @@
 {
-  "trello.server.port": 8080
+  "trello.service.port": "8080",
+  "trello.service.host": "127.0.0.1",
+  "trello.service.api.version": "v1"
 }
