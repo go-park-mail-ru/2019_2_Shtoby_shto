@@ -1,7 +1,7 @@
 package main
 
 import (
-	"database/sql"
+	"2019_2_Shtoby_shto/src/database"
 	"flag"
 	"log"
 	"net/http"
@@ -9,19 +9,12 @@ import (
 )
 
 var initFlag = flag.Bool("initial start", false, "Check your service")
-var httpAddr = flag.String("http.addr", ":8080", "HTTP listen address")
+var httpAddr = flag.String("port", ":8080", "HTTP listen address")
 
 func main() {
 	flag.Parse()
 
-	// TODO:: add timeout for docker
-	dbInfo := "postgres://postgres:Aebnm@postgres:5432/db_1?sslmode=disable"
-	db, err := sql.Open("postgres", dbInfo)
-	defer db.Close()
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	//db, err := database.NewService()
 
 	if *initFlag {
 		return
