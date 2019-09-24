@@ -11,7 +11,7 @@ type InitDb struct {
 	db       *gorm.DB
 }
 
-func NewService() (*gorm.DB, error) {
+func NewDBService() (*gorm.DB, error) {
 	// TODO:: add timeout for docker
 	dbInfo := "postgres://postgres:Aebnm@postgres:5432/db_1?sslmode=disable"
 	db, err := gorm.Open("postgres", dbInfo)
