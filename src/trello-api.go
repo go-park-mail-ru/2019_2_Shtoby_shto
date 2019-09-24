@@ -1,11 +1,12 @@
 package main
 
 import (
+	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/route"
 	"flag"
-	"github.com/jinzhu/gorm"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -15,20 +16,16 @@ const (
 )
 
 var initFlag = flag.Bool("initial start", false, "Check your service")
-var httpAddr = flag.String("port", "localhost:8080", "HTTP listen address")
+var httpAddr = flag.String("address", "localhost:8080", "HTTP listen address")
 
 func main() {
 	flag.Parse()
 
-	dbInfo := postgreConfig
-	db, err := gorm.Open("postgres", dbInfo)
-	if err != nil {
+	dm := database.DataManager{}
+	if err := dm.Init("postgres", postgreConfig); err != nil {
 		log.Fatal(err)
-		return
+		os.Exit(1)
 	}
-
-	defer db.Close()
-	initService(db)
 
 	if *initFlag {
 		return
@@ -47,5 +44,5 @@ func main() {
 
 }
 
-func initService(db *gorm.DB) {
+func initService() {
 }

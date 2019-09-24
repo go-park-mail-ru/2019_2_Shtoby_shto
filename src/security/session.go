@@ -44,6 +44,14 @@ func (sm *SessionManager) Create(in *Session) (*SessionID, error) {
 	return &session, err
 }
 
+func (sm *SessionManager) putSession(id, userId string) error {
+	return nil
+}
+
+func (sm *SessionManager) getSession(idIn string) error {
+	return nil
+}
+
 func (sm *SessionManager) Check(sessionId *SessionID) (bool, error) {
 	return true, nil
 }

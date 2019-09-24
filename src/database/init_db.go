@@ -2,25 +2,27 @@ package database
 
 import (
 	"flag"
+	"github.com/go-redis/redis"
 	"github.com/jinzhu/gorm"
 	"log"
 )
 
-type InitDb struct {
+type DataManager struct {
 	Recreate bool
 	db       *gorm.DB
+	cache    *redis.Client
 }
 
-func NewDBService() (*gorm.DB, error) {
+func (d *DataManager) Init(dialect, args string) error {
 	// TODO:: add timeout for docker
-	dbInfo := "postgres://postgres:Aebnm@postgres:5432/db_1?sslmode=disable"
-	db, err := gorm.Open("postgres", dbInfo)
+	db, err := gorm.Open(dialect, args)
 	defer db.Close()
 	if err != nil {
 		log.Fatal(err)
-		return nil, err
+		return err
 	}
-	return db, nil
+	d.db = db
+	return nil
 }
 
 var autoMigration = flag.Bool("auto-migration", true, "GORM autoMigration")
