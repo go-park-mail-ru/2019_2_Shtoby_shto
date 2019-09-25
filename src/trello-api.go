@@ -3,7 +3,9 @@ package main
 import (
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/route"
+	"2019_2_Shtoby_shto/src/security"
 	"flag"
+	"github.com/go-redis/redis"
 	"log"
 	"net/http"
 	"os"
@@ -20,28 +22,50 @@ var httpAddr = flag.String("address", "localhost:8080", "HTTP listen address")
 
 func main() {
 	flag.Parse()
-
-	dm := database.DataManager{}
-	if err := dm.Init("postgres", postgreConfig); err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-
+	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
+	sessionManager := security.NewSessionManager()
+	println(sessionManager.Check(&security.SessionID{ID: "123"}))
+	srv := newServer(logger)
 	if *initFlag {
 		return
 	}
 
-	router := route.NewRouterService()
+	dm := database.DataManager{}
+	if err := dm.Init("postgres", postgreConfig); err != nil {
+		logger.Fatal(err)
+		os.Exit(1)
+	}
 
-	s := &http.Server{
+	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+		logger.Fatalf("HTTP server ListenAndServe: %v", err)
+	}
+
+	//idleConnsClosed := make(chan struct{})
+	//go func() {
+	//	sigint := make(chan os.Signal, 1)
+	//	signal.Notify(sigint, os.Interrupt)
+	//	<-sigint
+	//	if err := srv.Shutdown(context.Background()); err != nil {
+	//		logger.Printf("HTTP server Shutdown: %v", err)
+	//	}
+	//	close(idleConnsClosed)
+	//}()
+	//if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+	//	logger.Fatalf("HTTP server ListenAndServe: %v", err)
+	//}
+	//<-idleConnsClosed
+}
+
+func newServer(logger *log.Logger) *http.Server {
+	router := route.NewRouterService()
+	return &http.Server{
 		Addr:           *httpAddr,
 		Handler:        router,
+		ErrorLog:       logger,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	log.Fatal(s.ListenAndServe())
-
 }
 
 func initService() {

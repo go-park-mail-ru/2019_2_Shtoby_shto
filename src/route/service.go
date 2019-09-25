@@ -5,11 +5,14 @@ import (
 	"net/http"
 )
 
+const (
+	apiName = "api"
+	ver     = "v1"
+)
+
 func NewRouterService() *mux.Router {
 	r := mux.NewRouter()
-	r.HandleFunc("/", nil)
-	r.HandleFunc("/products", nil)
-	r.HandleFunc("/articles", nil)
+	r.HandleFunc(apiName+"/"+ver+"/user", nil)
 	http.Handle("/", r)
 	return r
 }

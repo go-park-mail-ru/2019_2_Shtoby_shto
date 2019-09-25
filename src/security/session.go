@@ -2,7 +2,7 @@ package security
 
 import (
 	"2019_2_Shtoby_shto/src/utils"
-	"database/sql"
+	"github.com/go-redis/redis"
 )
 
 // Обработчик сессий
@@ -25,12 +25,12 @@ type SessionID struct {
 
 // TODO::Redis
 type SessionManager struct {
-	db *sql.DB
+	cache *redis.Client
 }
 
-func NewSessionManager(db *sql.DB) *SessionManager {
+func NewSessionManager() SessionHandler {
 	return &SessionManager{
-		db: db,
+		cache: &redis.Client{},
 	}
 }
 
@@ -45,6 +45,7 @@ func (sm *SessionManager) Create(in *Session) (*SessionID, error) {
 }
 
 func (sm *SessionManager) putSession(id, userId string) error {
+
 	return nil
 }
 

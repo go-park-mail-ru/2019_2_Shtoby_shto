@@ -1,21 +1,20 @@
 package database
 
 import (
+	"database/sql"
 	"flag"
-	"github.com/go-redis/redis"
-	"github.com/jinzhu/gorm"
+	_ "github.com/lib/pq"
 	"log"
 )
 
 type DataManager struct {
 	Recreate bool
-	db       *gorm.DB
-	cache    *redis.Client
+	db       *sql.DB
 }
 
 func (d *DataManager) Init(dialect, args string) error {
 	// TODO:: add timeout for docker
-	db, err := gorm.Open(dialect, args)
+	db, err := sql.Open(dialect, args)
 	defer db.Close()
 	if err != nil {
 		log.Fatal(err)
