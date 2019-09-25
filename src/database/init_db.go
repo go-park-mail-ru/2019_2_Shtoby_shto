@@ -12,7 +12,7 @@ type DataManager struct {
 	db       *sql.DB
 }
 
-func (d *DataManager) Init(dialect, args string) error {
+func (d *DataManager) NewDataManager(dialect, args string) error {
 	// TODO:: add timeout for docker
 	db, err := sql.Open(dialect, args)
 	defer db.Close()

@@ -1,6 +1,7 @@
 package route
 
 import (
+	"2019_2_Shtoby_shto/src/security"
 	"github.com/gorilla/mux"
 	"net/http"
 )
@@ -10,9 +11,10 @@ const (
 	ver     = "v1"
 )
 
-func NewRouterService() *mux.Router {
+func NewRouterService(s security.Security) *mux.Router {
 	r := mux.NewRouter()
-	r.HandleFunc(apiName+"/"+ver+"/user", nil)
-	http.Handle("/", r)
+	//apiUserPrefix := utils.Join(apiName, ver, "user")
+	r.HandleFunc("/", nil)
+	r.HandleFunc("/login", s.Login).Methods(http.MethodPost)
 	return r
 }

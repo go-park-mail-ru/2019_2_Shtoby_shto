@@ -10,7 +10,7 @@ type DictHandler interface {
 }
 
 type Session struct {
-	SessionID string
+	ID string
 }
 
 type Context struct {
@@ -19,5 +19,5 @@ type Context struct {
 }
 
 func (c *Context) GetSessionID() string {
-	return c.SessionID
+	return c.ID
 }

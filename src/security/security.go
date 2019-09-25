@@ -1,6 +1,7 @@
 package security
 
 import (
+	"2019_2_Shtoby_shto/src/dicts/user"
 	"2019_2_Shtoby_shto/src/errors"
 	"encoding/json"
 	"log"
@@ -30,38 +31,16 @@ func CreateInstance(sm *SessionManager) Security {
 }
 
 func (s *service) Login(w http.ResponseWriter, r *http.Request) {
-	expiration := time.Now().Add(10 * time.Hour)
+	expiration := time.Now().Add(24 * time.Hour)
 
-	cookieUserName, err := r.Cookie("username")
-	if err == http.ErrNoCookie {
-		errors.ErrorHandler(w, "Access denied, username is not found", http.StatusUnauthorized, err)
-		return
-	} else if err != nil {
-		errors.ErrorHandler(w, "Get cookies error", http.StatusInternalServerError, err)
+	user := user.User{}
+
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		errors.ErrorHandler(w, "Decode error", http.StatusInternalServerError, err)
 		return
 	}
 
-	cookiePassword, err := r.Cookie("password")
-	if err == http.ErrNoCookie {
-		errors.ErrorHandler(w, "Access denied, password is not found", http.StatusUnauthorized, err)
-		return
-	} else if err != nil {
-		errors.ErrorHandler(w, "Get cookies error", http.StatusInternalServerError, err)
-		return
-	}
-
-	// Put session
-
-	//if err != nil {
-	//	errors.ErrorHandler(w, "Get user error", http.StatusInternalServerError, err)
-	//	return
-	//}
-
-	sessionId, err := s.Sm.Create(&Session{
-		Login:    cookieUserName.Value,
-		Password: cookiePassword.Value,
-	})
-
+	sessionId, err := s.Sm.Create(user)
 	if err != nil {
 		errors.ErrorHandler(w, "Create error", http.StatusInternalServerError, err)
 		return

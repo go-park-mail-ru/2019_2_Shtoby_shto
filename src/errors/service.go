@@ -2,6 +2,7 @@ package errors
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -20,6 +21,7 @@ func ErrorHandler(w http.ResponseWriter, message string, status int, err error) 
 		Message: message,
 		Error:   errorMessage,
 	})
+	log.Fatal(message)
 	w.Write([]byte(b))
 	w.WriteHeader(status)
 }

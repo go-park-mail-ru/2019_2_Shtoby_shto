@@ -55,3 +55,7 @@ func GenerateUUID() (uuid.UUID, error) {
 	}
 	return uuid.NewV4(), nil
 }
+
+func Join(args ...string) string {
+	return strings.Join(args, "/")
+}
