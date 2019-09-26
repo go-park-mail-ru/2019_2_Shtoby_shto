@@ -4,11 +4,6 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type DictHandler interface {
-	IsValid() bool
-	TableName() string
-}
-
 type Session struct {
 	ID string
 }

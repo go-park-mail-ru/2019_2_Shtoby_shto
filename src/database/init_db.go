@@ -1,58 +1,57 @@
 package database
 
 import (
-	"2019_2_Shtoby_shto/src/dicts"
 	"flag"
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 	"log"
-	"reflect"
 )
 
+var autoMigration = flag.Bool("auto-migration", true, "GORM autoMigration")
+
 type IDataManager interface {
-	DbConnect(dialect, args string)
-	FindDictById(sql string, p interface{}) error
+	DbConnect(manager *DataManager, dialect, args string) error
 }
-
-type DataManager struct {
+type InitDB struct {
 	Recreate bool
-	db       *gorm.DB
+	//db       *gorm.DB
 }
 
-func (d *DataManager) DbConnect(dialect, args string) error {
+type tabler interface {
+	GetTableName() string
+}
+
+var tables = []tabler{
+	//&user.User{},
+}
+
+func Tables() []tabler {
+	return tables
+}
+
+func Init() *InitDB {
+	return &InitDB{}
+}
+
+func (d *InitDB) DbConnect(manager *DataManager, dialect, args string) error {
 	// TODO:: add timeout for docker
 	db, err := gorm.Open(dialect, args)
 	defer db.Close()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return err
 	}
-	d.db = db
-	return nil
-}
-
-func (d DataManager) ExecuteQueryUser(sql string, args ...string) error {
-	return d.db.Exec(sql, args).Error
-}
-
-func (d DataManager) FindDictById(sql string, p interface{}) error {
-	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
-	res := d.db.Table(obj.GetTableName()).Where("id = ?", obj.GetId()).First(p)
-	if res.RecordNotFound() || res.Error != nil {
-		log.Fatal(res)
-		return res.Error
+	manager.db = db
+	if *autoMigration {
+		d.autoMigrate(manager)
 	}
 	return nil
 }
 
-var autoMigration = flag.Bool("auto-migration", true, "GORM autoMigration")
-
-type tabler interface {
-	TableName() string
-}
-
-var tables = []tabler{}
-
-func Tables() []tabler {
-	return tables
+func (d *InitDB) autoMigrate(dm *DataManager) {
+	for _, value := range Tables() {
+		if dm.db.HasTable(value.GetTableName()) {
+			dm.db.AutoMigrate(value)
+		}
+	}
 }

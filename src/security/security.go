@@ -12,6 +12,7 @@ import (
 type Security interface {
 	Login(w http.ResponseWriter, r *http.Request)
 	Logout(w http.ResponseWriter, r *http.Request)
+	Registration(w http.ResponseWriter, r *http.Request)
 	CheckSession(h http.HandlerFunc) http.HandlerFunc
 }
 
@@ -30,6 +31,16 @@ func CreateInstance(sm *SessionManager, user user.UserHandler) Security {
 		Sm:   sm,
 		User: user,
 	}
+}
+
+func (s *service) Registration(w http.ResponseWriter, r *http.Request) {
+	user := user.User{}
+
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		errors.ErrorHandler(w, "Decode error", http.StatusInternalServerError, err)
+		return
+	}
+
 }
 
 func (s *service) Logout(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +68,7 @@ func (s *service) Login(w http.ResponseWriter, r *http.Request) {
 	sessionId, err := s.Sm.Create(user)
 	if err != nil {
 		errors.ErrorHandler(w, "Create error", http.StatusInternalServerError, err)
-		return
+		//return
 	}
 
 	// TODO:: add token in cookie and expire time for session_id

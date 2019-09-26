@@ -15,9 +15,10 @@ import (
 )
 
 const (
-	port          = ":3001"
-	postgreConfig = "postgres://postgres:Aebnm@postgres:5432/db_1?sslmode=disable"
-	//postgreConfig = "host='postgres' port=5432 user=postgres dbname='trello' password='1111'"
+	port = ":3001"
+	//postgreConfig = "postgres:Aebnm@postgres:5432/db_1?sslmode=disable"
+	//postgreConfig = "postgres://postgres:Aebnm@postgres:5432/db_1?sslmode=disable"
+	postgreConfig = "host='localhost' port=5432 user=postgres dbname='postgres' sslmode=disable password='1111'"
 )
 
 var initFlag = flag.Bool("initial start", false, "Check your service")
@@ -27,13 +28,17 @@ var (
 	transportService transport.Handler
 	securityService  security.Security
 	userService      user.UserHandler
+	dbService        database.IDataManager
 )
 
 func main() {
 	flag.Parse()
 	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
-	dm := database.DataManager{}
-	if err := dm.DbConnect("postgres", postgreConfig); err != nil {
+
+	// TODO::add context with dm and sessionId
+	dm := &database.DataManager{}
+	dbService = database.Init()
+	if err := dbService.DbConnect(dm, "postgres", postgreConfig); err != nil {
 		logger.Fatal(err)
 		os.Exit(1)
 	}
@@ -61,7 +66,7 @@ func newServer(logger *log.Logger) *http.Server {
 	}
 }
 
-func initService(db database.DataManager) {
+func initService(db *database.DataManager) {
 	sessionService := security.NewSessionManager("localhost:6379", "", 0)
 	userService = user.CreateInstance(db)
 	transportService = transport.CreateInstance(sessionService)
