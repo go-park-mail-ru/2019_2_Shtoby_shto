@@ -1,0 +1,43 @@
+version: '3'
+
+networks:
+  hohoho:
+
+services:
+  trello-api:
+    build:
+      context: .
+      args:
+        - VER=1.0
+    ports:
+      - "8080:8080"
+    restart: on-failure
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - hohoho
+
+  postgres:
+    image: postgres:latest
+    restart: on-failure
+    volumes:
+      - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    environment:
+      POSTGRES_DB: trello
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1111
+    ports:
+      - "8001:5432"
+    networks:
+      - hohoho
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - hohoho
+

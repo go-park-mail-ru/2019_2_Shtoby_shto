@@ -22,7 +22,7 @@ const (
 )
 
 var initFlag = flag.Bool("initial start", false, "Check your service")
-var httpAddr = flag.String("address", "localhost:8080", "HTTP listen address")
+var httpAddr = flag.String("address", ":8080", "HTTP listen address")
 
 var (
 	transportService transport.Handler
@@ -67,7 +67,7 @@ func newServer(logger *log.Logger) *http.Server {
 }
 
 func initService(db *database.DataManager) {
-	sessionService := security.NewSessionManager("localhost:6379", "", 0)
+	sessionService := security.NewSessionManager("redis:6379", "", 0)
 	userService = user.CreateInstance(db)
 	transportService = transport.CreateInstance(sessionService)
 	securityService = security.CreateInstance(sessionService, userService)
