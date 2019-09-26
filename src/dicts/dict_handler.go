@@ -1,19 +1,21 @@
 package dicts
 
+import . "2019_2_Shtoby_shto/src/custom_type"
+
 type Dict interface {
-	SetId(id string)
-	GetId() string
+	SetId(id StringUUID)
+	GetId() StringUUID
 	GetTableName() string
 }
 
 type BaseInfo struct {
-	ID string `json:"id" sql:"id"`
+	ID StringUUID `json:"id" sql:"type:uuid;not null;unique"`
 }
 
-func (b BaseInfo) GetId() string {
+func (b BaseInfo) GetId() StringUUID {
 	return b.ID
 }
 
-func (d *BaseInfo) SetId(id string) {
-	d.ID = id
+func (b *BaseInfo) SetId(id StringUUID) {
+	b.ID = id
 }

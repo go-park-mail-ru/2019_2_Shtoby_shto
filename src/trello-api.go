@@ -18,7 +18,7 @@ const (
 	port = ":3001"
 	//postgreConfig = "postgres:Aebnm@postgres:5432/db_1?sslmode=disable"
 	//postgreConfig = "postgres://postgres:Aebnm@postgres:5432/db_1?sslmode=disable"
-	postgreConfig = "host='localhost' port=5432 user=postgres dbname='postgres' sslmode=disable password='1111'"
+	postgreConfig = "host='localhost' port=5432 user=postgres dbname='trello' sslmode=disable password='1111'"
 )
 
 var initFlag = flag.Bool("initial start", false, "Check your service")

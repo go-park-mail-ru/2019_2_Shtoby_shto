@@ -1,6 +1,7 @@
 package security
 
 import (
+	. "2019_2_Shtoby_shto/src/custom_type"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	"2019_2_Shtoby_shto/src/utils"
 	"errors"
@@ -23,7 +24,7 @@ type SessionHandler interface {
 
 // id сессии
 type SessionID struct {
-	ID string `json:"session_id"`
+	ID StringUUID `json:"session_id"`
 }
 
 type SessionManager struct {
@@ -47,12 +48,12 @@ func (sm SessionManager) Create(user user.User) (*SessionID, error) {
 	if err != nil || id.String() == "" {
 		return nil, err
 	}
-	session := SessionID{id.String()}
+	session := SessionID{StringUUID(id.String())}
 	return &session, sm.putSession(session.ID, user, expire)
 }
 
-func (sm *SessionManager) putSession(id string, user user.User, expire time.Duration) error {
-	return sm.cache.Set(id, user.ID, 0).Err()
+func (sm *SessionManager) putSession(id StringUUID, user user.User, expire time.Duration) error {
+	return sm.cache.Set(id.String(), user.ID.String(), 0).Err()
 }
 
 func (sm *SessionManager) getSession(idIn string) error {
@@ -68,9 +69,9 @@ func (sm *SessionManager) getSession(idIn string) error {
 }
 
 func (sm *SessionManager) Check(sessionId *SessionID) (bool, error) {
-	return true, sm.getSession(sessionId.ID)
+	return true, sm.getSession(sessionId.ID.String())
 }
 
 func (sm *SessionManager) Delete(in *SessionID) error {
-	return sm.cache.Del(in.ID).Err()
+	return sm.cache.Del(in.ID.String()).Err()
 }

@@ -17,6 +17,6 @@ func NewRouterService(s security.Security) *mux.Router {
 	r.HandleFunc("/", nil)
 	r.HandleFunc("/login", s.Login).Methods(http.MethodPost)
 	r.HandleFunc("/logout", s.Logout).Methods(http.MethodGet)
-	r.HandleFunc("/registration", s.Logout).Methods(http.MethodGet)
+	r.HandleFunc("/registration", s.Registration).Methods(http.MethodPost)
 	return r
 }
