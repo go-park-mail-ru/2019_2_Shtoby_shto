@@ -52,7 +52,7 @@ func (sm SessionManager) Create(user user.User) (*SessionID, error) {
 }
 
 func (sm *SessionManager) putSession(id string, user user.User, expire time.Duration) error {
-	return sm.cache.Set(id, user.Id, 0).Err()
+	return sm.cache.Set(id, user.ID, 0).Err()
 }
 
 func (sm *SessionManager) getSession(idIn string) error {

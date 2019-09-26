@@ -2,6 +2,7 @@ package main
 
 import (
 	"2019_2_Shtoby_shto/src/database"
+	"2019_2_Shtoby_shto/src/dicts/user"
 	transport "2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/route"
 	"2019_2_Shtoby_shto/src/security"
@@ -16,6 +17,7 @@ import (
 const (
 	port          = ":3001"
 	postgreConfig = "postgres://postgres:Aebnm@postgres:5432/db_1?sslmode=disable"
+	//postgreConfig = "host='postgres' port=5432 user=postgres dbname='trello' password='1111'"
 )
 
 var initFlag = flag.Bool("initial start", false, "Check your service")
@@ -24,21 +26,22 @@ var httpAddr = flag.String("address", "localhost:8080", "HTTP listen address")
 var (
 	transportService transport.Handler
 	securityService  security.Security
+	userService      user.UserHandler
 )
 
 func main() {
 	flag.Parse()
 	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
-	initService()
+	dm := database.DataManager{}
+	if err := dm.DbConnect("postgres", postgreConfig); err != nil {
+		logger.Fatal(err)
+		os.Exit(1)
+	}
+
+	initService(dm)
 	srv := newServer(logger)
 	if *initFlag {
 		return
-	}
-
-	dm := database.DataManager{}
-	if err := dm.NewDataManager("postgres", postgreConfig); err != nil {
-		logger.Fatal(err)
-		os.Exit(1)
 	}
 
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
@@ -58,11 +61,11 @@ func newServer(logger *log.Logger) *http.Server {
 	}
 }
 
-func initService() {
+func initService(db database.DataManager) {
 	sessionService := security.NewSessionManager("localhost:6379", "", 0)
-
+	userService = user.CreateInstance(db)
 	transportService = transport.CreateInstance(sessionService)
-	securityService = security.CreateInstance(sessionService)
+	securityService = security.CreateInstance(sessionService, userService)
 }
 
 func AccessLogMiddleware(next http.Handler) http.Handler {

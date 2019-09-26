@@ -16,5 +16,6 @@ func NewRouterService(s security.Security) *mux.Router {
 	//apiUserPrefix := utils.Join(apiName, ver, "user")
 	r.HandleFunc("/", nil)
 	r.HandleFunc("/login", s.Login).Methods(http.MethodPost)
+	r.HandleFunc("/logout", s.Logout).Methods(http.MethodGet)
 	return r
 }

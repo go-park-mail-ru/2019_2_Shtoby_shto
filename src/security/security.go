@@ -11,12 +11,13 @@ import (
 
 type Security interface {
 	Login(w http.ResponseWriter, r *http.Request)
+	Logout(w http.ResponseWriter, r *http.Request)
 	CheckSession(h http.HandlerFunc) http.HandlerFunc
 }
 
 type service struct {
-	Sm *SessionManager
-	//Users users.UserHandler
+	Sm   *SessionManager
+	User user.UserHandler
 }
 
 type LoginResponse struct {
@@ -24,9 +25,22 @@ type LoginResponse struct {
 	Error   error  `json:"error"`
 }
 
-func CreateInstance(sm *SessionManager) Security {
+func CreateInstance(sm *SessionManager, user user.UserHandler) Security {
 	return &service{
-		Sm: sm,
+		Sm:   sm,
+		User: user,
+	}
+}
+
+func (s *service) Logout(w http.ResponseWriter, r *http.Request) {
+	ok, session := s.check(r, w)
+	if !ok || session.ID == "" {
+		errors.ErrorHandler(w, "Error unauthorized", http.StatusUnauthorized, nil)
+		return
+	}
+	if err := s.Sm.Delete(session); err != nil {
+		errors.ErrorHandler(w, "Error delete session", http.StatusInternalServerError, err)
+		return
 	}
 }
 
@@ -67,24 +81,29 @@ func (s *service) Login(w http.ResponseWriter, r *http.Request) {
 
 func (s *service) CheckSession(h http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookieSessionID, err := r.Cookie("session_id")
-		if err == http.ErrNoCookie {
-			log.Println("No session_id", err)
-			s.Login(w, r)
-		} else if err != nil {
-			log.Println("Error cookie", err)
-			errors.ErrorHandler(w, "Error cookie", http.StatusUnauthorized, err)
-			return
-		}
-		ok, err := s.Sm.Check(&SessionID{ID: cookieSessionID.Value})
-		if err != nil {
-			log.Println("Error check session", err)
-			errors.ErrorHandler(w, "Error check session", http.StatusUnauthorized, err)
-			return
-		}
+		ok, _ := s.check(r, w)
 		if !ok {
 			s.Login(w, r)
 		}
 		h.ServeHTTP(w, r)
 	})
+}
+
+func (s *service) check(r *http.Request, w http.ResponseWriter) (bool, *SessionID) {
+	cookieSessionID, err := r.Cookie("session_id")
+	if err == http.ErrNoCookie {
+		log.Println("No session_id", err)
+		s.Login(w, r)
+	} else if err != nil {
+		log.Println("Error cookie", err)
+		errors.ErrorHandler(w, "Error cookie", http.StatusUnauthorized, err)
+		return false, nil
+	}
+	ok, err := s.Sm.Check(&SessionID{ID: cookieSessionID.Value})
+	if err != nil {
+		log.Println("Error check session", err)
+		errors.ErrorHandler(w, "Error check session", http.StatusUnauthorized, err)
+		return false, nil
+	}
+	return ok, &SessionID{ID: cookieSessionID.Value}
 }
