@@ -120,7 +120,7 @@ func (s *service) createSession(w http.ResponseWriter, user user.User) error {
 }
 
 func (s *service) securityResponse(w http.ResponseWriter, status int, respMessage string, err error) {
-	w.Header().Set("Content-Type", "application/json")
+	utils.SetHeaders(&w)
 	b, err := json.Marshal(&ResponseSecurity{
 		Status:  status,
 		Message: respMessage,

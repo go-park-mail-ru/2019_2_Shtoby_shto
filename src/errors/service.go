@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"2019_2_Shtoby_shto/src/utils"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -24,7 +25,7 @@ func ErrorHandler(w http.ResponseWriter, message string, status int, err error) 
 		Error:   errorMessage,
 	})
 	log.Println(message)
-	w.Header().Set("Content-Type", "application/json")
+	utils.SetHeaders(&w)
 	w.WriteHeader(status)
 	w.Write([]byte(b))
 }
