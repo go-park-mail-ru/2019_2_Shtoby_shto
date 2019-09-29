@@ -6,6 +6,7 @@ import (
 	transport "2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/route"
 	"2019_2_Shtoby_shto/src/security"
+	"2019_2_Shtoby_shto/src/utils"
 	"flag"
 	"fmt"
 	"log"
@@ -55,7 +56,7 @@ func main() {
 }
 
 func newServer(logger *log.Logger) *http.Server {
-	router := AccessLogMiddleware(route.NewRouterService(securityService))
+	router := AccessLogMiddleware(AccessCORS(route.NewRouterService(securityService)))
 	return &http.Server{
 		Addr:           *httpAddr,
 		Handler:        router,
@@ -80,5 +81,16 @@ func AccessLogMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 		fmt.Printf("[%s] %s, %s %s\n",
 			r.Method, r.RemoteAddr, r.URL.Path, time.Since(start))
+	})
+}
+
+func AccessCORS(next http.Handler) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		utils.SetHeaders(&w)
+		if (*r).Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		next.ServeHTTP(w, r)
 	})
 }
