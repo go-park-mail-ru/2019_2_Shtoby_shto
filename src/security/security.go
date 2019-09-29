@@ -98,7 +98,6 @@ func (s *service) Registration(w http.ResponseWriter, r *http.Request) {
 		errors.ErrorHandler(w, "User not valid", http.StatusBadRequest, err)
 		return
 	}
-	errors.ErrorHandler(w, "Create session error", http.StatusInternalServerError, err)
 	if err := s.createSession(w, user); err != nil {
 		return
 	}
