@@ -20,6 +20,7 @@ type Security interface {
 	Registration(w http.ResponseWriter, r *http.Request)
 	CheckSession(h http.HandlerFunc) http.HandlerFunc
 	UpdateUserSecurity(w http.ResponseWriter, r *http.Request)
+	GetUserSecurity(w http.ResponseWriter, r *http.Request)
 }
 
 type service struct {
@@ -58,6 +59,26 @@ func (s *service) UpdateUserSecurity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.securityResponse(w, http.StatusOK, "Update is success", nil)
+}
+
+func (s *service) GetUserSecurity(w http.ResponseWriter, r *http.Request) {
+	user := user.User{}
+	vars := mux.Vars(r)
+	id := vars["id"]
+	if !StringUUID(id).IsUUID() {
+		errors.ErrorHandler(w, "Not valid id", http.StatusBadRequest, errors2.New("Not valid id"))
+		return
+	}
+	user, err := s.User.GetUserById(StringUUID(id))
+	if err != nil {
+		errors.ErrorHandler(w, "Update user error", http.StatusBadRequest, err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	b, err := json.Marshal(&user)
+	if _, err := w.Write([]byte(b)); err != nil {
+		return
+	}
 }
 
 func (s *service) Registration(w http.ResponseWriter, r *http.Request) {
