@@ -7,6 +7,7 @@ import (
 
 type UserHandler interface {
 	PutUser(user User) error
+	UpdateUser(user User, id StringUUID) error
 	GetUserById(id StringUUID) (User, error)
 	GetUserByLogin(login string) (User, error)
 }
@@ -37,4 +38,11 @@ func (s *service) GetUserByLogin(login string) (User, error) {
 	user := User{}
 	err := s.db.FindDictByLogin(&user, "login", login)
 	return user, err
+}
+
+func (s *service) UpdateUser(user User, id StringUUID) error {
+	if err := s.db.UpdateRecord(&user, id); err != nil {
+		return err
+	}
+	return nil
 }

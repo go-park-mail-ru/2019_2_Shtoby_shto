@@ -1,6 +1,7 @@
 package database
 
 import (
+	"2019_2_Shtoby_shto/src/custom_type"
 	"2019_2_Shtoby_shto/src/dicts"
 	"errors"
 	"fmt"
@@ -57,6 +58,16 @@ func (d DataManager) FindDictByLogin(p interface{}, where, whereArg string) erro
 func (d DataManager) CreateRecord(p interface{}) error {
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
 	res := d.db.Table(obj.GetTableName()).Create(p)
+	if res.Error != nil {
+		return res.Error
+	}
+	return nil
+}
+
+func (d DataManager) UpdateRecord(p interface{}, id custom_type.StringUUID) error {
+	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
+	obj.SetId(id)
+	res := d.db.Table(obj.GetTableName()).Save(p)
 	if res.Error != nil {
 		return res.Error
 	}

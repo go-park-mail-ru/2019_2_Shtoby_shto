@@ -16,9 +16,6 @@ import (
 )
 
 const (
-	port = ":3001"
-	// postgreConfig = "postgres:Aebnm@postgres:5432/db_1?sslmode=disable"
-	//postgreConfig = "postgres://postgres:Aebnm@postgres:5432/db_1?sslmode=disable"
 	postgreConfig = "host='postgres' port=5432 user=postgres dbname='trello' sslmode=disable password='1111'"
 )
 
@@ -50,6 +47,7 @@ func main() {
 		return
 	}
 
+	//TODO::great shutdown
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 		logger.Fatalf("HTTP server ListenAndServe: %v", err)
 	}

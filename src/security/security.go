@@ -6,6 +6,8 @@ import (
 	"2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/utils"
 	"encoding/json"
+	errors2 "errors"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"strings"
@@ -17,6 +19,7 @@ type Security interface {
 	Logout(w http.ResponseWriter, r *http.Request)
 	Registration(w http.ResponseWriter, r *http.Request)
 	CheckSession(h http.HandlerFunc) http.HandlerFunc
+	UpdateUserSecurity(w http.ResponseWriter, r *http.Request)
 }
 
 type service struct {
@@ -37,6 +40,26 @@ func CreateInstance(sm *SessionManager, user user.UserHandler) Security {
 	}
 }
 
+// TODO::replace into handler
+func (s *service) UpdateUserSecurity(w http.ResponseWriter, r *http.Request) {
+	user := user.User{}
+	vars := mux.Vars(r)
+	id := vars["id"]
+	if !StringUUID(id).IsUUID() {
+		errors.ErrorHandler(w, "Not valid id", http.StatusBadRequest, errors2.New("Not valid id"))
+		return
+	}
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		errors.ErrorHandler(w, "Decode error", http.StatusInternalServerError, err)
+		return
+	}
+	if err := s.User.UpdateUser(user, StringUUID(id)); err != nil {
+		errors.ErrorHandler(w, "Update user error", http.StatusBadRequest, err)
+		return
+	}
+	s.securityResponse(w, http.StatusOK, "Update is success", nil)
+}
+
 func (s *service) Registration(w http.ResponseWriter, r *http.Request) {
 	user := user.User{}
 
@@ -54,13 +77,13 @@ func (s *service) Registration(w http.ResponseWriter, r *http.Request) {
 		errors.ErrorHandler(w, "User not valid", http.StatusBadRequest, err)
 		return
 	}
+	errors.ErrorHandler(w, "Create session error", http.StatusInternalServerError, err)
 	if err := s.createSession(w, user); err != nil {
-		errors.ErrorHandler(w, "Create session error", http.StatusInternalServerError, err)
 		return
 	}
 	s.securityResponse(w, http.StatusOK, "Registration is success", err)
-}
 
+}
 func (s *service) Logout(w http.ResponseWriter, r *http.Request) {
 	ok, session := s.check(r, w)
 	if !ok || session.ID == "" {
@@ -100,7 +123,6 @@ func (s *service) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.securityResponse(w, http.StatusOK, "Login", err)
-	//http.Redirect(w, r, "/books", http.StatusFound)
 }
 
 func (s *service) createSession(w http.ResponseWriter, user user.User) error {
@@ -120,12 +142,15 @@ func (s *service) createSession(w http.ResponseWriter, user user.User) error {
 }
 
 func (s *service) securityResponse(w http.ResponseWriter, status int, respMessage string, err error) {
+	w.WriteHeader(status)
 	b, err := json.Marshal(&ResponseSecurity{
 		Status:  status,
 		Message: respMessage,
 		Error:   err,
 	})
-	w.Write([]byte(b))
+	if _, err := w.Write([]byte(b)); err != nil {
+		return
+	}
 }
 
 func (s *service) CheckSession(h http.HandlerFunc) http.HandlerFunc {

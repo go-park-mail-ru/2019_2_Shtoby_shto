@@ -50,5 +50,6 @@ func NewRouterService(s security.Security) *mux.Router {
 	r.HandleFunc("/login", s.Login).Methods(http.MethodPost, http.MethodOptions)
 	r.HandleFunc("/logout", s.Logout).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/registration", s.Registration).Methods(http.MethodPost, http.MethodOptions)
+	r.HandleFunc("/user/{id}", s.CheckSession(s.UpdateUserSecurity)).Methods(http.MethodPut, http.MethodOptions)
 	return r
 }
