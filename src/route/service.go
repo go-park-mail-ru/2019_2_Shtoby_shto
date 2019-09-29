@@ -47,8 +47,8 @@ func NewRouterService(s security.Security) *mux.Router {
 	//apiUserPrefix := utils.Join(apiName, ver, "user")
 	r.HandleFunc("/docs/", httpSwagger.WrapHandler)
 	r.HandleFunc("/", nil)
-	r.HandleFunc("/login", s.Login).Methods(http.MethodPost)
-	r.HandleFunc("/logout", s.Logout).Methods(http.MethodGet)
-	r.HandleFunc("/registration", s.Registration).Methods(http.MethodPost)
+	r.HandleFunc("/login", s.Login).Methods(http.MethodPost, http.MethodOptions)
+	r.HandleFunc("/logout", s.Logout).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/registration", s.Registration).Methods(http.MethodPost, http.MethodOptions)
 	return r
 }
