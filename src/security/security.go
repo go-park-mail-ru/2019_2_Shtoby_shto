@@ -29,9 +29,10 @@ type service struct {
 }
 
 type ResponseSecurity struct {
-	Status  int    `json:"status"`
-	Message string `json:"message"`
-	Error   error  `json:"error"`
+	Status  int       `json:"status"`
+	Message string    `json:"message"`
+	Error   error     `json:"error"`
+	User    user.User `json:"user,omitempty"`
 }
 
 func CreateInstance(sm *SessionManager, user user.UserHandler) Security {
@@ -58,7 +59,7 @@ func (s *service) UpdateUserSecurity(w http.ResponseWriter, r *http.Request) {
 		errors.ErrorHandler(w, "Update user error", http.StatusBadRequest, err)
 		return
 	}
-	s.securityResponse(w, http.StatusOK, "Update is success", nil)
+	s.securityResponse(w, user, http.StatusOK, "Update is success", nil)
 }
 
 func (s *service) GetUserSecurity(w http.ResponseWriter, r *http.Request) {
@@ -99,9 +100,10 @@ func (s *service) Registration(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := s.createSession(w, user); err != nil {
+		errors.ErrorHandler(w, "Create session error", http.StatusInternalServerError, err)
 		return
 	}
-	s.securityResponse(w, http.StatusOK, "Registration is success", err)
+	s.securityResponse(w, user, http.StatusOK, "Registration is success", err)
 
 }
 func (s *service) Logout(w http.ResponseWriter, r *http.Request) {
@@ -115,7 +117,7 @@ func (s *service) Logout(w http.ResponseWriter, r *http.Request) {
 		errors.ErrorHandler(w, "Error delete session", http.StatusInternalServerError, err)
 		return
 	}
-	s.securityResponse(w, http.StatusOK, "Logout", err)
+	s.securityResponse(w, user.User{}, http.StatusOK, "Logout", err)
 }
 
 func (s *service) Login(w http.ResponseWriter, r *http.Request) {
@@ -142,7 +144,7 @@ func (s *service) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.securityResponse(w, http.StatusOK, "Login", err)
+	s.securityResponse(w, user, http.StatusOK, "Login", err)
 }
 
 func (s *service) createSession(w http.ResponseWriter, user user.User) error {
@@ -161,12 +163,13 @@ func (s *service) createSession(w http.ResponseWriter, user user.User) error {
 	return nil
 }
 
-func (s *service) securityResponse(w http.ResponseWriter, status int, respMessage string, err error) {
+func (s *service) securityResponse(w http.ResponseWriter, user user.User, status int, respMessage string, err error) {
 	w.WriteHeader(status)
 	b, err := json.Marshal(&ResponseSecurity{
 		Status:  status,
 		Message: respMessage,
 		Error:   err,
+		User:    user,
 	})
 	if _, err := w.Write([]byte(b)); err != nil {
 		return
