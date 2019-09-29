@@ -6,7 +6,6 @@ import (
 	"2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/utils"
 	"encoding/json"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -193,9 +192,8 @@ func (s *service) securityResponse(w http.ResponseWriter, status int, respMessag
 
 func (s *service) CheckSession(h http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ok, _ := s.check(r, w)
-		if !ok {
-			s.Login(w, r)
+		if ok, _ := s.check(r, w); !ok {
+			return
 		}
 		h.ServeHTTP(w, r)
 	})
@@ -204,16 +202,15 @@ func (s *service) CheckSession(h http.HandlerFunc) http.HandlerFunc {
 func (s *service) check(r *http.Request, w http.ResponseWriter) (bool, *SessionID) {
 	cookieSessionID, err := r.Cookie("session_id")
 	if err == http.ErrNoCookie {
-		log.Println("No session_id", err)
+		errors.ErrorHandler(w, "No session_id", http.StatusUnauthorized, err)
 		return false, nil
 	} else if err != nil {
-		log.Println("Error cookie", err)
 		errors.ErrorHandler(w, "Error cookie", http.StatusUnauthorized, err)
 		return false, nil
 	}
 	ok, err := s.Sm.Check(&SessionID{ID: StringUUID(cookieSessionID.Value)})
 	if err != nil {
-		log.Println("Error check session", err)
+		errors.ErrorHandler(w, "Error check session", http.StatusUnauthorized, err)
 		return false, nil
 	}
 	return ok, &SessionID{ID: StringUUID(cookieSessionID.Value)}
