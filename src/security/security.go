@@ -6,8 +6,6 @@ import (
 	"2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/utils"
 	"encoding/json"
-	errors2 "errors"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"strings"
@@ -19,8 +17,7 @@ type Security interface {
 	Logout(w http.ResponseWriter, r *http.Request)
 	Registration(w http.ResponseWriter, r *http.Request)
 	CheckSession(h http.HandlerFunc) http.HandlerFunc
-	UpdateUserSecurity(w http.ResponseWriter, r *http.Request)
-	GetUserSecurity(w http.ResponseWriter, r *http.Request)
+	UserSecurity(w http.ResponseWriter, r *http.Request)
 }
 
 type service struct {
@@ -29,10 +26,9 @@ type service struct {
 }
 
 type ResponseSecurity struct {
-	Status  int       `json:"status"`
-	Message string    `json:"message"`
-	Error   error     `json:"error"`
-	User    user.User `json:"user,omitempty"`
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Error   error  `json:"error"`
 }
 
 func CreateInstance(sm *SessionManager, user user.UserHandler) Security {
@@ -43,34 +39,54 @@ func CreateInstance(sm *SessionManager, user user.UserHandler) Security {
 }
 
 // TODO::replace into handler
-func (s *service) UpdateUserSecurity(w http.ResponseWriter, r *http.Request) {
+func (s *service) UserSecurity(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		s.getUserSecurity(w, r)
+	case http.MethodPut:
+		s.putUserSecurity(w, r)
+	}
+}
+
+func (s *service) putUserSecurity(w http.ResponseWriter, r *http.Request) {
 	user := user.User{}
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if !StringUUID(id).IsUUID() {
-		errors.ErrorHandler(w, "Not valid id", http.StatusBadRequest, errors2.New("Not valid id"))
+	cookieId, err := r.Cookie("session_id")
+	if err != nil {
+		errors.ErrorHandler(w, "Session error", http.StatusUnauthorized, err)
 		return
 	}
+
+	userId, err := s.Sm.getSession(cookieId.Value)
+	if err != nil {
+		errors.ErrorHandler(w, "Session error", http.StatusBadRequest, err)
+		return
+	}
+
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		errors.ErrorHandler(w, "Decode error", http.StatusInternalServerError, err)
 		return
 	}
-	if err := s.User.UpdateUser(user, StringUUID(id)); err != nil {
+	if err := s.User.UpdateUser(user, StringUUID(userId)); err != nil {
 		errors.ErrorHandler(w, "Update user error", http.StatusBadRequest, err)
 		return
 	}
-	s.securityResponse(w, user, http.StatusOK, "Update is success", nil)
+	s.securityResponse(w, http.StatusOK, "Update is success", nil)
 }
 
-func (s *service) GetUserSecurity(w http.ResponseWriter, r *http.Request) {
-	user := user.User{}
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if !StringUUID(id).IsUUID() {
-		errors.ErrorHandler(w, "Not valid id", http.StatusBadRequest, errors2.New("Not valid id"))
+func (s *service) getUserSecurity(w http.ResponseWriter, r *http.Request) {
+	cookieId, err := r.Cookie("session_id")
+	if err != nil {
+		errors.ErrorHandler(w, "Session error", http.StatusUnauthorized, err)
 		return
 	}
-	user, err := s.User.GetUserById(StringUUID(id))
+
+	userId, err := s.Sm.getSession(cookieId.Value)
+	if err != nil {
+		errors.ErrorHandler(w, "Session error", http.StatusBadRequest, err)
+		return
+	}
+
+	user, err := s.User.GetUserById(StringUUID(userId))
 	if err != nil {
 		errors.ErrorHandler(w, "Update user error", http.StatusBadRequest, err)
 		return
@@ -103,7 +119,7 @@ func (s *service) Registration(w http.ResponseWriter, r *http.Request) {
 		errors.ErrorHandler(w, "Create session error", http.StatusInternalServerError, err)
 		return
 	}
-	s.securityResponse(w, user, http.StatusOK, "Registration is success", err)
+	s.securityResponse(w, http.StatusOK, "Registration is success", err)
 
 }
 func (s *service) Logout(w http.ResponseWriter, r *http.Request) {
@@ -117,7 +133,7 @@ func (s *service) Logout(w http.ResponseWriter, r *http.Request) {
 		errors.ErrorHandler(w, "Error delete session", http.StatusInternalServerError, err)
 		return
 	}
-	s.securityResponse(w, user.User{}, http.StatusOK, "Logout", err)
+	s.securityResponse(w, http.StatusOK, "Logout", err)
 }
 
 func (s *service) Login(w http.ResponseWriter, r *http.Request) {
@@ -144,7 +160,7 @@ func (s *service) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.securityResponse(w, user, http.StatusOK, "Login", err)
+	s.securityResponse(w, http.StatusOK, "Login", err)
 }
 
 func (s *service) createSession(w http.ResponseWriter, user user.User) error {
@@ -163,13 +179,12 @@ func (s *service) createSession(w http.ResponseWriter, user user.User) error {
 	return nil
 }
 
-func (s *service) securityResponse(w http.ResponseWriter, user user.User, status int, respMessage string, err error) {
+func (s *service) securityResponse(w http.ResponseWriter, status int, respMessage string, err error) {
 	w.WriteHeader(status)
 	b, err := json.Marshal(&ResponseSecurity{
 		Status:  status,
 		Message: respMessage,
 		Error:   err,
-		User:    user,
 	})
 	if _, err := w.Write([]byte(b)); err != nil {
 		return

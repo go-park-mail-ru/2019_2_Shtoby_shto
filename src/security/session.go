@@ -56,20 +56,23 @@ func (sm *SessionManager) putSession(id StringUUID, user user.User, expire time.
 	return sm.cache.Set(id.String(), user.ID.String(), 0).Err()
 }
 
-func (sm *SessionManager) getSession(idIn string) error {
+func (sm *SessionManager) getSession(idIn string) (string, error) {
 	val, err := sm.cache.Get(idIn).Result()
 	if err == redis.Nil {
-		return errors.New("missing_key does not exist")
+		return "", errors.New("missing_key does not exist")
 	}
 	if err != nil {
-		return err
+		return "", err
 	}
-	println(val)
-	return nil
+	return val, nil
 }
 
 func (sm *SessionManager) Check(sessionId *SessionID) (bool, error) {
-	return true, sm.getSession(sessionId.ID.String())
+	userId, err := sm.getSession(sessionId.ID.String())
+	if userId == "" {
+		return false, errors.New("Missing userId")
+	}
+	return true, err
 }
 
 func (sm *SessionManager) Delete(in *SessionID) error {
