@@ -73,3 +73,12 @@ func (d DataManager) UpdateRecord(p interface{}, id custom_type.StringUUID) erro
 	}
 	return nil
 }
+
+func (d DataManager) DeleteRecord(p interface{}, id custom_type.StringUUID) error {
+	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
+	res := d.db.Table(obj.GetTableName()).Delete(p, "id = ?", id)
+	if res.Error != nil {
+		return res.Error
+	}
+	return nil
+}
