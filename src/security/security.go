@@ -17,6 +17,7 @@ type Security interface {
 	Registration(w http.ResponseWriter, r *http.Request)
 	CheckSession(h http.HandlerFunc) http.HandlerFunc
 	UserSecurity(w http.ResponseWriter, r *http.Request)
+	ImageSecurity(w http.ResponseWriter, r *http.Request)
 }
 
 type service struct {
@@ -38,12 +39,25 @@ func CreateInstance(sm *SessionManager, user user.UserHandler) Security {
 }
 
 // TODO::replace into handler
+func (s *service) ImageSecurity(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		s.getUserSecurity(w, r)
+	case http.MethodPut:
+		s.putUserSecurity(w, r)
+	default:
+		errors.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed, nil)
+	}
+}
+
 func (s *service) UserSecurity(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		s.getUserSecurity(w, r)
 	case http.MethodPut:
 		s.putUserSecurity(w, r)
+	default:
+		errors.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed, nil)
 	}
 }
 
@@ -132,6 +146,7 @@ func (s *service) Logout(w http.ResponseWriter, r *http.Request) {
 		errors.ErrorHandler(w, "Error delete session", http.StatusInternalServerError, err)
 		return
 	}
+	w.Header().Del("session_id")
 	s.securityResponse(w, http.StatusOK, "Logout", err)
 }
 
