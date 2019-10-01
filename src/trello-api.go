@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	postgreConfig = "host='localhost' port=5432 user=postgres dbname='trello' sslmode=disable password='1111'"
+	postgreConfig = "host='postgres' port=5432 user=postgres dbname='trello' sslmode=disable password='1111'"
 )
 
 var initFlag = flag.Bool("initial start", false, "Check your service")
@@ -66,7 +66,7 @@ func newServer(logger *log.Logger) *http.Server {
 }
 
 func initService(db *database.DataManager) {
-	sessionService := security.NewSessionManager("localhost:6379", "", 0)
+	sessionService := security.NewSessionManager("redis:6379", "", 0)
 	userService = user.CreateInstance(db)
 	transportService = transport.CreateInstance(sessionService)
 	securityService = security.CreateInstance(sessionService, userService)
