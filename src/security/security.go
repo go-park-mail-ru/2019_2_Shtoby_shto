@@ -2,9 +2,11 @@ package security
 
 import (
 	. "2019_2_Shtoby_shto/src/custom_type"
+	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	"2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/utils"
+	"bufio"
 	"encoding/json"
 	"net/http"
 	"strings"
@@ -21,20 +23,21 @@ type Security interface {
 }
 
 type service struct {
-	Sm   *SessionManager
-	User user.HandlerUserService
+	Sm    *SessionManager
+	User  user.HandlerUserService
+	Photo photo.HandlerPhotoService
 }
 
 type ResponseSecurity struct {
-	Status  int    `json:"status"`
 	Message string `json:"message"`
 	Error   error  `json:"error"`
 }
 
-func CreateInstance(sm *SessionManager, user user.HandlerUserService) Security {
+func CreateInstance(sm *SessionManager, user user.HandlerUserService, p photo.HandlerPhotoService) Security {
 	return &service{
-		Sm:   sm,
-		User: user,
+		Sm:    sm,
+		User:  user,
+		Photo: p,
 	}
 }
 
@@ -42,7 +45,33 @@ func CreateInstance(sm *SessionManager, user user.HandlerUserService) Security {
 func (s *service) ImageSecurity(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-		s.getUserSecurity(w, r)
+		rr := bufio.NewReader(r.Body)
+		// TODO:: replace in config
+		photoID, err := s.Photo.DownloadPhoto("D:/Projects/Home_Projects/2019_2_Shtoby_shto/image", rr)
+		if err != nil {
+			errors.ErrorHandler(w, "download fail", http.StatusInternalServerError, err)
+			return
+		}
+
+		// TODO:: add context with session and user values
+		cookieId, err := r.Cookie("session_id")
+		if err != nil {
+			errors.ErrorHandler(w, "Session error", http.StatusUnauthorized, err)
+			return
+		}
+
+		userId, err := s.Sm.getSession(cookieId.Value)
+		if err != nil {
+			errors.ErrorHandler(w, "Session error", http.StatusBadRequest, err)
+			return
+		}
+		user := user.User{
+			PhotoID: photoID,
+		}
+		if err := s.User.UpdateUser(user, StringUUID(userId)); err != nil {
+			errors.ErrorHandler(w, "Update user", http.StatusInternalServerError, err)
+			return
+		}
 	default:
 		errors.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed, nil)
 	}
@@ -122,7 +151,7 @@ func (s *service) Registration(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user.ID = StringUUID(id.String())
-	if err := s.User.PutUser(user); err != nil {
+	if err := s.User.CreateUser(user); err != nil {
 		errors.ErrorHandler(w, "User not valid", http.StatusBadRequest, err)
 		return
 	}
@@ -194,7 +223,6 @@ func (s *service) createSession(w http.ResponseWriter, user user.User) error {
 func (s *service) securityResponse(w http.ResponseWriter, status int, respMessage string, err error) {
 	w.WriteHeader(status)
 	b, err := json.Marshal(&ResponseSecurity{
-		Status:  status,
 		Message: respMessage,
 		Error:   err,
 	})

@@ -2,6 +2,7 @@ package main
 
 import (
 	"2019_2_Shtoby_shto/src/database"
+	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	transport "2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/route"
@@ -26,6 +27,7 @@ var (
 	transportService transport.Handler
 	securityService  security.Security
 	userService      user.HandlerUserService
+	photoService     photo.HandlerPhotoService
 	dbService        database.IDataManager
 )
 
@@ -68,8 +70,9 @@ func newServer(logger *log.Logger) *http.Server {
 func initService(db *database.DataManager) {
 	sessionService := security.NewSessionManager("redis:6379", "", 0)
 	userService = user.CreateInstance(db)
+	photoService = photo.CreateInstance(db)
 	transportService = transport.CreateInstance(sessionService)
-	securityService = security.CreateInstance(sessionService, userService)
+	securityService = security.CreateInstance(sessionService, userService, photoService)
 }
 
 func AccessLogMiddleware(next http.Handler) http.Handler {

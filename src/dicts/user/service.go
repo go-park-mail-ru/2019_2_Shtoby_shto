@@ -6,7 +6,7 @@ import (
 )
 
 type HandlerUserService interface {
-	PutUser(user User) error
+	CreateUser(user User) error
 	UpdateUser(user User, id StringUUID) error
 	GetUserById(id StringUUID) (User, error)
 	GetUserByLogin(login string) (User, error)
@@ -22,7 +22,7 @@ func CreateInstance(db *database.DataManager) HandlerUserService {
 	}
 }
 
-func (s *service) PutUser(user User) error {
+func (s *service) CreateUser(user User) error {
 	//err := s.db.ExecuteQuery("insert into users(id, login, password) values($1, $2, $3)", user.ID.String(), user.Login, user.Password)
 	return s.db.CreateRecord(&user)
 }
