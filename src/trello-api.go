@@ -25,7 +25,7 @@ var httpAddr = flag.String("address", ":8080", "HTTP listen address")
 var (
 	transportService transport.Handler
 	securityService  security.Security
-	userService      user.UserHandler
+	userService      user.HandlerUserService
 	dbService        database.IDataManager
 )
 

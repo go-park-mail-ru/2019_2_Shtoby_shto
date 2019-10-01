@@ -22,7 +22,7 @@ type Security interface {
 
 type service struct {
 	Sm   *SessionManager
-	User user.UserHandler
+	User user.HandlerUserService
 }
 
 type ResponseSecurity struct {
@@ -31,7 +31,7 @@ type ResponseSecurity struct {
 	Error   error  `json:"error"`
 }
 
-func CreateInstance(sm *SessionManager, user user.UserHandler) Security {
+func CreateInstance(sm *SessionManager, user user.HandlerUserService) Security {
 	return &service{
 		Sm:   sm,
 		User: user,
@@ -41,10 +41,8 @@ func CreateInstance(sm *SessionManager, user user.UserHandler) Security {
 // TODO::replace into handler
 func (s *service) ImageSecurity(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case http.MethodGet:
+	case http.MethodPost:
 		s.getUserSecurity(w, r)
-	case http.MethodPut:
-		s.putUserSecurity(w, r)
 	default:
 		errors.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed, nil)
 	}

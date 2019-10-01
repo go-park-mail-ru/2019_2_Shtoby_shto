@@ -5,7 +5,7 @@ import (
 	"2019_2_Shtoby_shto/src/database"
 )
 
-type UserHandler interface {
+type HandlerUserService interface {
 	PutUser(user User) error
 	UpdateUser(user User, id StringUUID) error
 	GetUserById(id StringUUID) (User, error)
@@ -16,7 +16,7 @@ type service struct {
 	db *database.DataManager
 }
 
-func CreateInstance(db *database.DataManager) UserHandler {
+func CreateInstance(db *database.DataManager) HandlerUserService {
 	return &service{
 		db: db,
 	}
