@@ -1,6 +1,7 @@
 package security
 
 import (
+	"2019_2_Shtoby_shto/src/config"
 	. "2019_2_Shtoby_shto/src/custom_type"
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/user"
@@ -44,7 +45,8 @@ func CreateInstance(sm *SessionManager, user user.HandlerUserService, p photo.Ha
 // TODO::replace into handler
 func (s *service) ImageSecurity(w http.ResponseWriter, r *http.Request) {
 	// TODO:: get this from config!!!
-	photoPath := "D:/Projects/Home_Projects/2019_2_Shtoby_shto/image"
+	//photoPath := "D:/Projects/Home_Projects/2019_2_Shtoby_shto/image"
+	photoPath := config.GetInstance().ImagePath
 	switch r.Method {
 	case http.MethodPost:
 		rr := bufio.NewReader(r.Body)
