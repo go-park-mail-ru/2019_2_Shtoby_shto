@@ -1,0 +1,14 @@
+.idea/
+.idea/out/
+.vscode/
+.DS_Store
+
+out/
+pkg/
+bin/
+
+*.log
+*.exe
+*.rar
+*.iml
+*.zip
