@@ -5,6 +5,7 @@ import (
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/utils"
 	"bufio"
+	"bytes"
 	"io/ioutil"
 	"os"
 	"path"
@@ -43,15 +44,17 @@ func (s service) DownloadPhoto(photoPath string, photo *bufio.Reader) (custom_ty
 	if err != nil {
 		return "", err
 	}
-	defer file.Close()
-	photoData, err := ioutil.ReadAll(photo)
-	if err != nil {
+	//defer file.Close()
+	//photoData, err := ioutil.ReadAll(photo)
+	//if err != nil {
+	//	return "", err
+	//}
+	buf := bytes.Buffer{}
+	buf.ReadFrom(photo)
+	if _, err := bufio.NewWriter(file).Write(buf.Bytes()); err != nil {
 		return "", err
 	}
-	if _, err := bufio.NewWriter(file).Write(photoData); err != nil {
-		return "", err
-	}
-	if err := s.db.CreateRecord(newPhoto); err != nil {
+	if err := s.db.CreateRecord(&newPhoto); err != nil {
 		return "", err
 	}
 	return newPhoto.ID, nil
