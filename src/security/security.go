@@ -43,11 +43,13 @@ func CreateInstance(sm *SessionManager, user user.HandlerUserService, p photo.Ha
 
 // TODO::replace into handler
 func (s *service) ImageSecurity(w http.ResponseWriter, r *http.Request) {
+	// TODO:: get this from config!!!
+	photoPath := "D:/Projects/Home_Projects/2019_2_Shtoby_shto/image"
 	switch r.Method {
 	case http.MethodPost:
 		rr := bufio.NewReader(r.Body)
 		// TODO:: replace in config
-		photoID, err := s.Photo.DownloadPhoto("D:/Projects/Home_Projects/2019_2_Shtoby_shto/image", rr)
+		photoID, err := s.Photo.DownloadPhoto(photoPath, rr)
 		if err != nil {
 			errors.ErrorHandler(w, "download fail", http.StatusInternalServerError, err)
 			return
@@ -70,6 +72,32 @@ func (s *service) ImageSecurity(w http.ResponseWriter, r *http.Request) {
 		}
 		if err := s.User.UpdateUser(user, StringUUID(userId)); err != nil {
 			errors.ErrorHandler(w, "Update user", http.StatusInternalServerError, err)
+			return
+		}
+	case http.MethodGet:
+		cookieId, err := r.Cookie("session_id")
+		if err != nil {
+			errors.ErrorHandler(w, "Session error", http.StatusUnauthorized, err)
+			return
+		}
+
+		userId, err := s.Sm.getSession(cookieId.Value)
+		if err != nil {
+			errors.ErrorHandler(w, "Session error", http.StatusBadRequest, err)
+			return
+		}
+
+		user, err := s.User.GetUserById(StringUUID(userId))
+		if err != nil {
+			errors.ErrorHandler(w, "GetUserById error", http.StatusInternalServerError, err)
+			return
+		}
+		photo, err := s.Photo.GetPhotoByUser(user.PhotoID, photoPath)
+		if err != nil {
+			errors.ErrorHandler(w, "GetPhotoByUser error", http.StatusInternalServerError, err)
+			return
+		}
+		if _, err := w.Write([]byte(photo)); err != nil {
 			return
 		}
 	default:

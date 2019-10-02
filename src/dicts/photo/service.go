@@ -13,6 +13,7 @@ import (
 
 type HandlerPhotoService interface {
 	DownloadPhoto(photoPath string, photo *bufio.Reader) (custom_type.StringUUID, error)
+	GetPhotoByUser(photoID custom_type.StringUUID, photoPath string) ([]byte, error)
 }
 
 type service struct {
@@ -56,7 +57,6 @@ func (s service) DownloadPhoto(photoPath string, photo *bufio.Reader) (custom_ty
 	return newPhoto.ID, nil
 }
 
-func (s service) GetPhotoByUser() error {
-
-	return nil
+func (s service) GetPhotoByUser(photoID custom_type.StringUUID, photoPath string) ([]byte, error) {
+	return ioutil.ReadFile(path.Join(photoPath, photoID.String()+".jpg"))
 }
