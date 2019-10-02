@@ -1,6 +1,7 @@
 package main
 
 import (
+	"2019_2_Shtoby_shto/src/config"
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/user"
@@ -34,6 +35,8 @@ var (
 func main() {
 	flag.Parse()
 	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
+
+	config.InitConfig("")
 
 	// TODO::add context with dm and sessionId
 	dm := &database.DataManager{}
