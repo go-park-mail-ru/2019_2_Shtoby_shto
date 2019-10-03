@@ -17,10 +17,6 @@ import (
 	"time"
 )
 
-const (
-	postgreConfig = "host='postgres' port=5432 user=postgres dbname='trello' sslmode=disable password='1111'"
-)
-
 var initFlag = flag.Bool("initial start", false, "Check your service")
 var httpAddr = flag.String("address", ":8080", "HTTP listen address")
 
@@ -29,7 +25,7 @@ var (
 	securityService  security.Security
 	userService      user.HandlerUserService
 	photoService     photo.HandlerPhotoService
-	dbService        database.IDataManager
+	dbService        database.InitDBManager
 )
 
 func main() {
@@ -41,17 +37,23 @@ func main() {
 		logger.Fatal(err)
 		os.Exit(1)
 	}
-	config.InitConfig(dir)
 
-	// TODO::add context with dm and sessionId
-	dm := &database.DataManager{}
+	deployAPIConfig := os.Getenv("DEPLOYAPI")
+
+	config.InitConfig(dir, deployAPIConfig)
+
+	conf := config.GetInstance()
+
 	dbService = database.Init()
-	if err := dbService.DbConnect(dm, "postgres", postgreConfig); err != nil {
+	db, err := dbService.DbConnect("postgres", conf.DbConfig)
+	if err != nil {
 		logger.Fatal(err)
 		os.Exit(1)
 	}
+	dm := database.NewDataManager(db)
+	defer dm.CloseConnection()
 
-	initService(dm)
+	initService(dm, conf)
 	srv := newServer(logger)
 	if *initFlag {
 		return
@@ -75,8 +77,8 @@ func newServer(logger *log.Logger) *http.Server {
 	}
 }
 
-func initService(db *database.DataManager) {
-	sessionService := security.NewSessionManager("redis:6379", "", 0)
+func initService(db database.IDataManager, conf *config.Config) {
+	sessionService := security.NewSessionManager(conf.RedisConfig, conf.RedisPass, conf.RedisDbNumber)
 	userService = user.CreateInstance(db)
 	photoService = photo.CreateInstance(db)
 	transportService = transport.CreateInstance(sessionService)

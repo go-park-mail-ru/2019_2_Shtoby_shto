@@ -10,22 +10,38 @@ import (
 	"reflect"
 )
 
-//type IDataManager interface {
-//	Db() *gorm.DB
-//	DbConnect(dialect, args string)
-//	FindDictById(sql string, p interface{}) error
-//}
+type IDataManager interface {
+	Db() *gorm.DB
+	SetDb(db *gorm.DB)
+	CloseConnection() error
+	ExecuteQuery(sql string, args ...string) error
+	FindDictById(p interface{}) error
+	FindDictByLogin(p interface{}, where, whereArg string) error
+	CreateRecord(p interface{}) error
+	UpdateRecord(p interface{}, id customType.StringUUID) error
+	DeleteRecord(p interface{}, id customType.StringUUID) error
+}
 
 type DataManager struct {
 	db *gorm.DB
 }
 
-func NewDataManager() *DataManager {
-	return &DataManager{}
+func NewDataManager(db *gorm.DB) IDataManager {
+	return &DataManager{
+		db: db,
+	}
 }
 
 func (d DataManager) Db() *gorm.DB {
 	return d.db
+}
+
+func (d DataManager) SetDb(db *gorm.DB) {
+	d.db = db
+}
+
+func (d *DataManager) CloseConnection() error {
+	return d.db.Close()
 }
 
 func (d DataManager) ExecuteQuery(sql string, args ...string) error {

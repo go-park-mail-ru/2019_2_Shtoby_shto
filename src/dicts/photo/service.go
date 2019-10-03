@@ -18,10 +18,10 @@ type HandlerPhotoService interface {
 }
 
 type service struct {
-	db *database.DataManager
+	db database.IDataManager
 }
 
-func CreateInstance(db *database.DataManager) HandlerPhotoService {
+func CreateInstance(db database.IDataManager) HandlerPhotoService {
 	return service{
 		db: db,
 	}

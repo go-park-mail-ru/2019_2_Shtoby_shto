@@ -4,6 +4,7 @@ import (
 	. "2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	"2019_2_Shtoby_shto/src/utils"
+	"context"
 	"errors"
 	"github.com/go-redis/redis"
 	"time"
@@ -12,15 +13,9 @@ import (
 // Обработчик сессий
 type SessionHandler interface {
 	Create(user user.User) (*SessionID, error)
-	Check(in *SessionID) (bool, error)
-	Delete(in *SessionID) error
+	Check(ctx *context.Context) error
+	Delete(ctx context.Context) error
 }
-
-// Описание сессии
-//type Session struct {
-//	Login    string
-//	Password string
-//}
 
 // id сессии
 type SessionID struct {
@@ -43,21 +38,22 @@ func NewSessionManager(addr, password string, dbNumber int) *SessionManager {
 }
 
 func (sm SessionManager) Create(user user.User) (*SessionID, error) {
-	expire := time.Duration(24 * time.Hour)
+
 	id, err := utils.GenerateUUID()
 	if err != nil || id.String() == "" {
 		return nil, err
 	}
 	session := SessionID{StringUUID(id.String())}
-	return &session, sm.putSession(session.ID, user, expire)
+	return &session, sm.putSession(session.ID, user)
 }
 
-func (sm *SessionManager) putSession(id StringUUID, user user.User, expire time.Duration) error {
-	return sm.cache.Set(id.String(), user.ID.String(), 0).Err()
+func (sm *SessionManager) putSession(id StringUUID, user user.User) error {
+	expire := time.Duration(24 * time.Hour)
+	return sm.cache.Set(id.String(), user.ID.String(), expire).Err()
 }
 
-func (sm *SessionManager) getSession(idIn string) (string, error) {
-	val, err := sm.cache.Get(idIn).Result()
+func (sm *SessionManager) getSession(cacheID string) (string, error) {
+	val, err := sm.cache.Get(cacheID).Result()
 	if err == redis.Nil {
 		return "", errors.New("missing_key does not exist")
 	}
@@ -67,14 +63,18 @@ func (sm *SessionManager) getSession(idIn string) (string, error) {
 	return val, nil
 }
 
-func (sm *SessionManager) Check(sessionId *SessionID) (bool, error) {
-	userId, err := sm.getSession(sessionId.ID.String())
-	if userId == "" {
-		return false, errors.New("Missing userId")
-	}
-	return true, err
+func (sm *SessionManager) Delete(ctx context.Context) error {
+	return sm.cache.Del(ctx.Value("session_id").(string)).Err()
 }
 
-func (sm *SessionManager) Delete(in *SessionID) error {
-	return sm.cache.Del(in.ID.String()).Err()
+func (sm *SessionManager) Check(ctx *context.Context) error {
+	userId, err := sm.getSession((*ctx).Value("session_id").(string))
+	if err != nil {
+		return err
+	}
+	if userId == "" {
+		return errors.New("Missing userId")
+	}
+	*ctx = context.WithValue(*ctx, "user_id", StringUUID(userId))
+	return nil
 }

@@ -9,8 +9,8 @@ import (
 
 var autoMigration = flag.Bool("auto-migration", true, "GORM autoMigration")
 
-type IDataManager interface {
-	DbConnect(manager *DataManager, dialect, args string) error
+type InitDBManager interface {
+	DbConnect(dialect, args string) (*gorm.DB, error)
 }
 type InitDB struct {
 	Recreate bool
@@ -33,25 +33,23 @@ func Init() *InitDB {
 	return &InitDB{}
 }
 
-func (d *InitDB) DbConnect(manager *DataManager, dialect, args string) error {
+func (d *InitDB) DbConnect(dialect, args string) (*gorm.DB, error) {
 	// TODO:: add timeout for docker
 	db, err := gorm.Open(dialect, args)
-	//defer db.Close()
 	if err != nil {
 		log.Println(err)
-		return err
+		return nil, err
 	}
-	manager.db = db
 	if *autoMigration {
-		d.autoMigrate(manager)
+		d.autoMigrate(db)
 	}
-	return nil
+	return db, nil
 }
 
-func (d *InitDB) autoMigrate(dm *DataManager) {
+func (d *InitDB) autoMigrate(db *gorm.DB) {
 	for _, value := range Tables() {
-		if dm.db.HasTable(value.GetTableName()) {
-			dm.db.AutoMigrate(value)
+		if db.HasTable(value.GetTableName()) {
+			db.AutoMigrate(value)
 		}
 	}
 }

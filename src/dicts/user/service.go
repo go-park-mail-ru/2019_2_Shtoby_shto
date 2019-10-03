@@ -13,10 +13,10 @@ type HandlerUserService interface {
 }
 
 type service struct {
-	db *database.DataManager
+	db database.IDataManager
 }
 
-func CreateInstance(db *database.DataManager) HandlerUserService {
+func CreateInstance(db database.IDataManager) HandlerUserService {
 	return &service{
 		db: db,
 	}
