@@ -2,7 +2,7 @@ package security
 
 import (
 	"2019_2_Shtoby_shto/src/config"
-	. "2019_2_Shtoby_shto/src/custom_type"
+	. "2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	"2019_2_Shtoby_shto/src/errors"
@@ -69,11 +69,14 @@ func (s *service) ImageSecurity(w http.ResponseWriter, r *http.Request) {
 			errors.ErrorHandler(w, "Session error", http.StatusBadRequest, err)
 			return
 		}
-		user := user.User{
-			PhotoID: photoID,
+		user, err := s.User.GetUserById(StringUUID(userId))
+		if err != nil {
+			errors.ErrorHandler(w, "GetUserById error", http.StatusInternalServerError, err)
+			return
 		}
+		user.PhotoID = &photoID
 		if err := s.User.UpdateUser(user, StringUUID(userId)); err != nil {
-			errors.ErrorHandler(w, "Update user", http.StatusInternalServerError, err)
+			errors.ErrorHandler(w, "Update user error", http.StatusInternalServerError, err)
 			return
 		}
 	case http.MethodGet:
@@ -94,11 +97,12 @@ func (s *service) ImageSecurity(w http.ResponseWriter, r *http.Request) {
 			errors.ErrorHandler(w, "GetUserById error", http.StatusInternalServerError, err)
 			return
 		}
-		photo, err := s.Photo.GetPhotoByUser(user.PhotoID, photoPath)
+		photo, err := s.Photo.GetPhotoByUser(*user.PhotoID, photoPath)
 		if err != nil {
 			errors.ErrorHandler(w, "GetPhotoByUser error", http.StatusInternalServerError, err)
 			return
 		}
+		w.Header().Add("Content-Type", "multipart/form-data")
 		if _, err := w.Write([]byte(photo)); err != nil {
 			return
 		}

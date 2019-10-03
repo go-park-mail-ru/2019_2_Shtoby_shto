@@ -1,6 +1,6 @@
 package dicts
 
-import . "2019_2_Shtoby_shto/src/custom_type"
+import . "2019_2_Shtoby_shto/src/customType"
 
 type Dict interface {
 	SetId(id StringUUID)
