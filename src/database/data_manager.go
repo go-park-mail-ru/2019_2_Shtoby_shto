@@ -1,7 +1,7 @@
 package database
 
 import (
-	"2019_2_Shtoby_shto/src/custom_type"
+	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts"
 	"errors"
 	"fmt"
@@ -64,7 +64,7 @@ func (d DataManager) CreateRecord(p interface{}) error {
 	return nil
 }
 
-func (d DataManager) UpdateRecord(p interface{}, id custom_type.StringUUID) error {
+func (d DataManager) UpdateRecord(p interface{}, id customType.StringUUID) error {
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
 	obj.SetId(id)
 	res := d.db.Table(obj.GetTableName()).Save(p)
@@ -74,7 +74,7 @@ func (d DataManager) UpdateRecord(p interface{}, id custom_type.StringUUID) erro
 	return nil
 }
 
-func (d DataManager) DeleteRecord(p interface{}, id custom_type.StringUUID) error {
+func (d DataManager) DeleteRecord(p interface{}, id customType.StringUUID) error {
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
 	res := d.db.Table(obj.GetTableName()).Delete(p, "id = ?", id)
 	if res.Error != nil {

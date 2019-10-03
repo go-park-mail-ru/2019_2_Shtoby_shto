@@ -36,7 +36,12 @@ func main() {
 	flag.Parse()
 	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
 
-	config.InitConfig("")
+	dir, err := os.Getwd()
+	if err != nil {
+		logger.Fatal(err)
+		os.Exit(1)
+	}
+	config.InitConfig(dir)
 
 	// TODO::add context with dm and sessionId
 	dm := &database.DataManager{}

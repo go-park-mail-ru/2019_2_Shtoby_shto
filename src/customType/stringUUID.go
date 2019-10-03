@@ -1,4 +1,4 @@
-package custom_type
+package customType
 
 import "2019_2_Shtoby_shto/src/utils"
 

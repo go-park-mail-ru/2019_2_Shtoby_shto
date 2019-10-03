@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"path"
 )
 
 const (
@@ -28,7 +29,7 @@ func readConfig(fileName string) {
 }
 
 func InitConfig(workPath string) {
-	configFileName := workPath + PROPERTIESDEFAULT
+	configFileName := path.Join(workPath, PROPERTIESDEFAULT)
 	ToolConfig = new(Config)
 	readConfig(configFileName)
 }

@@ -1,7 +1,7 @@
 package security
 
 import (
-	. "2019_2_Shtoby_shto/src/custom_type"
+	. "2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	"2019_2_Shtoby_shto/src/utils"
 	"errors"
