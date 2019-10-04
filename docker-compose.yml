@@ -17,6 +17,8 @@ services:
       - redis
     networks:
       - hohoho
+    environment:
+      - DEPLOYAPI
 
   postgres:
     image: postgres:latest
