@@ -1,7 +1,9 @@
 {
+  "trello.service.port": 8080,
+  "trello.service.frontend.url": "http://localhost:3000",
   "trello.service.image.path": "./image",
-  "trello.service.db.config":"host='localhost' port=5432 user=postgres dbname='trello' sslmode=disable password='1111'",
-  "trello.service.redis.config":"localhost:6379",
+  "trello.service.db.config":"host='postgres' port=5432 user=postgres dbname='trello' sslmode=disable password='1111'",
+  "trello.service.redis.config":"redis:6379",
   "trello.service.redis.password":"",
   "trello.service.redis.db.number":0
 }

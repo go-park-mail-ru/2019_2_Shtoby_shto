@@ -8,18 +8,19 @@ import (
 )
 
 const (
-	defaultFileSettingsName = "trello-local-settings.json"
+	localSettingsFile = "trello-local-settings.json"
+	remoteSettingsFile = "trello-settings.json"
 )
 
 type Config struct {
+	Port          int    `json:"trello.service.port"`
+	FrontendURL   string `json:"trello.service.frontend.url"`
 	ImagePath     string `json:"trello.service.image.path"`
 	DbConfig      string `json:"trello.service.db.config"`
 	RedisConfig   string `json:"trello.service.redis.config"`
 	RedisPass     string `json:"trello.service.redis.password"`
 	RedisDbNumber int    `json:"trello.service.redis.db.number"`
 }
-
-var ToolConfig *Config
 
 func readConfig(fileName string) {
 	configFile, err := os.Open(fileName)
@@ -32,14 +33,41 @@ func readConfig(fileName string) {
 	}
 }
 
-func InitConfig(workPath, settingsFileName string) {
-	if settingsFileName == "" {
-		settingsFileName = defaultFileSettingsName
+const (
+	deployEnvVar = "DEPLOYAPI"
+)
+
+
+func InitConfig(logger *log.Logger) {
+	dir, err := os.Getwd()
+
+	if err != nil {
+		logger.Fatal(err)
+		os.Exit(1)
 	}
-	configFileName := path.Join(workPath, settingsFileName)
+
+	deployVar := os.Getenv(deployEnvVar)
+	if deployVar == "" {
+		log.Printf(
+			"%s not set, expecting requests from api on localhost deployment\n",
+			deployEnvVar,
+		)
+	}
+
+	var settingsFileName string
+
+	if deployVar == "" {
+		settingsFileName = localSettingsFile
+	} else {
+		settingsFileName = remoteSettingsFile
+	}
+
+	configFileName := path.Join(dir, settingsFileName)
 	ToolConfig = new(Config)
 	readConfig(configFileName)
 }
+
+var ToolConfig *Config
 
 func GetInstance() *Config {
 	return ToolConfig

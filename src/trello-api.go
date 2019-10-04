@@ -15,10 +15,17 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"strconv"
 )
 
-var initFlag = flag.Bool("initial start", false, "Check your service")
-var httpAddr = flag.String("address", ":8080", "HTTP listen address")
+const (
+	deployEnvVar = "DEPLOYAPI"
+)
+
+var (
+	initFlag = flag.Bool("initial start", false, "Check your service")
+	httpAddr = flag.String("address", ":8080", "HTTP listen address")
+)
 
 var (
 	transportService transport.Handler
@@ -28,21 +35,19 @@ var (
 	dbService        database.InitDBManager
 )
 
+var logger *log.Logger
+
 func main() {
 	flag.Parse()
 	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
 
-	dir, err := os.Getwd()
-	if err != nil {
-		logger.Fatal(err)
-		os.Exit(1)
-	}
-
-	deployAPIConfig := os.Getenv("DEPLOYAPI")
-
-	config.InitConfig(dir, deployAPIConfig)
+	config.InitConfig(logger)
 
 	conf := config.GetInstance()
+
+	// Нужно вообще убрать эту тему с флагами
+	*httpAddr = ":" + strconv.Itoa(conf.Port)
+	logger.Println("API Url:", *httpAddr)
 
 	dbService = database.Init()
 	db, err := dbService.DbConnect("postgres", conf.DbConfig)
@@ -67,6 +72,9 @@ func main() {
 
 func newServer(logger *log.Logger) *http.Server {
 	router := AccessLogMiddleware(AccessCORS(route.NewRouterService(securityService)))
+
+	logger.Println("serving on", *httpAddr)
+
 	return &http.Server{
 		Addr:           *httpAddr,
 		Handler:        router,

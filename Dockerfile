@@ -8,4 +8,6 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /go/app/trello-api /go/app
 
 FROM base
 COPY --from=go-builder /go/app/trello-api /trello-api
+COPY --from=go-builder /go/app/trello-local-settings.json /trello-local-settings.json
+COPY --from=go-builder /go/app/trello-settings.json /trello-settings.json
 CMD ["/trello-api"]

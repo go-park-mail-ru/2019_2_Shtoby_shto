@@ -1,12 +1,15 @@
 package utils
 
 import (
+	"2019_2_Shtoby_shto/src/config"
 	"fmt"
 	"github.com/satori/go.uuid"
 	"math/rand"
 	"net/http"
 	"regexp"
 	"strings"
+	"log"
+	"os"
 )
 
 const (
@@ -61,10 +64,22 @@ func Join(args ...string) string {
 	return strings.Join(args, "/")
 }
 
+var apiURL = ""
+
+func init() {
+	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
+	config.InitConfig(logger)
+
+	apiURL = config.GetInstance().FrontendURL
+
+	logger.Println("Frontend URL:", apiURL)
+}
+
 func SetHeaders(w *http.ResponseWriter) {
 	(*w).Header().Set("Content-Type", "application/json")
 	// (*w).Header().Set("Access-Control-Allow-Origin", "*")
-	(*w).Header().Set("Access-Control-Allow-Origin", "https://fmonster2.aleshka2012.now.sh")
+	(*w).Header().Set("Access-Control-Allow-Origin", apiURL)
+	// (*w).Header().Set("Access-Control-Allow-Origin", "https://fmonster2.aleshka2012.now.sh")
 	// "http://localhost:3000" https://fmonster2.aleshka2012.now.sh, https://20192shtobyshto-git-mergetest.ivanshport98.now.sh/")
 	(*w).Header().Set("Access-Control-Allow-Credentials", "true")
 	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
