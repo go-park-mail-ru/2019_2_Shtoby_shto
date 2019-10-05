@@ -65,8 +65,16 @@ func main() {
 	}
 
 	//TODO::great shutdown
-	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-		logger.Fatalf("HTTP server ListenAndServe: %v", err)
+	switch conf.Port {
+	case 443:
+		if err := srv.ListenAndServeTLS("keys/server.crt", "keys/server.key");
+		   err != http.ErrServerClosed {
+			logger.Fatalf("HTTPS server ListenAndServe: %v", err)
+		}
+	default:
+		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+			logger.Fatalf("HTTP server ListenAndServe: %v", err)
+		}
 	}
 }
 
