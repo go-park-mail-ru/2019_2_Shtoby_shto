@@ -2,7 +2,6 @@ package transport
 
 import (
 	"2019_2_Shtoby_shto/src/errors"
-	"2019_2_Shtoby_shto/src/security"
 	"encoding/json"
 	"net/http"
 )
@@ -22,31 +21,25 @@ type Handler interface {
 	// Get
 	Get(w http.ResponseWriter, req *http.Request)
 	// Patch
-	Patch(w http.ResponseWriter, req *http.Request)
+	//Patch(w http.ResponseWriter, req *http.Request)
 	// Post
 	Post(w http.ResponseWriter, req *http.Request)
 	// Delete ...handlerManager
 	Delete(w http.ResponseWriter, req *http.Request)
 	// Put
-	//Put(w http.ResponseWriter, req *http.Request)
+	Put(w http.ResponseWriter, req *http.Request)
 	// Обработчик запросов
 	Handle(http.ResponseWriter, *http.Request)
 }
 
 // Класс реализующий транспортный уровень
-type handlerManager struct {
-	Sm security.SessionHandler
-}
 
-// Создание инстанса
-func CreateInstance(sm *security.SessionManager) Handler {
-	return &handlerManager{
-		Sm: sm,
-	}
+type HandlerImpl struct {
+	Handler
 }
 
 // Get
-func (h *handlerManager) Get(w http.ResponseWriter, req *http.Request) {
+func (h HandlerImpl) Get(w http.ResponseWriter, req *http.Request) {
 	if id := req.URL.Query().Get("id"); id != "" {
 		if err := h.fetchOne(id, w); err != nil {
 			return
@@ -58,7 +51,7 @@ func (h *handlerManager) Get(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (h *handlerManager) fetchList(w http.ResponseWriter) error {
+func (h HandlerImpl) fetchList(w http.ResponseWriter) error {
 	var err error
 	if err != nil {
 		errors.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError, err)
@@ -74,27 +67,27 @@ func (h *handlerManager) fetchList(w http.ResponseWriter) error {
 	return nil
 }
 
-func (h *handlerManager) fetchOne(id string, w http.ResponseWriter) error {
+func (h HandlerImpl) fetchOne(id string, w http.ResponseWriter) error {
 	return nil
 }
 
 // Post
-func (h *handlerManager) Post(w http.ResponseWriter, req *http.Request) {
+func (h HandlerImpl) Post(w http.ResponseWriter, req *http.Request) {
 
 }
 
 // Patch
-func (h *handlerManager) Patch(w http.ResponseWriter, req *http.Request) {
+func (h HandlerImpl) Put(w http.ResponseWriter, req *http.Request) {
 
 }
 
 // Delete
-func (h *handlerManager) Delete(w http.ResponseWriter, req *http.Request) {
+func (h HandlerImpl) Delete(w http.ResponseWriter, req *http.Request) {
 
 }
 
 // Http Handle
-func (h *handlerManager) Handle(w http.ResponseWriter, req *http.Request) {
+func (h HandlerImpl) Handle(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case http.MethodGet:
 		h.Get(w, req)
@@ -104,10 +97,7 @@ func (h *handlerManager) Handle(w http.ResponseWriter, req *http.Request) {
 		return
 	case http.MethodDelete:
 		h.Delete(w, req)
-	case http.MethodPatch:
-		h.Patch(w, req)
 	case http.MethodPut:
-		// TODO:: create or load record
-		//handler.Put(req)
+		h.Put(w, req)
 	}
 }
