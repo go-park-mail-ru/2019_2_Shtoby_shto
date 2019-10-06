@@ -10,4 +10,5 @@ FROM base
 COPY --from=go-builder /go/app/trello-api /trello-api
 COPY --from=go-builder /go/app/trello-local-settings.json /trello-local-settings.json
 COPY --from=go-builder /go/app/trello-settings.json /trello-settings.json
+COPY --from=go-builder /go/app/keys /keys
 CMD ["/trello-api"]
