@@ -7,7 +7,6 @@ import (
 	"context"
 	"errors"
 	"github.com/go-redis/redis"
-	"time"
 )
 
 // Обработчик сессий
@@ -38,7 +37,6 @@ func NewSessionManager(addr, password string, dbNumber int) *SessionManager {
 }
 
 func (sm SessionManager) Create(user user.User) (*SessionID, error) {
-
 	id, err := utils.GenerateUUID()
 	if err != nil || id.String() == "" {
 		return nil, err
@@ -48,8 +46,9 @@ func (sm SessionManager) Create(user user.User) (*SessionID, error) {
 }
 
 func (sm *SessionManager) putSession(id StringUUID, user user.User) error {
-	expire := time.Duration(24 * time.Hour)
-	return sm.cache.Set(id.String(), user.ID.String(), expire).Err()
+	//todo::set expire
+	//expire := time.Duration(24 * time.Hour)
+	return sm.cache.Set(id.String(), user.ID.String(), 0).Err()
 }
 
 func (sm *SessionManager) getSession(cacheID string) (string, error) {

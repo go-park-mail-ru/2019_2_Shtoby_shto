@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	localSettingsFile = "trello-local-settings.json"
+	localSettingsFile  = "trello-local-settings.json"
 	remoteSettingsFile = "trello-settings.json"
 )
 
@@ -37,7 +37,6 @@ const (
 	deployEnvVar = "DEPLOYAPI"
 )
 
-
 func InitConfig(logger *log.Logger) {
 	dir, err := os.Getwd()
 
@@ -47,16 +46,14 @@ func InitConfig(logger *log.Logger) {
 	}
 
 	deployVar := os.Getenv(deployEnvVar)
+
+	var settingsFileName string
+
 	if deployVar == "" {
 		log.Printf(
 			"%s not set, expecting requests from api on localhost deployment\n",
 			deployEnvVar,
 		)
-	}
-
-	var settingsFileName string
-
-	if deployVar == "" {
 		settingsFileName = localSettingsFile
 	} else {
 		settingsFileName = remoteSettingsFile
