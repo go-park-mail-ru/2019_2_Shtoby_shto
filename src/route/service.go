@@ -2,9 +2,12 @@ package route
 
 import (
 	"2019_2_Shtoby_shto/src/security"
+	"2019_2_Shtoby_shto/src/utils"
+	"fmt"
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
+	"time"
 )
 
 const (
@@ -44,7 +47,12 @@ const (
 
 func NewRouterService(s security.Security) *mux.Router {
 	r := mux.NewRouter()
+	r.Use(AccessCORS, AccessLogMiddleware)
 	//apiUserPrefix := utils.Join(apiName, ver, "user")
+
+	//modelHandler := transport.CreateModelHandler()
+	//modelHandler.InitStaticModel("user")
+
 	r.HandleFunc("/docs/", httpSwagger.WrapHandler)
 	r.HandleFunc("/", nil)
 	r.HandleFunc("/login", s.Login).Methods(http.MethodPost, http.MethodOptions)
@@ -53,4 +61,25 @@ func NewRouterService(s security.Security) *mux.Router {
 	r.HandleFunc("/user", s.CheckSession(s.UserSecurity)).Methods(http.MethodGet, http.MethodPut, http.MethodOptions)
 	r.HandleFunc("/photo", s.CheckSession(s.ImageSecurity)).Methods(http.MethodGet, http.MethodPost, http.MethodPut, http.MethodOptions)
 	return r
+}
+
+func AccessLogMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("accessLogMiddleware", r.URL.Path)
+		start := time.Now()
+		next.ServeHTTP(w, r)
+		fmt.Printf("[%s] %s, %s %s\n",
+			r.Method, r.RemoteAddr, r.URL.Path, time.Since(start))
+	})
+}
+
+func AccessCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		utils.SetHeaders(&w)
+		if (*r).Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }

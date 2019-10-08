@@ -8,14 +8,12 @@ import (
 	transport "2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/route"
 	"2019_2_Shtoby_shto/src/security"
-	"2019_2_Shtoby_shto/src/utils"
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"time"
 	"strconv"
+	"time"
 )
 
 const (
@@ -67,8 +65,7 @@ func main() {
 	//TODO::great shutdown
 	switch conf.Port {
 	case 443:
-		if err := srv.ListenAndServeTLS("keys/server.crt", "keys/server.key");
-		   err != http.ErrServerClosed {
+		if err := srv.ListenAndServeTLS("keys/server.crt", "keys/server.key"); err != http.ErrServerClosed {
 			logger.Fatalf("HTTPS server ListenAndServe: %v", err)
 		}
 	default:
@@ -79,10 +76,8 @@ func main() {
 }
 
 func newServer(logger *log.Logger) *http.Server {
-	router := AccessLogMiddleware(AccessCORS(route.NewRouterService(securityService)))
-
+	router := route.NewRouterService(securityService)
 	logger.Println("serving on", *httpAddr)
-
 	return &http.Server{
 		Addr:           *httpAddr,
 		Handler:        router,
@@ -97,27 +92,6 @@ func initService(db database.IDataManager, conf *config.Config) {
 	sessionService := security.NewSessionManager(conf.RedisConfig, conf.RedisPass, conf.RedisDbNumber)
 	userService = user.CreateInstance(db)
 	photoService = photo.CreateInstance(db)
-	transportService = transport.CreateInstance(sessionService)
+	//transportService = transport.CreateInstance(sessionService)
 	securityService = security.CreateInstance(sessionService, userService, photoService)
-}
-
-func AccessLogMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("accessLogMiddleware", r.URL.Path)
-		start := time.Now()
-		next.ServeHTTP(w, r)
-		fmt.Printf("[%s] %s, %s %s\n",
-			r.Method, r.RemoteAddr, r.URL.Path, time.Since(start))
-	})
-}
-
-func AccessCORS(next http.Handler) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		utils.SetHeaders(&w)
-		if (*r).Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
 }
