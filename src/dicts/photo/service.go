@@ -1,8 +1,10 @@
 package photo
 
 import (
+	"2019_2_Shtoby_shto/src/config"
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
+	transport "2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/utils"
 	"bufio"
 	"bytes"
@@ -13,21 +15,24 @@ import (
 )
 
 type HandlerPhotoService interface {
-	DownloadPhoto(photoPath string, photo *bufio.Reader) (customType.StringUUID, error)
-	GetPhotoByUser(photoID customType.StringUUID, photoPath string) ([]byte, error)
+	transport.Handler
+	DownloadPhoto(photo *bufio.Reader) (customType.StringUUID, error)
+	GetPhotoByUser(photoID customType.StringUUID) ([]byte, error)
 }
 
 type service struct {
+	transport.HandlerImpl
 	db database.IDataManager
 }
 
 func CreateInstance(db database.IDataManager) HandlerPhotoService {
-	return service{
+	return &service{
 		db: db,
 	}
 }
 
-func (s service) DownloadPhoto(photoPath string, photo *bufio.Reader) (customType.StringUUID, error) {
+func (s service) DownloadPhoto(photo *bufio.Reader) (customType.StringUUID, error) {
+	photoPath := config.GetInstance().ImagePath
 	if err := os.MkdirAll(photoPath, os.ModePerm); err != nil {
 		return "", err
 	}
@@ -60,6 +65,7 @@ func (s service) DownloadPhoto(photoPath string, photo *bufio.Reader) (customTyp
 	return newPhoto.ID, nil
 }
 
-func (s service) GetPhotoByUser(photoID customType.StringUUID, photoPath string) ([]byte, error) {
+func (s service) GetPhotoByUser(photoID customType.StringUUID) ([]byte, error) {
+	photoPath := config.GetInstance().ImagePath
 	return ioutil.ReadFile(path.Join(photoPath, photoID.String()+".jpg"))
 }

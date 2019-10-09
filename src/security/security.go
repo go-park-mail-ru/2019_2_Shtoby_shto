@@ -1,7 +1,6 @@
 package security
 
 import (
-	"2019_2_Shtoby_shto/src/config"
 	. "2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/user"
@@ -21,7 +20,7 @@ type Security interface {
 	Registration(w http.ResponseWriter, r *http.Request)
 	CheckSession(h http.HandlerFunc) http.HandlerFunc
 	UserSecurity(w http.ResponseWriter, r *http.Request)
-	ImageSecurity(w http.ResponseWriter, r *http.Request)
+	ImageSecurity(h http.HandlerFunc) http.HandlerFunc
 }
 
 type service struct {
@@ -44,70 +43,72 @@ func CreateInstance(sm *SessionManager, user user.HandlerUserService, p photo.Ha
 }
 
 // TODO::replace into handler
-func (s *service) ImageSecurity(w http.ResponseWriter, r *http.Request) {
-	photoPath := config.GetInstance().ImagePath
-	switch r.Method {
-	case http.MethodPost:
-		rr := bufio.NewReader(r.Body)
-		// TODO:: replace in config
-		photoID, err := s.Photo.DownloadPhoto(photoPath, rr)
-		if err != nil {
-			errors.ErrorHandler(w, "download fail", http.StatusInternalServerError, err)
-			return
-		}
+func (s *service) ImageSecurity(h http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			rr := bufio.NewReader(r.Body)
+			photoID, err := s.Photo.DownloadPhoto(rr)
+			if err != nil {
+				errors.ErrorHandler(w, "download fail", http.StatusInternalServerError, err)
+				return
+			}
 
-		// TODO:: add _context with session and user values
-		cookieId, err := r.Cookie("session_id")
-		if err != nil {
-			errors.ErrorHandler(w, "Session error", http.StatusUnauthorized, err)
-			return
-		}
+			// TODO:: add _context with session and user values
+			cookieId, err := r.Cookie("session_id")
+			if err != nil {
+				errors.ErrorHandler(w, "Session error", http.StatusUnauthorized, err)
+				return
+			}
 
-		userId, err := s.Sm.getSession(cookieId.Value)
-		if err != nil {
-			errors.ErrorHandler(w, "Session error", http.StatusBadRequest, err)
-			return
-		}
-		user, err := s.User.GetUserById(StringUUID(userId))
-		if err != nil {
-			errors.ErrorHandler(w, "GetUserById error", http.StatusInternalServerError, err)
-			return
-		}
-		user.PhotoID = &photoID
-		if err := s.User.UpdateUser(user, StringUUID(userId)); err != nil {
-			errors.ErrorHandler(w, "Update user error", http.StatusInternalServerError, err)
-			return
-		}
-	case http.MethodGet:
-		cookieId, err := r.Cookie("session_id")
-		if err != nil {
-			errors.ErrorHandler(w, "Session error", http.StatusUnauthorized, err)
-			return
-		}
+			userId, err := s.Sm.getSession(cookieId.Value)
+			if err != nil {
+				errors.ErrorHandler(w, "Session error", http.StatusBadRequest, err)
+				return
+			}
+			user, err := s.User.GetUserById(StringUUID(userId))
+			if err != nil {
+				errors.ErrorHandler(w, "GetUserById error", http.StatusInternalServerError, err)
+				return
+			}
+			user.PhotoID = &photoID
+			if err := s.User.UpdateUser(user, StringUUID(userId)); err != nil {
+				errors.ErrorHandler(w, "Update user error", http.StatusInternalServerError, err)
+				return
+			}
+		case http.MethodGet:
+			cookieId, err := r.Cookie("session_id")
+			if err != nil {
+				errors.ErrorHandler(w, "Session error", http.StatusUnauthorized, err)
+				return
+			}
 
-		userId, err := s.Sm.getSession(cookieId.Value)
-		if err != nil {
-			errors.ErrorHandler(w, "Session error", http.StatusBadRequest, err)
-			return
-		}
+			userId, err := s.Sm.getSession(cookieId.Value)
+			if err != nil {
+				errors.ErrorHandler(w, "Session error", http.StatusBadRequest, err)
+				return
+			}
 
-		user, err := s.User.GetUserById(StringUUID(userId))
-		if err != nil {
-			errors.ErrorHandler(w, "GetUserById error", http.StatusInternalServerError, err)
-			return
+			user, err := s.User.GetUserById(StringUUID(userId))
+			if err != nil {
+				errors.ErrorHandler(w, "GetUserById error", http.StatusInternalServerError, err)
+				return
+			}
+			photo, err := s.Photo.GetPhotoByUser(*user.PhotoID)
+			if err != nil {
+				errors.ErrorHandler(w, "GetPhotoByUser error", http.StatusInternalServerError, err)
+				return
+			}
+			w.Header().Add("Content-Type", "multipart/form-data")
+			if _, err := w.Write([]byte(photo)); err != nil {
+				return
+			}
+		default:
+			errors.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed, nil)
 		}
-		photo, err := s.Photo.GetPhotoByUser(*user.PhotoID, photoPath)
-		if err != nil {
-			errors.ErrorHandler(w, "GetPhotoByUser error", http.StatusInternalServerError, err)
-			return
-		}
-		w.Header().Add("Content-Type", "multipart/form-data")
-		if _, err := w.Write([]byte(photo)); err != nil {
-			return
-		}
-	default:
-		errors.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed, nil)
-	}
+		h.ServeHTTP(w, r)
+	})
+
 }
 
 func (s *service) UserSecurity(w http.ResponseWriter, r *http.Request) {

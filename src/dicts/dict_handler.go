@@ -19,3 +19,7 @@ func (b BaseInfo) GetId() StringUUID {
 func (b *BaseInfo) SetId(id StringUUID) {
 	b.ID = id
 }
+
+func (b BaseInfo) GetTableName() string {
+	return "default table name"
+}

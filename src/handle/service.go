@@ -1,8 +1,10 @@
 package transport
 
 import (
+	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/errors"
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"net/http"
 )
 
@@ -28,8 +30,8 @@ type Handler interface {
 	Delete(w http.ResponseWriter, req *http.Request)
 	// Put
 	Put(w http.ResponseWriter, req *http.Request)
-	// Обработчик запросов
-	Handle(http.ResponseWriter, *http.Request)
+
+	CreateInstance() dicts.Dict
 }
 
 // Класс реализующий транспортный уровень
@@ -38,9 +40,15 @@ type HandlerImpl struct {
 	Handler
 }
 
+func (h HandlerImpl) CreateInstance() dicts.Dict {
+	return &dicts.BaseInfo{}
+}
+
 // Get
-func (h HandlerImpl) Get(w http.ResponseWriter, req *http.Request) {
-	if id := req.URL.Query().Get("id"); id != "" {
+func (h HandlerImpl) Get(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	if id != "" {
 		if err := h.fetchOne(id, w); err != nil {
 			return
 		}
@@ -53,12 +61,13 @@ func (h HandlerImpl) Get(w http.ResponseWriter, req *http.Request) {
 
 func (h HandlerImpl) fetchList(w http.ResponseWriter) error {
 	var err error
+
 	if err != nil {
 		errors.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError, err)
 		return err
 	}
 	b, _ := json.Marshal(&FetchResult{
-		Name: "List books",
+		Name: "List",
 		//Total: count,
 		Items: nil,
 	})
@@ -72,32 +81,16 @@ func (h HandlerImpl) fetchOne(id string, w http.ResponseWriter) error {
 }
 
 // Post
-func (h HandlerImpl) Post(w http.ResponseWriter, req *http.Request) {
+func (h HandlerImpl) Post(w http.ResponseWriter, r *http.Request) {
 
 }
 
 // Patch
-func (h HandlerImpl) Put(w http.ResponseWriter, req *http.Request) {
+func (h HandlerImpl) Put(w http.ResponseWriter, r *http.Request) {
 
 }
 
 // Delete
-func (h HandlerImpl) Delete(w http.ResponseWriter, req *http.Request) {
+func (h HandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
 
-}
-
-// Http Handle
-func (h HandlerImpl) Handle(w http.ResponseWriter, req *http.Request) {
-	switch req.Method {
-	case http.MethodGet:
-		h.Get(w, req)
-		return
-	case http.MethodPost:
-		h.Post(w, req)
-		return
-	case http.MethodDelete:
-		h.Delete(w, req)
-	case http.MethodPut:
-		h.Put(w, req)
-	}
 }
