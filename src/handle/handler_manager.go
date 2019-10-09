@@ -1,9 +1,8 @@
-package transport
+package handler
 
 import (
 	"github.com/pkg/errors"
 	"net/http"
-	"reflect"
 )
 
 const (
@@ -11,51 +10,29 @@ const (
 )
 
 type ModelHandler struct {
-	handlerModelFactory       map[string]*handlerItem
+	Handler                   Handler
 	handlerStaticModelFactory map[string]*handlerStaticItem
-}
-
-var ModelHandlers *ModelHandler
-
-func init() {
-	ModelHandlers = CreateModelHandler()
-}
-
-type handlerItem struct {
-	t reflect.Type
-	u string
 }
 
 type handlerStaticItem struct {
 	t Handler
-	u string
 }
 
-func CreateModelHandler() *ModelHandler {
+func CreateModelHandler(h Handler) *ModelHandler {
 	return &ModelHandler{
-		handlerModelFactory:       make(map[string]*handlerItem),
-		handlerStaticModelFactory: make(map[string]*handlerStaticItem),
+		Handler:                   h,
+		handlerStaticModelFactory: make(map[string]*handlerStaticItem, 0),
 	}
 }
 
-func (p *ModelHandler) InitModel(model string, t reflect.Type, u string) {
-	p.handlerModelFactory[model] = &handlerItem{t: t, u: u}
-}
-
-func (p *ModelHandler) InitStaticModel(model string, t interface{}, u string) {
-	p.handlerStaticModelFactory[model] = &handlerStaticItem{t: t.(Handler), u: u}
+func (p *ModelHandler) InitStaticModel(model string, t interface{}) {
+	p.handlerStaticModelFactory[model] = &handlerStaticItem{t: t.(Handler)}
 }
 
 func (p *ModelHandler) getHandler(model string) (Handler, error) {
-	t1 := p.handlerModelFactory[model]
-	if t1 != nil {
-		v := reflect.New(t1.t).Elem()
-		d := v.Interface().(Handler)
-		return d, nil
-	}
-	t2 := p.handlerStaticModelFactory[model]
-	if t2 != nil {
-		return t2.t, nil
+	t := p.handlerStaticModelFactory[model]
+	if t != nil {
+		return t.t, nil
 	}
 	return nil, errors.New(createHandlerErr)
 }

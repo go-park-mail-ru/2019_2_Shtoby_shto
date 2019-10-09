@@ -5,7 +5,7 @@ import (
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/user"
-	transport "2019_2_Shtoby_shto/src/handle"
+	handler "2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/route"
 	"2019_2_Shtoby_shto/src/security"
 	"2019_2_Shtoby_shto/src/utils"
@@ -14,8 +14,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 	"strconv"
+	"time"
 )
 
 const (
@@ -28,11 +28,11 @@ var (
 )
 
 var (
-	transportService transport.Handler
-	securityService  security.Security
-	userService      user.HandlerUserService
-	photoService     photo.HandlerPhotoService
-	dbService        database.InitDBManager
+	handlerService  handler.Handler
+	securityService security.Security
+	userService     user.HandlerUserService
+	photoService    photo.HandlerPhotoService
+	dbService       database.InitDBManager
 )
 
 var logger *log.Logger
@@ -67,8 +67,7 @@ func main() {
 	//TODO::great shutdown
 	switch conf.Port {
 	case 443:
-		if err := srv.ListenAndServeTLS("keys/server.crt", "keys/server.key");
-		   err != http.ErrServerClosed {
+		if err := srv.ListenAndServeTLS("keys/server.crt", "keys/server.key"); err != http.ErrServerClosed {
 			logger.Fatalf("HTTPS server ListenAndServe: %v", err)
 		}
 	default:
@@ -97,7 +96,7 @@ func initService(db database.IDataManager, conf *config.Config) {
 	sessionService := security.NewSessionManager(conf.RedisConfig, conf.RedisPass, conf.RedisDbNumber)
 	userService = user.CreateInstance(db)
 	photoService = photo.CreateInstance(db)
-	transportService = transport.CreateInstance(sessionService)
+	//handlerService = handler.CreateInstance(sessionService)
 	securityService = security.CreateInstance(sessionService, userService, photoService)
 }
 

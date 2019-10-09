@@ -1,4 +1,4 @@
-package transport
+package handler
 
 import (
 	"2019_2_Shtoby_shto/src/errors"
