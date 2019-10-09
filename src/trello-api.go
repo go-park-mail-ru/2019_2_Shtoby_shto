@@ -5,7 +5,7 @@ import (
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/user"
-	transport "2019_2_Shtoby_shto/src/handle"
+	handler "2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/route"
 	"2019_2_Shtoby_shto/src/security"
 	"flag"
@@ -26,14 +26,12 @@ var (
 )
 
 var (
-	transportService transport.Handler
-	securityService  security.Security
-	userService      user.HandlerUserService
-	photoService     photo.HandlerPhotoService
-	dbService        database.InitDBManager
+	handlerService  handler.Handler
+	securityService security.Security
+	userService     user.HandlerUserService
+	photoService    photo.HandlerPhotoService
+	dbService       database.InitDBManager
 )
-
-var logger *log.Logger
 
 func main() {
 	flag.Parse()
@@ -92,6 +90,6 @@ func initService(db database.IDataManager, conf *config.Config) {
 	sessionService := security.NewSessionManager(conf.RedisConfig, conf.RedisPass, conf.RedisDbNumber)
 	userService = user.CreateInstance(db)
 	photoService = photo.CreateInstance(db)
-	//transportService = transport.CreateInstance(sessionService)
+	//transportService = handler.CreateInstance(sessionService)
 	securityService = security.CreateInstance(sessionService, userService, photoService)
 }
