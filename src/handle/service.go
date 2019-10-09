@@ -73,7 +73,7 @@ func (h HandlerImpl) fetchOne(id string, w http.ResponseWriter) error {
 
 // Post
 func (h HandlerImpl) Post(w http.ResponseWriter, req *http.Request) {
-
+	return
 }
 
 // Patch
