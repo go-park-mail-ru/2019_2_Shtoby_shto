@@ -15,7 +15,6 @@ import (
 )
 
 type HandlerPhotoService interface {
-	transport.Handler
 	DownloadPhoto(photo *bufio.Reader) (customType.StringUUID, error)
 	GetPhotoByUser(photoID customType.StringUUID) ([]byte, error)
 }
