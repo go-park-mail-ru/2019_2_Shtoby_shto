@@ -9,6 +9,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"github.com/labstack/echo"
 	"net/http"
 	"strings"
 	"time"
@@ -21,6 +22,7 @@ type Security interface {
 	CheckSession(h http.HandlerFunc) http.HandlerFunc
 	UserSecurity(w http.ResponseWriter, r *http.Request)
 	ImageSecurity(w http.ResponseWriter, r *http.Request)
+	ImageSecurityEcho(ctx echo.Context) error
 }
 
 type service struct {
@@ -40,6 +42,71 @@ func CreateInstance(sm *SessionManager, user user.HandlerUserService, p photo.Ha
 		User:  user,
 		Photo: p,
 	}
+}
+
+func (s *service) ImageSecurityEcho(ctx echo.Context) error {
+	switch ctx.Request().Method {
+	case http.MethodPost:
+		rr := bufio.NewReader(ctx.Request().Body)
+		photoID, err := s.Photo.DownloadPhoto(rr)
+		if err != nil {
+			errors.ErrorHandler(ctx.Response(), "download fail", http.StatusInternalServerError, err)
+			return err
+		}
+
+		// TODO:: add _context with session and user values
+		cookieId, err := ctx.Request().Cookie("session_id")
+		if err != nil {
+			errors.ErrorHandler(ctx.Response(), "Session error", http.StatusUnauthorized, err)
+			return err
+		}
+
+		userId, err := s.Sm.getSession(cookieId.Value)
+		if err != nil {
+			errors.ErrorHandler(ctx.Response(), "Session error", http.StatusBadRequest, err)
+			return err
+		}
+		user, err := s.User.GetUserById(StringUUID(userId))
+		if err != nil {
+			errors.ErrorHandler(ctx.Response(), "GetUserById error", http.StatusInternalServerError, err)
+			return err
+		}
+		user.PhotoID = &photoID
+		if err := s.User.UpdateUser(user, StringUUID(userId)); err != nil {
+			errors.ErrorHandler(ctx.Response(), "Update user error", http.StatusInternalServerError, err)
+			return err
+		}
+	case http.MethodGet:
+		cookieId, err := ctx.Request().Cookie("session_id")
+		if err != nil {
+			errors.ErrorHandler(ctx.Response(), "Session error", http.StatusUnauthorized, err)
+			return err
+		}
+
+		userId, err := s.Sm.getSession(cookieId.Value)
+		if err != nil {
+			errors.ErrorHandler(ctx.Response(), "Session error", http.StatusBadRequest, err)
+			return err
+		}
+
+		user, err := s.User.GetUserById(StringUUID(userId))
+		if err != nil {
+			errors.ErrorHandler(ctx.Response(), "GetUserById error", http.StatusInternalServerError, err)
+			return err
+		}
+		photo, err := s.Photo.GetPhotoByUser(*user.PhotoID)
+		if err != nil {
+			errors.ErrorHandler(ctx.Response(), "GetPhotoByUser error", http.StatusInternalServerError, err)
+			return err
+		}
+		ctx.Response().Header().Add("Content-Type", "multipart/form-data")
+		if _, err := ctx.Response().Write([]byte(photo)); err != nil {
+			return err
+		}
+	default:
+		errors.ErrorHandler(ctx.Response(), "Method Not Allowed", http.StatusMethodNotAllowed, nil)
+	}
+	return nil
 }
 
 // TODO::replace into handler

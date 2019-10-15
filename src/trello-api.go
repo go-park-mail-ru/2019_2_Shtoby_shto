@@ -76,6 +76,7 @@ func main() {
 func newServer(logger *log.Logger) *http.Server {
 	router := route.NewRouterService(securityService)
 	logger.Println("serving on", *httpAddr)
+
 	return &http.Server{
 		Addr:           *httpAddr,
 		Handler:        router,

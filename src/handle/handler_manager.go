@@ -67,7 +67,6 @@ func (p *ModelHandler) GetHandler(model string) (Handler, error) {
 func (p *ModelHandler) ModelRequestPost(w http.ResponseWriter, r *http.Request) {
 	h, err := p.getHandler(r.Context().Value("model").(string))
 	if err != nil {
-		//r.Error = exception.CreateError(http.StatusBadRequest, 10101, createHandlerErr, r.Request.Uri)
 		return
 	}
 	h.Post(w, r)
@@ -76,7 +75,6 @@ func (p *ModelHandler) ModelRequestPost(w http.ResponseWriter, r *http.Request) 
 func (p *ModelHandler) ModelRequestPut(w http.ResponseWriter, r *http.Request) {
 	h, err := p.getHandler(r.Context().Value("model").(string))
 	if err != nil {
-		//r.Error = exception.CreateError(http.StatusBadRequest, 10101, createHandlerErr, r.Request.Uri)
 		return
 	}
 	h.Put(w, r)
@@ -84,9 +82,7 @@ func (p *ModelHandler) ModelRequestPut(w http.ResponseWriter, r *http.Request) {
 
 func (p *ModelHandler) ModelRequestGet(w http.ResponseWriter, r *http.Request) {
 	h, err := p.getHandler(r.Context().Value("model").(string))
-	// resolve duplicate with ModelRequestFetch, for mr. Sonar
 	if err != nil {
-		//r.Error = exception.CreateError(http.StatusBadRequest, 10101, createHandlerErr, uri)
 		return
 	}
 	h.Get(w, r)

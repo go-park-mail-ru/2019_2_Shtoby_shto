@@ -1,10 +1,13 @@
 package route
 
 import (
+	"2019_2_Shtoby_shto/src/config"
 	"2019_2_Shtoby_shto/src/security"
 	"2019_2_Shtoby_shto/src/utils"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 	"time"
@@ -50,9 +53,18 @@ func NewRouterService(s security.Security) *mux.Router {
 	r.Use(AccessCORS, AccessLogMiddleware)
 	//apiUserPrefix := utils.Join(apiName, ver, "user")
 
-	//modelHandler := transport.CreateModelHandler()
+	e := echo.New()
+	apiURL := config.GetInstance().FrontendURL
+	e.Use(middleware.Logger(), middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{apiURL},
+		AllowCredentials: true,
+		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete, http.MethodOptions},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	}))
+	e.GET("/user", s.ImageSecurityEcho)
+	go e.Start(":8081")
 	//modelHandler.InitStaticModel("user")
-
+	//modelHandler := transport.CreateModelHandler()
 	r.HandleFunc("/docs/", httpSwagger.WrapHandler)
 	r.HandleFunc("/", nil)
 	r.HandleFunc("/login", s.Login).Methods(http.MethodPost, http.MethodOptions)
