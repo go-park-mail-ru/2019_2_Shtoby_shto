@@ -2,10 +2,7 @@ package transport
 
 import (
 	"2019_2_Shtoby_shto/src/dicts"
-	"2019_2_Shtoby_shto/src/errors"
-	"encoding/json"
-	"github.com/gorilla/mux"
-	"net/http"
+	"github.com/labstack/echo"
 )
 
 // Описание структуры ответа на list-запрос
@@ -21,15 +18,17 @@ type SuccessResponse struct {
 
 type Handler interface {
 	// Get
-	Get(w http.ResponseWriter, req *http.Request)
+	Get(c echo.Context)
+	// Fetch all
+	Fetch(c echo.Context)
 	// Patch
 	//Patch(w http.ResponseWriter, req *http.Request)
 	// Post
-	Post(w http.ResponseWriter, req *http.Request)
+	Post(c echo.Context)
 	// Delete ...handlerManager
-	Delete(w http.ResponseWriter, req *http.Request)
+	Delete(c echo.Context)
 	// Put
-	Put(w http.ResponseWriter, req *http.Request)
+	Put(c echo.Context)
 
 	CreateInstance() dicts.Dict
 }
@@ -45,52 +44,25 @@ func (h HandlerImpl) CreateInstance() dicts.Dict {
 }
 
 // Get
-func (h HandlerImpl) Get(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if id != "" {
-		if err := h.fetchOne(id, w); err != nil {
-			return
-		}
-	} else {
-		if err := h.fetchList(w); err != nil {
-			return
-		}
-	}
-}
-
-func (h HandlerImpl) fetchList(w http.ResponseWriter) error {
-	var err error
-
-	if err != nil {
-		errors.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError, err)
-		return err
-	}
-	b, _ := json.Marshal(&FetchResult{
-		Name: "List",
-		//Total: count,
-		Items: nil,
-	})
-	w.Write([]byte(b))
-	w.WriteHeader(http.StatusOK)
+func (h HandlerImpl) Get(c echo.Context) error {
 	return nil
 }
 
-func (h HandlerImpl) fetchOne(id string, w http.ResponseWriter) error {
+func (h HandlerImpl) Fetch(c echo.Context) error {
 	return nil
 }
 
 // Post
-func (h HandlerImpl) Post(w http.ResponseWriter, r *http.Request) {
-
+func (h HandlerImpl) Post(c echo.Context) error {
+	return nil
 }
 
 // Patch
-func (h HandlerImpl) Put(w http.ResponseWriter, r *http.Request) {
-
+func (h HandlerImpl) Put(c echo.Context) error {
+	return nil
 }
 
 // Delete
-func (h HandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
-
+func (h HandlerImpl) Delete(c echo.Context) error {
+	return nil
 }
