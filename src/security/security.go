@@ -19,7 +19,9 @@ type Security interface {
 	Login(w http.ResponseWriter, r *http.Request)
 	LoginEcho(ctx echo.Context) error
 	Logout(w http.ResponseWriter, r *http.Request)
+	LogoutEcho(ctx echo.Context) error
 	Registration(w http.ResponseWriter, r *http.Request)
+	RegistrationEcho(ctx echo.Context) error
 	CheckSession(h http.HandlerFunc) http.HandlerFunc
 	CheckSessionEcho(h echo.HandlerFunc) echo.HandlerFunc
 	UserSecurity(w http.ResponseWriter, r *http.Request)
@@ -260,6 +262,11 @@ func (s *service) Registration(w http.ResponseWriter, r *http.Request) {
 	}
 	s.securityResponse(w, http.StatusOK, "Registration is success", err)
 
+}
+
+func (s *service) RegistrationEcho(ctx echo.Context) error {
+
+	return nil
 }
 func (s *service) Logout(w http.ResponseWriter, r *http.Request) {
 	err := s.Sm.Delete(r.Context())

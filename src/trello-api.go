@@ -7,12 +7,15 @@ import (
 	"2019_2_Shtoby_shto/src/dicts/user"
 	handler "2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/security"
+	"context"
 	"flag"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	echoLog "github.com/labstack/gommon/log"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
 	"time"
 )
@@ -56,22 +59,36 @@ func main() {
 	defer dm.CloseConnection()
 
 	e := echo.New()
+	e.Logger.SetLevel(echoLog.INFO)
 	initService(e, dm, conf)
 	newServer(e, logger)
 	if *initFlag {
 		return
 	}
 
-	//TODO::great shutdown
-	switch conf.Port {
-	case 443:
-		if err := e.StartTLS(*httpAddr, "keys/server.crt", "keys/server.key"); err != http.ErrServerClosed {
-			logger.Fatalf("HTTPS server ListenAndServe: %v", err)
+	// great shutdown
+	go func() {
+		switch conf.Port {
+		case 443:
+			if err := e.StartTLS(*httpAddr, "keys/server.crt", "keys/server.key"); err != http.ErrServerClosed {
+				logger.Fatalf("HTTPS server ListenAndServe: %v", err)
+			}
+		default:
+			if err := e.Start(*httpAddr); err != http.ErrServerClosed {
+				logger.Fatalf("HTTP server ListenAndServe: %v", err)
+			}
 		}
-	default:
-		if err := e.Start(*httpAddr); err != http.ErrServerClosed {
-			logger.Fatalf("HTTP server ListenAndServe: %v", err)
-		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server with
+	// a timeout of 10 seconds.
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := e.Shutdown(ctx); err != nil {
+		e.Logger.Fatal(err)
 	}
 }
 
@@ -80,12 +97,13 @@ func newServer(e *echo.Echo, logger *log.Logger) {
 	logger.Println("serving on", *httpAddr)
 
 	apiURL := config.GetInstance().FrontendURL
-	e.Use(middleware.Logger(), middleware.CORSWithConfig(middleware.CORSConfig{
+	e.Use(middleware.Logger(), securityService.CheckSessionEcho, middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{apiURL},
 		AllowCredentials: true,
 		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete, http.MethodOptions},
 		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
+
 	//e.POST("/login", s.LoginEcho)
 	//e.GET("/user", s.CheckSessionEcho(s.ImageSecurityEcho))
 
@@ -107,5 +125,4 @@ func initService(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	securityService = security.CreateInstance(sessionService, userService, photoService)
 	user.NewUserHandler(e, userService)
 	photo.NewPhotoHandler(e, photoService, userService)
-
 }
