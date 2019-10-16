@@ -61,7 +61,7 @@ func NewRouterService(s security.Security) *mux.Router {
 		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete, http.MethodOptions},
 		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
-	e.GET("/user", s.ImageSecurityEcho)
+	e.GET("/user", s.CheckSessionEcho(s.ImageSecurityEcho))
 	go e.Start(":8081")
 	//modelHandler.InitStaticModel("user")
 	//modelHandler := transport.CreateModelHandler()

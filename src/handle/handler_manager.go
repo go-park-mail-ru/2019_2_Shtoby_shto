@@ -65,25 +65,25 @@ func (p *ModelHandler) GetHandler(model string) (Handler, error) {
 }
 
 func (p *ModelHandler) ModelRequestPost(w http.ResponseWriter, r *http.Request) {
-	h, err := p.getHandler(r.Context().Value("model").(string))
-	if err != nil {
-		return
-	}
-	h.Post(w, r)
+	//h, err := p.getHandler(r.Context().Value("model").(string))
+	//if err != nil {
+	//	return
+	//}
+	//h.Post(w, r)
 }
 
 func (p *ModelHandler) ModelRequestPut(w http.ResponseWriter, r *http.Request) {
-	h, err := p.getHandler(r.Context().Value("model").(string))
-	if err != nil {
-		return
-	}
-	h.Put(w, r)
+	//h, err := p.getHandler(r.Context().Value("model").(string))
+	//if err != nil {
+	//	return
+	//}
+	//h.Put(w, r)
 }
 
 func (p *ModelHandler) ModelRequestGet(w http.ResponseWriter, r *http.Request) {
-	h, err := p.getHandler(r.Context().Value("model").(string))
-	if err != nil {
-		return
-	}
-	h.Get(w, r)
+	//h, err := p.getHandler(r.Context().Value("model").(string))
+	//if err != nil {
+	//	return
+	//}
+	//h.Get(w, r)
 }

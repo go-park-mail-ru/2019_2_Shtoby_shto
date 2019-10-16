@@ -20,6 +20,7 @@ type Security interface {
 	Logout(w http.ResponseWriter, r *http.Request)
 	Registration(w http.ResponseWriter, r *http.Request)
 	CheckSession(h http.HandlerFunc) http.HandlerFunc
+	CheckSessionEcho(h echo.HandlerFunc) echo.HandlerFunc
 	UserSecurity(w http.ResponseWriter, r *http.Request)
 	ImageSecurity(w http.ResponseWriter, r *http.Request)
 	ImageSecurityEcho(ctx echo.Context) error
@@ -341,4 +342,23 @@ func (s *service) CheckSession(h http.HandlerFunc) http.HandlerFunc {
 		r = r.WithContext(ctx)
 		h.ServeHTTP(w, r)
 	})
+}
+
+func (s *service) CheckSessionEcho(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) (err error) {
+		cookieSessionID, err := ctx.Cookie("session_id")
+		if err == http.ErrNoCookie {
+			errors.ErrorHandler(ctx.Response(), "No session_id", http.StatusUnauthorized, err)
+			return err
+		} else if err != nil {
+			errors.ErrorHandler(ctx.Response(), "Error cookie", http.StatusUnauthorized, err)
+			return err
+		}
+		ctx.Set("session_id", cookieSessionID.Value)
+		if err := s.Sm.CheckEcho(&ctx); err != nil {
+			errors.ErrorHandler(ctx.Response(), "Error check session", http.StatusUnauthorized, err)
+			return err
+		}
+		return nil
+	}
 }

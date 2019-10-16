@@ -5,13 +5,13 @@ import (
 	"github.com/labstack/echo"
 )
 
-type UserHandler struct {
+type Handler struct {
 	userService HandlerUserService
 	transport.HandlerImpl
 }
 
 func NewUserHandler(e *echo.Echo, userService HandlerUserService) {
-	handler := UserHandler{
+	handler := Handler{
 		userService: userService,
 	}
 	e.GET("/users", handler.Fetch)
@@ -21,6 +21,6 @@ func NewUserHandler(e *echo.Echo, userService HandlerUserService) {
 	e.DELETE("/users/:id", handler.Delete)
 }
 
-func (u UserHandler) Get(c echo.Context) error {
+func (u Handler) Get(c echo.Context) error {
 	return nil
 }

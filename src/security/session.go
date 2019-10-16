@@ -7,12 +7,14 @@ import (
 	"context"
 	"errors"
 	"github.com/go-redis/redis"
+	"github.com/labstack/echo"
 )
 
 // Обработчик сессий
 type SessionHandler interface {
 	Create(user user.User) (*SessionID, error)
 	Check(ctx *context.Context) error
+	CheckEcho(ctx *echo.Context) error
 	Delete(ctx context.Context) error
 }
 
@@ -75,5 +77,17 @@ func (sm *SessionManager) Check(ctx *context.Context) error {
 		return errors.New("Missing userId")
 	}
 	*ctx = context.WithValue(*ctx, "user_id", StringUUID(userId))
+	return nil
+}
+
+func (sm *SessionManager) CheckEcho(ctx *echo.Context) error {
+	userId, err := sm.getSession((*ctx).Get("session_id").(string))
+	if err != nil {
+		return err
+	}
+	if userId == "" {
+		return errors.New("Missing userId")
+	}
+	(*ctx).Set("user_id", StringUUID(userId))
 	return nil
 }
