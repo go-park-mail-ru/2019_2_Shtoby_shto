@@ -17,6 +17,7 @@ import (
 
 type Security interface {
 	Login(w http.ResponseWriter, r *http.Request)
+	LoginEcho(ctx echo.Context) error
 	Logout(w http.ResponseWriter, r *http.Request)
 	Registration(w http.ResponseWriter, r *http.Request)
 	CheckSession(h http.HandlerFunc) http.HandlerFunc
@@ -270,6 +271,17 @@ func (s *service) Logout(w http.ResponseWriter, r *http.Request) {
 	s.securityResponse(w, http.StatusOK, "Logout", err)
 }
 
+func (s *service) LogoutEcho(ctx echo.Context) error {
+	err := s.Sm.Delete(ctx.Request().Context())
+	if err != nil {
+		errors.ErrorHandler(ctx.Response(), "Error delete session", http.StatusInternalServerError, err)
+		return err
+	}
+	ctx.Response().Header().Del("session_id")
+	s.securityResponse(ctx.Response(), http.StatusOK, "Logout", err)
+	return nil
+}
+
 func (s *service) Login(w http.ResponseWriter, r *http.Request) {
 	curUser := user.User{}
 
@@ -295,6 +307,36 @@ func (s *service) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.securityResponse(w, http.StatusOK, "Login", err)
+}
+
+func (s *service) LoginEcho(ctx echo.Context) error {
+	curUser := user.User{}
+
+	if err := json.NewDecoder(ctx.Request().Body).Decode(&curUser); err != nil {
+		errors.ErrorHandler(ctx.Response(), "Decode error", http.StatusInternalServerError, err)
+		return err
+	}
+
+	user, err := s.User.GetUserByLogin(curUser.Login)
+	if err != nil {
+		errors.ErrorHandler(ctx.Response(), "Please, reg yourself", http.StatusUnauthorized, err)
+		return err
+	}
+
+	if strings.Compare(user.Password, curUser.Password) != 0 {
+		errors.ErrorHandler(ctx.Response(), "Ne tot password )0))", http.StatusBadRequest, err)
+		return err
+	}
+
+	if err := s.createSession(ctx.Response(), user); err != nil {
+		errors.ErrorHandler(ctx.Response(), "Create session error", http.StatusInternalServerError, err)
+		return err
+	}
+
+	ctx.Set("user_id", user.ID)
+
+	s.securityResponse(ctx.Response(), http.StatusOK, "Login", err)
+	return nil
 }
 
 func (s *service) createSession(w http.ResponseWriter, user user.User) error {

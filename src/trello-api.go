@@ -6,9 +6,10 @@ import (
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	handler "2019_2_Shtoby_shto/src/handle"
-	"2019_2_Shtoby_shto/src/route"
 	"2019_2_Shtoby_shto/src/security"
 	"flag"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"log"
 	"net/http"
 	"os"
@@ -54,8 +55,9 @@ func main() {
 	dm := database.NewDataManager(db)
 	defer dm.CloseConnection()
 
-	initService(dm, conf)
-	srv := newServer(logger)
+	e := echo.New()
+	initService(e, dm, conf)
+	newServer(e, logger)
 	if *initFlag {
 		return
 	}
@@ -63,23 +65,33 @@ func main() {
 	//TODO::great shutdown
 	switch conf.Port {
 	case 443:
-		if err := srv.ListenAndServeTLS("keys/server.crt", "keys/server.key"); err != http.ErrServerClosed {
+		if err := e.StartTLS(*httpAddr, "keys/server.crt", "keys/server.key"); err != http.ErrServerClosed {
 			logger.Fatalf("HTTPS server ListenAndServe: %v", err)
 		}
 	default:
-		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+		if err := e.Start(*httpAddr); err != http.ErrServerClosed {
 			logger.Fatalf("HTTP server ListenAndServe: %v", err)
 		}
 	}
 }
 
-func newServer(logger *log.Logger) *http.Server {
-	router := route.NewRouterService(securityService)
+func newServer(e *echo.Echo, logger *log.Logger) {
+	//router := route.NewRouterService(securityService)
 	logger.Println("serving on", *httpAddr)
 
-	return &http.Server{
-		Addr:           *httpAddr,
-		Handler:        router,
+	apiURL := config.GetInstance().FrontendURL
+	e.Use(middleware.Logger(), middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{apiURL},
+		AllowCredentials: true,
+		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete, http.MethodOptions},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	}))
+	//e.POST("/login", s.LoginEcho)
+	//e.GET("/user", s.CheckSessionEcho(s.ImageSecurityEcho))
+
+	e.Server = &http.Server{
+		Addr: *httpAddr,
+		//Handler:        router,
 		ErrorLog:       logger,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
@@ -87,10 +99,13 @@ func newServer(logger *log.Logger) *http.Server {
 	}
 }
 
-func initService(db database.IDataManager, conf *config.Config) {
+func initService(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	sessionService := security.NewSessionManager(conf.RedisConfig, conf.RedisPass, conf.RedisDbNumber)
 	userService = user.CreateInstance(db)
 	photoService = photo.CreateInstance(db)
 	//transportService = handler.CreateInstance(sessionService)
 	securityService = security.CreateInstance(sessionService, userService, photoService)
+	user.NewUserHandler(e, userService)
+	photo.NewPhotoHandler(e, photoService, userService)
+
 }
