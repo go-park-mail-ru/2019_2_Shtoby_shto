@@ -25,10 +25,10 @@ func NewPhotoHandler(e *echo.Echo, photoService HandlerPhotoService, userService
 		userService:     userService,
 		securityService: securityService,
 	}
-	e.GET("/photo", handler.securityService.CheckSession(handler.Get))
-	e.POST("/photo", handler.securityService.CheckSession(handler.Post))
-	e.PUT("/photo/:id", handler.securityService.CheckSession(handler.Put))
-	e.DELETE("/photo/:id", handler.securityService.CheckSession(handler.Delete))
+	e.GET("/photo", handler.Get)
+	e.POST("/photo", handler.Post)
+	e.PUT("/photo/:id", handler.Put)
+	e.DELETE("/photo/:id", handler.Delete)
 }
 
 func (h Handler) Get(ctx echo.Context) error {

@@ -98,7 +98,7 @@ func newServer(e *echo.Echo, logger *log.Logger) {
 
 	apiURL := config.GetInstance().FrontendURL
 	// securityService.CheckSession,
-	e.Use(middleware.Logger(), middleware.CORSWithConfig(middleware.CORSConfig{
+	e.Use(middleware.Logger(), securityService.CheckSession, middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{apiURL},
 		AllowCredentials: true,
 		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete, http.MethodOptions},

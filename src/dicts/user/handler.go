@@ -25,12 +25,12 @@ func NewUserHandler(e *echo.Echo, userService HandlerUserService, securityServic
 		securityService: securityService,
 	}
 	e.POST("/login", handler.Login)
-	e.GET("/logout", handler.securityService.CheckSession(handler.Logout))
-	e.GET("/users", handler.securityService.CheckSession(handler.Fetch))
-	e.GET("/users/:id", handler.securityService.CheckSession(handler.Get))
-	e.POST("/users", handler.securityService.CheckSession(handler.Post))
-	e.PUT("/users/:id", handler.securityService.CheckSession(handler.Put))
-	e.DELETE("/users/:id", handler.securityService.CheckSession(handler.Delete))
+	e.GET("/logout", handler.Logout)
+	e.GET("/users", handler.Fetch)
+	e.GET("/users/:id", handler.Get)
+	e.POST("/users", handler.Post)
+	e.PUT("/users/:id", handler.Put)
+	e.DELETE("/users/:id", handler.Delete)
 }
 
 func (h Handler) Get(ctx echo.Context) error {
