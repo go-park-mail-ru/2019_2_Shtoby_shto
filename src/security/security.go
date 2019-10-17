@@ -83,6 +83,6 @@ func (s *service) CheckSession(h echo.HandlerFunc) echo.HandlerFunc {
 			errors.ErrorHandler(ctx.Response(), "Error check session", http.StatusUnauthorized, err)
 			return err
 		}
-		return nil
+		return h(ctx)
 	}
 }

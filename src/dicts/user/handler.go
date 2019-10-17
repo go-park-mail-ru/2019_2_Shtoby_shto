@@ -36,13 +36,13 @@ func NewUserHandler(e *echo.Echo, userService HandlerUserService, securityServic
 func (h Handler) Get(ctx echo.Context) error {
 	userID, ok := ctx.Get("user_id").(customType.StringUUID)
 	if !ok {
-		errorsLib.ErrorHandler(ctx.Response(), "download fail", http.StatusInternalServerError, errors.New("download fail"))
-		return errors.New("download fail")
+		errorsLib.ErrorHandler(ctx.Response(), "get user_id failed", http.StatusInternalServerError, errors.New("download fail"))
+		return errors.New("get user_id failed")
 	}
 
 	user, err := h.userService.GetUserById(userID)
 	if err != nil {
-		errorsLib.ErrorHandler(ctx.Response(), "Update user error", http.StatusBadRequest, err)
+		errorsLib.ErrorHandler(ctx.Response(), "GetUserById error", http.StatusBadRequest, err)
 		return err
 	}
 	ctx.Response().WriteHeader(http.StatusOK)
