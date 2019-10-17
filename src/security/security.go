@@ -13,6 +13,7 @@ type HandlerSecurity interface {
 	CheckSession(h echo.HandlerFunc) echo.HandlerFunc
 	CreateSession(w http.ResponseWriter, userID customType.StringUUID) error
 	SecurityResponse(w http.ResponseWriter, status int, respMessage string, err error)
+	Logout(ctx echo.Context) error
 }
 
 type service struct {
@@ -30,16 +31,12 @@ func CreateInstance(sm *SessionManager) HandlerSecurity {
 	}
 }
 
-//func (s *service) LogoutEcho(ctx echo.Context) error {
-//	err := s.Sm.Delete(ctx.Request().Context())
-//	if err != nil {
-//		errors.ErrorHandler(ctx.Response(), "Error delete session", http.StatusInternalServerError, err)
-//		return err
-//	}
-//	ctx.Response().Header().Del("session_id")
-//	s.SecurityResponse(ctx.Response(), http.StatusOK, "Logout", err)
-//	return nil
-//}
+func (s *service) Logout(ctx echo.Context) error {
+	if err := s.Sm.Delete(ctx.Request().Context()); err != nil {
+		return err
+	}
+	return nil
+}
 
 func (s *service) CreateSession(w http.ResponseWriter, userID customType.StringUUID) error {
 	sessionId, err := s.Sm.Create(userID)

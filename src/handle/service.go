@@ -1,4 +1,5 @@
-package transport
+// TODO:: work in progress
+package handle
 
 import (
 	"2019_2_Shtoby_shto/src/dicts"
@@ -34,7 +35,6 @@ type Handler interface {
 }
 
 // Класс реализующий транспортный уровень
-
 type HandlerImpl struct {
 	Handler
 }
