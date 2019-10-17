@@ -5,7 +5,6 @@ import (
 	"2019_2_Shtoby_shto/src/utils"
 	"fmt"
 	"github.com/gorilla/mux"
-	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 	"time"
 )
@@ -45,20 +44,20 @@ const (
 // @host petstore.swagger.io
 // @BasePath /api/v1
 
-func NewRouterService(s security.Security) *mux.Router {
+func NewRouterService(s security.HandlerSecurity) *mux.Router {
 	r := mux.NewRouter()
 	r.Use(AccessCORS, AccessLogMiddleware)
 	//apiUserPrefix := utils.Join(apiName, ver, "user")
 
 	//modelHandler.InitStaticModel("user")
 	//modelHandler := transport.CreateModelHandler()
-	r.HandleFunc("/docs/", httpSwagger.WrapHandler)
-	r.HandleFunc("/", nil)
-	r.HandleFunc("/login", s.Login).Methods(http.MethodPost, http.MethodOptions)
-	r.HandleFunc("/registration", s.Registration).Methods(http.MethodPost, http.MethodOptions)
-	r.HandleFunc("/logout", s.CheckSession(s.Logout)).Methods(http.MethodPost, http.MethodOptions)
-	r.HandleFunc("/user", s.CheckSession(s.UserSecurity)).Methods(http.MethodGet, http.MethodPut, http.MethodOptions)
-	r.HandleFunc("/photo", s.CheckSession(s.ImageSecurity)).Methods(http.MethodGet, http.MethodPost, http.MethodPut, http.MethodOptions)
+	//r.HandleFunc("/docs/", httpSwagger.WrapHandler)
+	//r.HandleFunc("/", nil)
+	//r.HandleFunc("/login", s.Login).Methods(http.MethodPost, http.MethodOptions)
+	//r.HandleFunc("/registration", s.Registration).Methods(http.MethodPost, http.MethodOptions)
+	//r.HandleFunc("/logout", s.CheckSession(s.Logout)).Methods(http.MethodPost, http.MethodOptions)
+	//r.HandleFunc("/user", s.CheckSession(s.UserSecurity)).Methods(http.MethodGet, http.MethodPut, http.MethodOptions)
+	//r.HandleFunc("/photo", s.CheckSession(s.ImageSecurity)).Methods(http.MethodGet, http.MethodPost, http.MethodPut, http.MethodOptions)
 	return r
 }
 

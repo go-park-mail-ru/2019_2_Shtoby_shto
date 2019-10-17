@@ -2,7 +2,6 @@ package security
 
 import (
 	. "2019_2_Shtoby_shto/src/customType"
-	"2019_2_Shtoby_shto/src/dicts/user"
 	"2019_2_Shtoby_shto/src/utils"
 	"context"
 	"errors"
@@ -12,9 +11,8 @@ import (
 
 // Обработчик сессий
 type SessionHandler interface {
-	Create(user user.User) (*SessionID, error)
-	Check(ctx *context.Context) error
-	CheckEcho(ctx *echo.Context) error
+	Create(userID StringUUID) (*SessionID, error)
+	Check(ctx *echo.Context) error
 	Delete(ctx context.Context) error
 }
 
@@ -38,19 +36,19 @@ func NewSessionManager(addr, password string, dbNumber int) *SessionManager {
 	}
 }
 
-func (sm SessionManager) Create(user user.User) (*SessionID, error) {
+func (sm SessionManager) Create(userID StringUUID) (*SessionID, error) {
 	id, err := utils.GenerateUUID()
 	if err != nil || id.String() == "" {
 		return nil, err
 	}
 	session := SessionID{StringUUID(id.String())}
-	return &session, sm.putSession(session.ID, user)
+	return &session, sm.putSession(session.ID, userID)
 }
 
-func (sm *SessionManager) putSession(id StringUUID, user user.User) error {
+func (sm *SessionManager) putSession(sessionID StringUUID, userID StringUUID) error {
 	//todo::set expire
 	//expire := time.Duration(24 * time.Hour)
-	return sm.cache.Set(id.String(), user.ID.String(), 0).Err()
+	return sm.cache.Set(sessionID.String(), userID.String(), 0).Err()
 }
 
 func (sm *SessionManager) getSession(cacheID string) (string, error) {
@@ -68,25 +66,13 @@ func (sm *SessionManager) Delete(ctx context.Context) error {
 	return sm.cache.Del(ctx.Value("session_id").(string)).Err()
 }
 
-func (sm *SessionManager) Check(ctx *context.Context) error {
-	userId, err := sm.getSession((*ctx).Value("session_id").(string))
-	if err != nil {
-		return err
-	}
-	if userId == "" {
-		return errors.New("Missing userId")
-	}
-	*ctx = context.WithValue(*ctx, "user_id", StringUUID(userId))
-	return nil
-}
-
-func (sm *SessionManager) CheckEcho(ctx *echo.Context) error {
+func (sm *SessionManager) Check(ctx *echo.Context) error {
 	userId, err := sm.getSession((*ctx).Get("session_id").(string))
 	if err != nil {
 		return err
 	}
 	if userId == "" {
-		return errors.New("Missing userId")
+		return errors.New("Missing user id")
 	}
 	(*ctx).Set("user_id", StringUUID(userId))
 	return nil

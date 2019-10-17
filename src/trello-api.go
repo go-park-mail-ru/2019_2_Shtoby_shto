@@ -31,7 +31,7 @@ var (
 
 var (
 	handlerService  handler.Handler
-	securityService security.Security
+	securityService security.HandlerSecurity
 	userService     user.HandlerUserService
 	photoService    photo.HandlerPhotoService
 	dbService       database.InitDBManager
@@ -97,7 +97,8 @@ func newServer(e *echo.Echo, logger *log.Logger) {
 	logger.Println("serving on", *httpAddr)
 
 	apiURL := config.GetInstance().FrontendURL
-	e.Use(middleware.Logger(), securityService.CheckSessionEcho, middleware.CORSWithConfig(middleware.CORSConfig{
+	// securityService.CheckSession,
+	e.Use(middleware.Logger(), middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{apiURL},
 		AllowCredentials: true,
 		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete, http.MethodOptions},
@@ -122,7 +123,7 @@ func initService(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	userService = user.CreateInstance(db)
 	photoService = photo.CreateInstance(db)
 	//transportService = handler.CreateInstance(sessionService)
-	securityService = security.CreateInstance(sessionService, userService, photoService)
-	user.NewUserHandler(e, userService)
-	photo.NewPhotoHandler(e, photoService, userService)
+	securityService = security.CreateInstance(sessionService)
+	user.NewUserHandler(e, userService, securityService)
+	photo.NewPhotoHandler(e, photoService, userService, securityService)
 }
