@@ -28,7 +28,7 @@ func NewUserHandler(e *echo.Echo, userService HandlerUserService, securityServic
 	e.GET("/logout", handler.Logout)
 	e.GET("/users", handler.Fetch)
 	e.GET("/users/:id", handler.Get)
-	e.POST("/users", handler.Post)
+	e.POST("/users/registration", handler.Post)
 	e.PUT("/users/:id", handler.Put)
 	e.DELETE("/users/:id", handler.Delete)
 }

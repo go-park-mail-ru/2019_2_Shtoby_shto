@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"os"
 	"path"
@@ -10,6 +11,7 @@ import (
 const (
 	localSettingsFile  = "trello-local-settings.json"
 	remoteSettingsFile = "trello-settings.json"
+	deployEnvVar       = "DEPLOYAPI"
 )
 
 type Config struct {
@@ -22,27 +24,31 @@ type Config struct {
 	RedisDbNumber int    `json:"trello.service.redis.db.number"`
 }
 
-func readConfig(fileName string) {
-	configFile, err := os.Open(fileName)
-	if err != nil {
-		log.Println("Can't open properties file: " + err.Error())
-	}
-	defer configFile.Close()
-	if err = json.NewDecoder(configFile).Decode(ToolConfig); err != nil {
-		log.Println("Can't parsing properties file: " + err.Error())
-	}
+var ToolConfig *Config
+
+func GetInstance() *Config {
+	return ToolConfig
 }
 
-const (
-	deployEnvVar = "DEPLOYAPI"
-)
+func readConfig(fileName string) error {
+	configFile, err := os.Open(fileName)
+	if err != nil {
+		return errors.New("Can't open properties file: " + err.Error())
+	}
+	if err = json.NewDecoder(configFile).Decode(ToolConfig); err != nil {
+		return errors.New("Can't parsing properties file: " + err.Error())
+	}
+	if err := configFile.Close(); err != nil {
+		return err
+	}
+	return nil
+}
 
-func InitConfig(logger *log.Logger) {
+func InitConfig() error {
 	dir, err := os.Getwd()
 
 	if err != nil {
-		logger.Fatal(err)
-		os.Exit(1)
+		return err
 	}
 
 	deployVar := os.Getenv(deployEnvVar)
@@ -61,11 +67,8 @@ func InitConfig(logger *log.Logger) {
 
 	configFileName := path.Join(dir, settingsFileName)
 	ToolConfig = new(Config)
-	readConfig(configFileName)
-}
-
-var ToolConfig *Config
-
-func GetInstance() *Config {
-	return ToolConfig
+	if err := readConfig(configFileName); err != nil {
+		return err
+	}
+	return nil
 }

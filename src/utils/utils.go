@@ -1,12 +1,9 @@
 package utils
 
 import (
-	"2019_2_Shtoby_shto/src/config"
 	"fmt"
 	"github.com/satori/go.uuid"
-	"log"
 	"math/rand"
-	"os"
 	"regexp"
 	"strings"
 )
@@ -37,15 +34,4 @@ func GenerateUUID() (uuid.UUID, error) {
 
 func Join(args ...string) string {
 	return strings.Join(args, "/")
-}
-
-var apiURL = ""
-
-func init() {
-	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
-	config.InitConfig(logger)
-
-	apiURL = config.GetInstance().FrontendURL
-
-	logger.Println("Frontend URL:", apiURL)
 }
