@@ -2,8 +2,7 @@ package errors
 
 import (
 	"encoding/json"
-	"log"
-	"net/http"
+	"github.com/labstack/echo/v4"
 )
 
 // Описание структуры ответа при ошибке
@@ -13,7 +12,7 @@ type ErrorResponse struct {
 	Error   string `json:"error"`
 }
 
-func ErrorHandler(w http.ResponseWriter, message string, status int, err error) {
+func ErrorHandler(response *echo.Response, message string, status int, err error) {
 	errorMessage := "Error!"
 	if err != nil {
 		errorMessage = err.Error()
@@ -23,7 +22,8 @@ func ErrorHandler(w http.ResponseWriter, message string, status int, err error) 
 		Message: message,
 		Error:   errorMessage,
 	})
-	log.Println(message)
-	w.WriteHeader(status)
-	w.Write([]byte(b))
+	response.WriteHeader(status)
+	if _, err := response.Write([]byte(b)); err != nil {
+
+	}
 }

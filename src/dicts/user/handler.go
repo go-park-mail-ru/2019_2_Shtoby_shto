@@ -8,7 +8,7 @@ import (
 	"2019_2_Shtoby_shto/src/utils"
 	"encoding/json"
 	"errors"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"net/http"
 	"strings"
 )

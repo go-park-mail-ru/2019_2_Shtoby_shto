@@ -3,7 +3,7 @@ package handle
 
 import (
 	"2019_2_Shtoby_shto/src/dicts"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 // Описание структуры ответа на list-запрос

@@ -6,7 +6,7 @@ import (
 	"context"
 	"errors"
 	"github.com/go-redis/redis"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 // Обработчик сессий
