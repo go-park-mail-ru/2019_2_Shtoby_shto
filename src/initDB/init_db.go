@@ -1,6 +1,9 @@
-package database
+package initDB
 
 import (
+	"2019_2_Shtoby_shto/src/dicts/board"
+	"2019_2_Shtoby_shto/src/dicts/photo"
+	"2019_2_Shtoby_shto/src/dicts/user"
 	"flag"
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
@@ -22,7 +25,9 @@ type tabler interface {
 }
 
 var tables = []tabler{
-	//&user.User{},
+	&user.User{},
+	&photo.Photo{},
+	&board.Board{},
 }
 
 func Tables() []tabler {

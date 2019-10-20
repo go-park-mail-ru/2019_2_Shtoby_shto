@@ -1,4 +1,4 @@
-package photo
+package board
 
 import (
 	"2019_2_Shtoby_shto/src/dicts/user"

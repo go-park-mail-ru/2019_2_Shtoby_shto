@@ -5,6 +5,7 @@ import (
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/user"
+	"2019_2_Shtoby_shto/src/initDB"
 	"2019_2_Shtoby_shto/src/security"
 	"context"
 	"flag"
@@ -28,7 +29,7 @@ var (
 	securityService security.HandlerSecurity
 	userService     user.HandlerUserService
 	photoService    photo.HandlerPhotoService
-	dbService       database.InitDBManager
+	dbService       initDB.InitDBManager
 )
 
 // @title Swagger Example API
@@ -62,7 +63,7 @@ func main() {
 	httpAddr := ":" + strconv.Itoa(conf.Port)
 	e.Logger.Info("API Url:", httpAddr)
 
-	dbService = database.Init()
+	dbService = initDB.Init()
 	db, err := dbService.DbConnect("postgres", conf.DbConfig)
 	if err != nil {
 		e.Logger.Error(err)
