@@ -67,6 +67,9 @@ func (s *service) SecurityResponse(w http.ResponseWriter, status int, respMessag
 
 func (s *service) CheckSession(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) (err error) {
+		if ctx.Request().RequestURI == "/login" {
+			return h(ctx)
+		}
 		cookieSessionID, err := ctx.Cookie("session_id")
 		if err == http.ErrNoCookie {
 			errors.ErrorHandler(ctx.Response(), "No session_id", http.StatusUnauthorized, err)
