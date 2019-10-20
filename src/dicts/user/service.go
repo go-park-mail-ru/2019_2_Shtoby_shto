@@ -3,6 +3,7 @@ package user
 import (
 	. "2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
+	"github.com/pkg/errors"
 )
 
 type HandlerUserService interface {
@@ -36,11 +37,14 @@ func (s *service) GetUserById(id StringUUID) (User, error) {
 
 func (s *service) GetUserByLogin(login string) (User, error) {
 	user := User{}
-	err := s.db.FindDictByLogin(&user, "login", login)
+	err := s.db.FindDictByColumn(&user, "login", login)
 	return user, err
 }
 
 func (s *service) UpdateUser(user User, id StringUUID) error {
+	if !user.IsValid() {
+		return errors.New("User not valid!")
+	}
 	if err := s.db.UpdateRecord(&user, id); err != nil {
 		return err
 	}

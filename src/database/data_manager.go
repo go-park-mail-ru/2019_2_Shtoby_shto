@@ -3,6 +3,7 @@ package database
 import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts"
+	"2019_2_Shtoby_shto/src/utils"
 	"errors"
 	"fmt"
 	"github.com/jinzhu/gorm"
@@ -16,7 +17,7 @@ type IDataManager interface {
 	CloseConnection() error
 	ExecuteQuery(sql string, args ...string) error
 	FindDictById(p interface{}) error
-	FindDictByLogin(p interface{}, where, whereArg string) error
+	FindDictByColumn(p interface{}, where, whereArg string) error
 	CreateRecord(p interface{}) error
 	UpdateRecord(p interface{}, id customType.StringUUID) error
 	DeleteRecord(p interface{}, id customType.StringUUID) error
@@ -61,7 +62,7 @@ func (d DataManager) FindDictById(p interface{}) error {
 	return nil
 }
 
-func (d DataManager) FindDictByLogin(p interface{}, where, whereArg string) error {
+func (d DataManager) FindDictByColumn(p interface{}, where, whereArg string) error {
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
 	res := d.db.Table(obj.GetTableName()).Where(fmt.Sprintf("%s = ?", where), whereArg).First(p)
 	if res.RecordNotFound() || res.Error != nil {
@@ -73,6 +74,11 @@ func (d DataManager) FindDictByLogin(p interface{}, where, whereArg string) erro
 
 func (d DataManager) CreateRecord(p interface{}) error {
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
+	id, err := utils.GenerateUUID()
+	if err != nil {
+		return err
+	}
+	obj.SetId(customType.StringUUID(id.String()))
 	res := d.db.Table(obj.GetTableName()).Create(p)
 	if res.Error != nil {
 		return res.Error

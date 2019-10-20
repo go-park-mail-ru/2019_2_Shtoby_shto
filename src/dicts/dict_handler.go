@@ -5,6 +5,7 @@ import . "2019_2_Shtoby_shto/src/customType"
 type Dict interface {
 	SetId(id StringUUID)
 	GetId() StringUUID
+	IsValid() bool
 	GetTableName() string
 }
 
@@ -22,4 +23,8 @@ func (b *BaseInfo) SetId(id StringUUID) {
 
 func (b BaseInfo) GetTableName() string {
 	return "default table name"
+}
+
+func (b BaseInfo) IsValid() bool {
+	return true
 }

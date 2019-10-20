@@ -14,6 +14,10 @@ type Board struct {
 	Users []user.User `json:"users" sql:"-"`
 }
 
-func (p Board) GetTableName() string {
+func (b Board) GetTableName() string {
 	return boardTableName
+}
+
+func (b Board) IsValid() bool {
+	return b.Caption != ""
 }

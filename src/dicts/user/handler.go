@@ -5,7 +5,6 @@ import (
 	errorsLib "2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/security"
-	"2019_2_Shtoby_shto/src/utils"
 	"encoding/json"
 	"errors"
 	"github.com/labstack/echo/v4"
@@ -64,13 +63,6 @@ func (h Handler) Post(ctx echo.Context) error {
 		ctx.Logger().Error(err)
 		return err
 	}
-	id, err := utils.GenerateUUID()
-	if err != nil || id.String() == "" {
-		errorsLib.ErrorHandler(ctx.Response(), "Error create UUID", http.StatusInternalServerError, err)
-		ctx.Logger().Error(err)
-		return err
-	}
-	user.ID = customType.StringUUID(id.String())
 	if err := h.userService.CreateUser(user); err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "User not valid", http.StatusBadRequest, err)
 		ctx.Logger().Error(err)
@@ -81,7 +73,7 @@ func (h Handler) Post(ctx echo.Context) error {
 		ctx.Logger().Error(err)
 		return err
 	}
-	h.securityService.SecurityResponse(ctx.Response(), http.StatusOK, "Registration is success", err)
+	h.securityService.SecurityResponse(ctx.Response(), http.StatusOK, "Registration is success", nil)
 	return nil
 }
 

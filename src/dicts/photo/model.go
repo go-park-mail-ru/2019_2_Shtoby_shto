@@ -16,3 +16,7 @@ type Photo struct {
 func (p Photo) GetTableName() string {
 	return photoTableName
 }
+
+func (p Photo) IsValid() bool {
+	return p.Path != ""
+}

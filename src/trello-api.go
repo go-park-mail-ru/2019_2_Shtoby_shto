@@ -3,6 +3,7 @@ package main
 import (
 	"2019_2_Shtoby_shto/src/config"
 	"2019_2_Shtoby_shto/src/database"
+	"2019_2_Shtoby_shto/src/dicts/board"
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	"2019_2_Shtoby_shto/src/initDB"
@@ -29,6 +30,7 @@ var (
 	securityService security.HandlerSecurity
 	userService     user.HandlerUserService
 	photoService    photo.HandlerPhotoService
+	boardService    board.HandlerBoardService
 	dbService       initDB.InitDBManager
 )
 
@@ -129,7 +131,9 @@ func initService(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	sessionService := security.NewSessionManager(conf.RedisConfig, conf.RedisPass, conf.RedisDbNumber)
 	userService = user.CreateInstance(db)
 	photoService = photo.CreateInstance(db)
+	boardService = board.CreateInstance(db)
 	securityService = security.CreateInstance(sessionService)
 	user.NewUserHandler(e, userService, securityService)
 	photo.NewPhotoHandler(e, photoService, userService, securityService)
+	board.NewBoardHandler(e, userService, boardService, securityService)
 }

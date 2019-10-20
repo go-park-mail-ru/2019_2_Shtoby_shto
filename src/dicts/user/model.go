@@ -20,3 +20,7 @@ type User struct {
 func (u User) GetTableName() string {
 	return userTableName
 }
+
+func (u User) IsValid() bool {
+	return u.Login != ""
+}
