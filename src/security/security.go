@@ -67,7 +67,7 @@ func (s *service) SecurityResponse(w http.ResponseWriter, status int, respMessag
 
 func (s *service) CheckSession(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) (err error) {
-		if ctx.Request().RequestURI == "/login" {
+		if ctx.Request().RequestURI == "/login" || ctx.Request().RequestURI == "/users/registration" {
 			return h(ctx)
 		}
 		cookieSessionID, err := ctx.Cookie("session_id")
@@ -79,6 +79,7 @@ func (s *service) CheckSession(h echo.HandlerFunc) echo.HandlerFunc {
 			return err
 		}
 		ctx.Set("session_id", cookieSessionID.Value)
+		ctx.Logger().Info(ctx.Request().Host, ctx.Request().RequestURI)
 		if err := s.Sm.Check(&ctx); err != nil {
 			errors.ErrorHandler(ctx.Response(), "Error check session", http.StatusUnauthorized, err)
 			return err
