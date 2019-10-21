@@ -73,7 +73,7 @@ func (h Handler) Post(ctx echo.Context) error {
 		ctx.Logger().Error(err)
 		return err
 	}
-	h.securityService.SecurityResponse(ctx.Response(), http.StatusOK, "Registration is success", nil)
+	h.SecurityResponse(ctx.Response(), http.StatusOK, "Registration is success", nil)
 	return nil
 }
 
@@ -96,7 +96,7 @@ func (h Handler) Put(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "Update user error", http.StatusBadRequest, err)
 		return err
 	}
-	h.securityService.SecurityResponse(ctx.Response(), http.StatusOK, "Update is success", nil)
+	h.SecurityResponse(ctx.Response(), http.StatusOK, "Update is success", nil)
 	return nil
 }
 func (h Handler) Login(ctx echo.Context) error {
@@ -125,7 +125,7 @@ func (h Handler) Login(ctx echo.Context) error {
 		return err
 	}
 	ctx.Set("user_id", user.ID)
-	h.securityService.SecurityResponse(ctx.Response(), http.StatusOK, "Login", err)
+	h.SecurityResponse(ctx.Response(), http.StatusOK, "Login", err)
 	return nil
 }
 
@@ -136,6 +136,6 @@ func (h Handler) Logout(ctx echo.Context) (err error) {
 		return err
 	}
 	ctx.Response().Header().Del("session_id")
-	h.securityService.SecurityResponse(ctx.Response(), http.StatusOK, "Logout", err)
+	h.SecurityResponse(ctx.Response(), http.StatusOK, "Logout", err)
 	return err
 }

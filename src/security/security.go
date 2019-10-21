@@ -3,7 +3,6 @@ package security
 import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/errors"
-	"encoding/json"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"sync"
@@ -13,7 +12,6 @@ import (
 type HandlerSecurity interface {
 	CheckSession(h echo.HandlerFunc) echo.HandlerFunc
 	CreateSession(w http.ResponseWriter, userID customType.StringUUID) error
-	SecurityResponse(w http.ResponseWriter, status int, respMessage string, err error)
 	Logout(ctx echo.Context) error
 }
 
@@ -21,11 +19,6 @@ type service struct {
 	Sm                 *SessionManager
 	NotSecurityRouters map[string]struct{}
 	mx                 sync.Mutex
-}
-
-type ResponseSecurity struct {
-	Message string `json:"message"`
-	Error   error  `json:"error"`
 }
 
 func CreateInstance(sm *SessionManager) HandlerSecurity {
@@ -59,17 +52,6 @@ func (s *service) CreateSession(w http.ResponseWriter, userID customType.StringU
 	}
 	http.SetCookie(w, &cookie)
 	return nil
-}
-
-func (s *service) SecurityResponse(w http.ResponseWriter, status int, respMessage string, err error) {
-	w.WriteHeader(status)
-	b, err := json.Marshal(&ResponseSecurity{
-		Message: respMessage,
-		Error:   err,
-	})
-	if _, err := w.Write([]byte(b)); err != nil {
-		return
-	}
 }
 
 func (s service) checkNotSecurity(route string) bool {
