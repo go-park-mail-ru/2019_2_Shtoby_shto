@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -17,7 +18,9 @@ type HandlerSecurity interface {
 }
 
 type service struct {
-	Sm *SessionManager
+	Sm                 *SessionManager
+	NotSecurityRouters map[string]struct{}
+	mx                 sync.Mutex
 }
 
 type ResponseSecurity struct {
@@ -28,6 +31,11 @@ type ResponseSecurity struct {
 func CreateInstance(sm *SessionManager) HandlerSecurity {
 	return &service{
 		Sm: sm,
+		NotSecurityRouters: map[string]struct{}{
+			"/users/registration": {},
+			"/login":              {},
+			"/swagger/index.html": {},
+		},
 	}
 }
 
@@ -43,7 +51,6 @@ func (s *service) CreateSession(w http.ResponseWriter, userID customType.StringU
 	if err != nil {
 		return err
 	}
-	// TODO:: add token in cookie and expire time for session_id
 	expiration := time.Now().Add(24 * time.Hour)
 	cookie := http.Cookie{
 		Name:    "session_id",
@@ -65,9 +72,16 @@ func (s *service) SecurityResponse(w http.ResponseWriter, status int, respMessag
 	}
 }
 
+func (s service) checkNotSecurity(route string) bool {
+	s.mx.Lock()
+	defer s.mx.Unlock()
+	_, ok := s.NotSecurityRouters[route]
+	return ok
+}
+
 func (s *service) CheckSession(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) (err error) {
-		if ctx.Request().RequestURI == "/login" || ctx.Request().RequestURI == "/users/registration" {
+		if s.checkNotSecurity(ctx.Request().RequestURI) {
 			return h(ctx)
 		}
 		cookieSessionID, err := ctx.Cookie("session_id")
