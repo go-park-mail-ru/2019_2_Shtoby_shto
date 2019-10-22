@@ -7,6 +7,7 @@ import (
 
 const photoTableName = "photo"
 
+//easyjson:json
 type Photo struct {
 	dicts.BaseInfo
 	TimeLoad time.Time `json:"time_load" sql:"type:time"`

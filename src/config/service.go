@@ -14,6 +14,7 @@ const (
 	deployEnvVar       = "DEPLOYAPI"
 )
 
+//easyjson:json
 type Config struct {
 	Port          int    `json:"trello.service.port"`
 	FrontendURL   string `json:"trello.service.frontend.url"`

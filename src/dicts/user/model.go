@@ -7,6 +7,7 @@ import (
 
 const userTableName = "users"
 
+//easyjson:json
 type User struct {
 	dicts.BaseInfo
 	Login    string                 `json:"login, omitempty" sql:"not null;unique"`

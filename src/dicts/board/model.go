@@ -7,6 +7,7 @@ import (
 
 const boardTableName = "board"
 
+//easyjson:json
 type Board struct {
 	dicts.BaseInfo
 	Caption string `json:"caption"`
