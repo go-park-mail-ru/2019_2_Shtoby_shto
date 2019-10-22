@@ -1,8 +1,8 @@
 package errors
 
 import (
-	"encoding/json"
 	"github.com/labstack/echo/v4"
+	"github.com/prometheus/common/log"
 )
 
 // Описание структуры ответа при ошибке
@@ -17,13 +17,18 @@ func ErrorHandler(response *echo.Response, message string, status int, err error
 	if err != nil {
 		errorMessage = err.Error()
 	}
-	b, _ := json.Marshal(&ErrorResponse{
+	resp := &ErrorResponse{
 		Status:  status,
 		Message: message,
 		Error:   errorMessage,
-	})
+	}
+	r, err := resp.MarshalJSON()
 	response.WriteHeader(status)
-	if _, err := response.Write([]byte(b)); err != nil {
-
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	if _, err := response.Write(r); err != nil {
+		log.Error(err)
 	}
 }

@@ -1,8 +1,8 @@
 package config
 
 import (
-	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -31,15 +31,12 @@ func GetInstance() *Config {
 }
 
 func readConfig(fileName string) error {
-	configFile, err := os.Open(fileName)
+	configFile, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return errors.New("Can't open properties file: " + err.Error())
 	}
-	if err = json.NewDecoder(configFile).Decode(ToolConfig); err != nil {
+	if err = ToolConfig.UnmarshalJSON(configFile); err != nil {
 		return errors.New("Can't parsing properties file: " + err.Error())
-	}
-	if err := configFile.Close(); err != nil {
-		return err
 	}
 	return nil
 }
