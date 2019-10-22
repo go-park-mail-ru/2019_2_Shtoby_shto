@@ -20,6 +20,8 @@ import (
 	"os/signal"
 	"strconv"
 	"time"
+	//"github.com/prometheus/client_golang/prometheus"
+	//"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var (
@@ -34,7 +36,7 @@ var (
 	dbService       initDB.InitDBManager
 )
 
-// @title Swagger Example API
+// @title Sample Project API
 // @version 1.0
 // @description This is a sample server Petstore server.
 // @termsOfService http://swagger.io/terms/
@@ -47,7 +49,7 @@ var (
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host petstore.swagger.io
-// @BasePath /v2
+// @BasePath /api/v1
 
 func main() {
 	flag.Parse()

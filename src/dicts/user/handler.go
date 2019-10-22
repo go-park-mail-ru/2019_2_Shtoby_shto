@@ -130,12 +130,12 @@ func (h Handler) Login(ctx echo.Context) error {
 }
 
 func (h Handler) Logout(ctx echo.Context) (err error) {
-	if err = h.securityService.Logout(ctx); err != nil {
+	if err = h.securityService.DeleteSession(ctx); err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "Error delete session", http.StatusInternalServerError, err)
 		return err
 	}
 	ctx.Response().Header().Del("session_id")
-	h.SecurityResponse(ctx.Response(), http.StatusOK, "Logout", err)
+	h.SecurityResponse(ctx.Response(), http.StatusOK, "DeleteSession", err)
 	return err
 }

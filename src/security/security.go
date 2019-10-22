@@ -12,19 +12,19 @@ import (
 type HandlerSecurity interface {
 	CheckSession(h echo.HandlerFunc) echo.HandlerFunc
 	CreateSession(w http.ResponseWriter, userID customType.StringUUID) error
-	Logout(ctx echo.Context) error
+	DeleteSession(ctx echo.Context) error
 }
 
 type service struct {
-	Sm                 *SessionManager
-	NotSecurityRouters map[string]struct{}
-	mx                 sync.Mutex
+	Sm                *SessionManager
+	noSecurityRouters map[string]struct{}
+	mx                sync.Mutex
 }
 
 func CreateInstance(sm *SessionManager) HandlerSecurity {
 	return &service{
 		Sm: sm,
-		NotSecurityRouters: map[string]struct{}{
+		noSecurityRouters: map[string]struct{}{
 			"/users/registration": {},
 			"/login":              {},
 			"/swagger/index.html": {},
@@ -32,7 +32,7 @@ func CreateInstance(sm *SessionManager) HandlerSecurity {
 	}
 }
 
-func (s *service) Logout(ctx echo.Context) error {
+func (s *service) DeleteSession(ctx echo.Context) error {
 	if err := s.Sm.Delete(ctx.Request().Context()); err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func (s *service) CreateSession(w http.ResponseWriter, userID customType.StringU
 func (s service) checkNotSecurity(route string) bool {
 	s.mx.Lock()
 	defer s.mx.Unlock()
-	_, ok := s.NotSecurityRouters[route]
+	_, ok := s.noSecurityRouters[route]
 	return ok
 }
 
