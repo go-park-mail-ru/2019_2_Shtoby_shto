@@ -6,7 +6,7 @@ import (
 	errorsLib "2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/security"
-	"encoding/json"
+	"bytes"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -39,7 +39,7 @@ func (h Handler) Get(ctx echo.Context) error {
 	}
 	ctx.Response().WriteHeader(http.StatusOK)
 	ctx.Response().Header().Set("Content-Type", "application/json")
-	b, err := json.Marshal(&board)
+	b, err := board.MarshalJSON()
 	if _, err := ctx.Response().Write([]byte(b)); err != nil {
 		ctx.Logger().Error(err)
 		return err
@@ -49,7 +49,11 @@ func (h Handler) Get(ctx echo.Context) error {
 
 func (h Handler) Post(ctx echo.Context) error {
 	board := &Board{}
-	if err := json.NewDecoder(ctx.Request().Body).Decode(board); err != nil {
+	buf := bytes.Buffer{}
+	if _, err := buf.ReadFrom(ctx.Request().Body); err != nil {
+		return err
+	}
+	if err := board.UnmarshalJSON(buf.Bytes()); err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "Decode error", http.StatusInternalServerError, err)
 		ctx.Logger().Error(err)
 		return err
@@ -64,7 +68,11 @@ func (h Handler) Post(ctx echo.Context) error {
 
 func (h Handler) Put(ctx echo.Context) error {
 	board := &Board{}
-	if err := json.NewDecoder(ctx.Request().Body).Decode(&board); err != nil {
+	buf := bytes.Buffer{}
+	if _, err := buf.ReadFrom(ctx.Request().Body); err != nil {
+		return err
+	}
+	if err := board.UnmarshalJSON(buf.Bytes()); err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "Decode error", http.StatusInternalServerError, err)
 		return err

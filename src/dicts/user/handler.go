@@ -5,7 +5,7 @@ import (
 	errorsLib "2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/security"
-	"encoding/json"
+	"bytes"
 	"errors"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -48,7 +48,7 @@ func (h Handler) Get(ctx echo.Context) error {
 	}
 	ctx.Response().WriteHeader(http.StatusOK)
 	ctx.Response().Header().Set("Content-Type", "application/json")
-	b, err := json.Marshal(&user)
+	b, err := user.MarshalJSON()
 	if _, err := ctx.Response().Write([]byte(b)); err != nil {
 		ctx.Logger().Error(err)
 		return err
@@ -58,7 +58,11 @@ func (h Handler) Get(ctx echo.Context) error {
 
 func (h Handler) Post(ctx echo.Context) error {
 	user := User{}
-	if err := json.NewDecoder(ctx.Request().Body).Decode(&user); err != nil {
+	buf := bytes.Buffer{}
+	if _, err := buf.ReadFrom(ctx.Request().Body); err != nil {
+		return err
+	}
+	if err := user.UnmarshalJSON(buf.Bytes()); err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "Decode error", http.StatusInternalServerError, err)
 		ctx.Logger().Error(err)
 		return err
@@ -85,8 +89,11 @@ func (h Handler) Put(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "get user_id failed", http.StatusInternalServerError, errors.New("get user_id failed"))
 		return errors.New("get user_id failed")
 	}
-
-	if err := json.NewDecoder(ctx.Request().Body).Decode(&user); err != nil {
+	buf := bytes.Buffer{}
+	if _, err := buf.ReadFrom(ctx.Request().Body); err != nil {
+		return err
+	}
+	if err := user.UnmarshalJSON(buf.Bytes()); err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "Decode error", http.StatusInternalServerError, err)
 		return err
@@ -101,7 +108,11 @@ func (h Handler) Put(ctx echo.Context) error {
 }
 func (h Handler) Login(ctx echo.Context) error {
 	curUser := User{}
-	if err := json.NewDecoder(ctx.Request().Body).Decode(&curUser); err != nil {
+	buf := bytes.Buffer{}
+	if _, err := buf.ReadFrom(ctx.Request().Body); err != nil {
+		return err
+	}
+	if err := curUser.UnmarshalJSON(buf.Bytes()); err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "Decode error", http.StatusInternalServerError, err)
 		return err
