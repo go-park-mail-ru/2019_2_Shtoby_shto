@@ -62,8 +62,12 @@ func (sm *SessionManager) getSession(cacheID string) (string, error) {
 	return val, nil
 }
 
-func (sm *SessionManager) Delete(ctx context.Context) error {
-	return sm.cache.Del(ctx.Value("session_id").(string)).Err()
+func (sm *SessionManager) Delete(ctx echo.Context) error {
+	s := ctx.Get("session_id")
+	if s == nil {
+		return errors.New("Error session")
+	}
+	return sm.cache.Del(s.(string)).Err()
 }
 
 func (sm *SessionManager) Check(ctx *echo.Context) error {

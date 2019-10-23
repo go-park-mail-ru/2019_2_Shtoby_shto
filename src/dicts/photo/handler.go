@@ -76,7 +76,13 @@ func (h Handler) Post(ctx echo.Context) error {
 		return err
 	}
 	user.PhotoID = &photoID
-	if err := h.userService.UpdateUser(user, userID); err != nil {
+	updateUser, err := user.MarshalJSON()
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "Update user error", http.StatusInternalServerError, err)
+		return err
+	}
+	if err := h.userService.UpdateUser(updateUser, userID); err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "Update user error", http.StatusInternalServerError, err)
 		return err

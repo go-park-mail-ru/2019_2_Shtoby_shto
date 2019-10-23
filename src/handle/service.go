@@ -52,6 +52,7 @@ func (h *HandlerImpl) SecurityResponse(w http.ResponseWriter, status int, respMe
 		Message: respMessage,
 		Error:   err,
 	})
+	w.Header().Set("content-type", "application/json")
 	if _, err := w.Write([]byte(b)); err != nil {
 		return
 	}

@@ -33,7 +33,7 @@ func CreateInstance(sm *SessionManager) HandlerSecurity {
 }
 
 func (s *service) DeleteSession(ctx echo.Context) error {
-	if err := s.Sm.Delete(ctx.Request().Context()); err != nil {
+	if err := s.Sm.Delete(ctx); err != nil {
 		return err
 	}
 	return nil

@@ -9,7 +9,6 @@ import (
 	"errors"
 	"github.com/labstack/echo/v4"
 	"net/http"
-	"strings"
 )
 
 type Handler struct {
@@ -46,28 +45,18 @@ func (h Handler) Get(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "GetUserById error", http.StatusBadRequest, err)
 		return err
 	}
-	ctx.Response().WriteHeader(http.StatusOK)
-	ctx.Response().Header().Set("Content-Type", "application/json")
-	b, err := user.MarshalJSON()
-	if _, err := ctx.Response().Write([]byte(b)); err != nil {
-		ctx.Logger().Error(err)
-		return err
-	}
-	return nil
+	return ctx.JSON(http.StatusOK, user)
 }
 
 func (h Handler) Post(ctx echo.Context) error {
-	user := User{}
 	buf := bytes.Buffer{}
 	if _, err := buf.ReadFrom(ctx.Request().Body); err != nil {
-		return err
-	}
-	if err := user.UnmarshalJSON(buf.Bytes()); err != nil {
-		errorsLib.ErrorHandler(ctx.Response(), "Decode error", http.StatusInternalServerError, err)
 		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "Invalid body", http.StatusInternalServerError, err)
 		return err
 	}
-	if err := h.userService.CreateUser(user); err != nil {
+	user, err := h.userService.CreateUser(buf.Bytes())
+	if err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "User not valid", http.StatusBadRequest, err)
 		ctx.Logger().Error(err)
 		return err
@@ -77,12 +66,11 @@ func (h Handler) Post(ctx echo.Context) error {
 		ctx.Logger().Error(err)
 		return err
 	}
-	h.SecurityResponse(ctx.Response(), http.StatusOK, "Registration is success", nil)
+	h.SecurityResponse(ctx.Response(), http.StatusOK, "Registration is success, user id: "+user.ID.String(), nil)
 	return nil
 }
 
 func (h Handler) Put(ctx echo.Context) error {
-	user := User{}
 	userID, ok := ctx.Get("user_id").(customType.StringUUID)
 	if !ok {
 		ctx.Logger().Error("get user_id failed")
@@ -93,12 +81,7 @@ func (h Handler) Put(ctx echo.Context) error {
 	if _, err := buf.ReadFrom(ctx.Request().Body); err != nil {
 		return err
 	}
-	if err := user.UnmarshalJSON(buf.Bytes()); err != nil {
-		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "Decode error", http.StatusInternalServerError, err)
-		return err
-	}
-	if err := h.userService.UpdateUser(user, customType.StringUUID(userID)); err != nil {
+	if err := h.userService.UpdateUser(buf.Bytes(), customType.StringUUID(userID)); err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "Update user error", http.StatusBadRequest, err)
 		return err
@@ -106,27 +89,18 @@ func (h Handler) Put(ctx echo.Context) error {
 	h.SecurityResponse(ctx.Response(), http.StatusOK, "Update is success", nil)
 	return nil
 }
+
 func (h Handler) Login(ctx echo.Context) error {
-	curUser := User{}
 	buf := bytes.Buffer{}
 	if _, err := buf.ReadFrom(ctx.Request().Body); err != nil {
-		return err
-	}
-	if err := curUser.UnmarshalJSON(buf.Bytes()); err != nil {
 		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "Decode error", http.StatusInternalServerError, err)
+		errorsLib.ErrorHandler(ctx.Response(), "Invalid body", http.StatusInternalServerError, err)
 		return err
 	}
-
-	user, err := h.userService.GetUserByLogin(curUser.Login)
+	user, err := h.userService.GetUserByLogin(buf.Bytes())
 	if err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "Please, reg yourself", http.StatusUnauthorized, err)
-		return err
-	}
-	if strings.Compare(user.Password, curUser.Password) != 0 {
-		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "Ne tot password )0))", http.StatusBadRequest, err)
 		return err
 	}
 
@@ -147,6 +121,6 @@ func (h Handler) Logout(ctx echo.Context) (err error) {
 		return err
 	}
 	ctx.Response().Header().Del("session_id")
-	h.SecurityResponse(ctx.Response(), http.StatusOK, "DeleteSession", err)
+	h.SecurityResponse(ctx.Response(), http.StatusOK, "Logout", err)
 	return err
 }
