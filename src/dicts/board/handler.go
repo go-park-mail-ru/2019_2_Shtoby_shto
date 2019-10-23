@@ -6,6 +6,7 @@ import (
 	errorsLib "2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/security"
+	"bytes"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -40,7 +41,13 @@ func (h Handler) Get(ctx echo.Context) error {
 }
 
 func (h Handler) Post(ctx echo.Context) error {
-	responseData, err := h.boardService.CreateBoard(ctx.Request().Body)
+	buf := bytes.Buffer{}
+	if _, err := buf.ReadFrom(ctx.Request().Body); err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
+		return err
+	}
+	responseData, err := h.boardService.CreateBoard(buf.Bytes())
 	if err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "Create error", http.StatusInternalServerError, err)
 		ctx.Logger().Error(err)
@@ -50,7 +57,13 @@ func (h Handler) Post(ctx echo.Context) error {
 }
 
 func (h Handler) Put(ctx echo.Context) error {
-	board, err := h.boardService.UpdateBoard(ctx.Request().Body, customType.StringUUID(ctx.Param("id")))
+	buf := bytes.Buffer{}
+	if _, err := buf.ReadFrom(ctx.Request().Body); err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
+		return err
+	}
+	board, err := h.boardService.UpdateBoard(buf.Bytes(), customType.StringUUID(ctx.Param("id")))
 	if err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "UpdateBoard error", http.StatusInternalServerError, err)

@@ -5,14 +5,12 @@ import (
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/handle"
-	"bytes"
-	"io"
 )
 
 type HandlerBoardService interface {
 	FindBoardByID(id customType.StringUUID) (*Board, error)
-	CreateBoard(request io.ReadCloser) (*Board, error)
-	UpdateBoard(request io.ReadCloser, id customType.StringUUID) (*Board, error)
+	CreateBoard(data []byte) (*Board, error)
+	UpdateBoard(data []byte, id customType.StringUUID) (*Board, error)
 	DeleteBoard(id customType.StringUUID) error
 }
 
@@ -37,26 +35,18 @@ func (s service) FindBoardByID(id customType.StringUUID) (*Board, error) {
 	return board, err
 }
 
-func (s service) CreateBoard(request io.ReadCloser) (*Board, error) {
+func (s service) CreateBoard(data []byte) (*Board, error) {
 	board := &Board{}
-	buf := bytes.Buffer{}
-	if _, err := buf.ReadFrom(request); err != nil {
-		return nil, err
-	}
-	if err := board.UnmarshalJSON(buf.Bytes()); err != nil {
+	if err := board.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
 	err := s.db.CreateRecord(board)
 	return board, err
 }
 
-func (s service) UpdateBoard(request io.ReadCloser, id customType.StringUUID) (*Board, error) {
+func (s service) UpdateBoard(data []byte, id customType.StringUUID) (*Board, error) {
 	board := &Board{}
-	buf := bytes.Buffer{}
-	if _, err := buf.ReadFrom(request); err != nil {
-		return nil, err
-	}
-	if err := board.UnmarshalJSON(buf.Bytes()); err != nil {
+	if err := board.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
 	err := s.db.UpdateRecord(board, id)
