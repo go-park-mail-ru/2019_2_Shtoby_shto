@@ -2,6 +2,7 @@ package initDB
 
 import (
 	"2019_2_Shtoby_shto/src/dicts/board"
+	"2019_2_Shtoby_shto/src/dicts/card"
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	"flag"
@@ -28,13 +29,14 @@ var tables = []tabler{
 	&user.User{},
 	&photo.Photo{},
 	&board.Board{},
+	&card.Card{},
 }
 
 func Tables() []tabler {
 	return tables
 }
 
-func Init() *InitDB {
+func Init() InitDBManager {
 	return &InitDB{}
 }
 
@@ -53,8 +55,6 @@ func (d *InitDB) DbConnect(dialect, args string) (*gorm.DB, error) {
 
 func (d *InitDB) autoMigrate(db *gorm.DB) {
 	for _, value := range Tables() {
-		if db.HasTable(value.GetTableName()) {
-			db.AutoMigrate(value)
-		}
+		db.AutoMigrate(value)
 	}
 }

@@ -1,24 +1,24 @@
-package board
+package card
 
 import (
 	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/dicts/user"
 )
 
-const boardTableName = "boards"
+const cardTableName = "cards"
 
 //easyjson:json
-type Board struct {
+type Card struct {
 	dicts.BaseInfo
 	Caption string `json:"caption"`
 	// Tasks []task.Task `json:"tasks"`
-	Users []user.User `json:"users" sql:"-"`
+	UsersAssign []user.User `json:"users" sql:"-"`
 }
 
-func (b Board) GetTableName() string {
-	return boardTableName
+func (b Card) GetTableName() string {
+	return cardTableName
 }
 
-func (b Board) IsValid() bool {
+func (b Card) IsValid() bool {
 	return b.Caption != ""
 }

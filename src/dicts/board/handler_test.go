@@ -21,6 +21,7 @@ func TestNewBoardHandler(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			NewBoardHandler(tt.args.e, tt.args.userService, tt.args.boardService, tt.args.securityService)

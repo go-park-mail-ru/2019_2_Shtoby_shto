@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-const photoTableName = "photo"
+const photoTableName = "photos"
 
 //easyjson:json
 type Photo struct {
