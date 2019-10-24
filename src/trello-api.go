@@ -6,6 +6,7 @@ import (
 	"2019_2_Shtoby_shto/src/dicts/board"
 	"2019_2_Shtoby_shto/src/dicts/card"
 	"2019_2_Shtoby_shto/src/dicts/photo"
+	"2019_2_Shtoby_shto/src/dicts/task"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	"2019_2_Shtoby_shto/src/initDB"
 	"2019_2_Shtoby_shto/src/security"
@@ -35,6 +36,7 @@ var (
 	photoService    photo.HandlerPhotoService
 	boardService    board.HandlerBoardService
 	cardService     card.HandlerCardService
+	taskService     task.HandlerTaskService
 	dbService       initDB.InitDBManager
 )
 
@@ -122,9 +124,11 @@ func initService(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	photoService = photo.CreateInstance(db)
 	boardService = board.CreateInstance(db)
 	cardService = card.CreateInstance(db)
+	taskService = task.CreateInstance(db)
 	securityService = security.CreateInstance(sessionService)
 	user.NewUserHandler(e, userService, securityService)
 	photo.NewPhotoHandler(e, photoService, userService, securityService)
 	board.NewBoardHandler(e, userService, boardService, securityService)
 	card.NewCardHandler(e, userService, cardService, securityService)
+	task.NewTaskHandler(e, userService, taskService, securityService)
 }

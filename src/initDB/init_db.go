@@ -4,6 +4,7 @@ import (
 	"2019_2_Shtoby_shto/src/dicts/board"
 	"2019_2_Shtoby_shto/src/dicts/card"
 	"2019_2_Shtoby_shto/src/dicts/photo"
+	"2019_2_Shtoby_shto/src/dicts/task"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	"flag"
 	"github.com/jinzhu/gorm"
@@ -30,6 +31,7 @@ var tables = []tabler{
 	&photo.Photo{},
 	&board.Board{},
 	&card.Card{},
+	&task.Task{},
 }
 
 func Tables() []tabler {
