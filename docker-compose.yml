@@ -12,7 +12,6 @@ services:
     ports:
       - "80:8080"
       - "443:443"
-    restart: on-failure
     depends_on:
       - postgres
       - redis
@@ -23,7 +22,6 @@ services:
 
   postgres:
     image: postgres:latest
-    restart: on-failure
     volumes:
       - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
     environment:
