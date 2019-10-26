@@ -10,7 +10,8 @@ const taskTableName = "tasks"
 //easyjson:json
 type Task struct {
 	dicts.BaseInfo
-	Text 			string `json:"text"`
+	Text 			string 	`json:"text"`
+	Done			bool	`json:"done"`
 }
 
 func (b Task) GetTableName() string {
