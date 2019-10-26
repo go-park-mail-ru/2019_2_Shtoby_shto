@@ -3,6 +3,7 @@ package board
 import (
 	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/dicts/user"
+	"2019_2_Shtoby_shto/src/dicts/card"
 )
 
 const boardTableName = "boards"
@@ -10,7 +11,8 @@ const boardTableName = "boards"
 //easyjson:json
 type Board struct {
 	dicts.BaseInfo
-	Name 	string `json:"name"`
+	Name 	string 		`json:"name"`
+	Cards	[]card.Card `json:"cards"`
 	Users 	[]user.User `json:"users" sql:"-"`
 }
 

@@ -11,7 +11,6 @@ const taskTableName = "tasks"
 type Task struct {
 	dicts.BaseInfo
 	Text 			string `json:"text"`
-	UsersAssign 	[]user.User `json:"users" sql:"-"`
 }
 
 func (b Task) GetTableName() string {
