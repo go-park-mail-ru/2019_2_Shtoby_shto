@@ -38,8 +38,8 @@ func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsBoard(in *jlexer.Lexer, out *B
 			continue
 		}
 		switch key {
-		case "caption":
-			out.Caption = string(in.String())
+		case "name":
+			out.Name = string(in.String())
 		case "users":
 			if in.IsNull() {
 				in.Skip()
@@ -57,7 +57,7 @@ func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsBoard(in *jlexer.Lexer, out *B
 				}
 				for !in.IsDelim(']') {
 					var v1 user.User
-					easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsUser(in, &v1)
+					(v1).UnmarshalEasyJSON(in)
 					out.Users = append(out.Users, v1)
 					in.WantComma()
 				}
@@ -80,9 +80,9 @@ func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsBoard(out *jwriter.Writer, in 
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"caption\":"
+		const prefix string = ",\"name\":"
 		out.RawString(prefix[1:])
-		out.String(string(in.Caption))
+		out.String(string(in.Name))
 	}
 	{
 		const prefix string = ",\"users\":"
@@ -95,7 +95,7 @@ func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsBoard(out *jwriter.Writer, in 
 				if v2 > 0 {
 					out.RawByte(',')
 				}
-				easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsUser(out, v3)
+				(v3).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -130,75 +130,4 @@ func (v *Board) UnmarshalJSON(data []byte) error {
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Board) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsBoard(l, v)
-}
-func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsUser(in *jlexer.Lexer, out *user.User) {
-	isTopLevel := in.IsStart()
-	if in.IsNull() {
-		if isTopLevel {
-			in.Consumed()
-		}
-		in.Skip()
-		return
-	}
-	in.Delim('{')
-	for !in.IsDelim('}') {
-		key := in.UnsafeString()
-		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
-		switch key {
-		case "login":
-			out.Login = string(in.String())
-		case "password":
-			out.Password = string(in.String())
-		case "photo_id":
-			if in.IsNull() {
-				in.Skip()
-				out.PhotoID = nil
-			} else {
-				if out.PhotoID == nil {
-					out.PhotoID = new(customType.StringUUID)
-				}
-				*out.PhotoID = customType.StringUUID(in.String())
-			}
-		case "id":
-			out.ID = customType.StringUUID(in.String())
-		default:
-			in.SkipRecursive()
-		}
-		in.WantComma()
-	}
-	in.Delim('}')
-	if isTopLevel {
-		in.Consumed()
-	}
-}
-func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsUser(out *jwriter.Writer, in user.User) {
-	out.RawByte('{')
-	first := true
-	_ = first
-	{
-		const prefix string = ",\"login\":"
-		out.RawString(prefix[1:])
-		out.String(string(in.Login))
-	}
-	if in.Password != "" {
-		const prefix string = ",\"password\":"
-		out.RawString(prefix)
-		out.String(string(in.Password))
-	}
-	if in.PhotoID != nil {
-		const prefix string = ",\"photo_id\":"
-		out.RawString(prefix)
-		out.String(string(*in.PhotoID))
-	}
-	{
-		const prefix string = ",\"id\":"
-		out.RawString(prefix)
-		out.String(string(in.ID))
-	}
-	out.RawByte('}')
 }

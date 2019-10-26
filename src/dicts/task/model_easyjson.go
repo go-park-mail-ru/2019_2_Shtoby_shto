@@ -38,8 +38,8 @@ func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsTask(in *jlexer.Lexer, out *Ta
 			continue
 		}
 		switch key {
-		case "caption":
-			out.Caption = string(in.String())
+		case "text":
+			out.Text = string(in.String())
 		case "users":
 			if in.IsNull() {
 				in.Skip()
@@ -80,9 +80,9 @@ func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsTask(out *jwriter.Writer, in T
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"caption\":"
+		const prefix string = ",\"text\":"
 		out.RawString(prefix[1:])
-		out.String(string(in.Caption))
+		out.String(string(in.Text))
 	}
 	{
 		const prefix string = ",\"users\":"

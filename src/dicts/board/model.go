@@ -10,9 +10,8 @@ const boardTableName = "boards"
 //easyjson:json
 type Board struct {
 	dicts.BaseInfo
-	Caption string `json:"caption"`
-	// Tasks []task.Task `json:"tasks"`
-	Users []user.User `json:"users" sql:"-"`
+	Name 	string `json:"name"`
+	Users 	[]user.User `json:"users" sql:"-"`
 }
 
 func (b Board) GetTableName() string {
@@ -20,5 +19,5 @@ func (b Board) GetTableName() string {
 }
 
 func (b Board) IsValid() bool {
-	return b.Caption != ""
+	return b.Name != ""
 }
