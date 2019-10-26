@@ -2,7 +2,6 @@ package task
 
 import (
 	"2019_2_Shtoby_shto/src/dicts"
-	"2019_2_Shtoby_shto/src/dicts/user"
 )
 
 const taskTableName = "tasks"

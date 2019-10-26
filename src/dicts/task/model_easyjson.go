@@ -4,7 +4,6 @@ package task
 
 import (
 	customType "2019_2_Shtoby_shto/src/customType"
-	user "2019_2_Shtoby_shto/src/dicts/user"
 	json "encoding/json"
 	easyjson "github.com/mailru/easyjson"
 	jlexer "github.com/mailru/easyjson/jlexer"
@@ -40,29 +39,8 @@ func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsTask(in *jlexer.Lexer, out *Ta
 		switch key {
 		case "text":
 			out.Text = string(in.String())
-		case "users":
-			if in.IsNull() {
-				in.Skip()
-				out.UsersAssign = nil
-			} else {
-				in.Delim('[')
-				if out.UsersAssign == nil {
-					if !in.IsDelim(']') {
-						out.UsersAssign = make([]user.User, 0, 1)
-					} else {
-						out.UsersAssign = []user.User{}
-					}
-				} else {
-					out.UsersAssign = (out.UsersAssign)[:0]
-				}
-				for !in.IsDelim(']') {
-					var v1 user.User
-					(v1).UnmarshalEasyJSON(in)
-					out.UsersAssign = append(out.UsersAssign, v1)
-					in.WantComma()
-				}
-				in.Delim(']')
-			}
+		case "done":
+			out.Done = bool(in.Bool())
 		case "id":
 			out.ID = customType.StringUUID(in.String())
 		default:
@@ -85,20 +63,9 @@ func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsTask(out *jwriter.Writer, in T
 		out.String(string(in.Text))
 	}
 	{
-		const prefix string = ",\"users\":"
+		const prefix string = ",\"done\":"
 		out.RawString(prefix)
-		if in.UsersAssign == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
-		} else {
-			out.RawByte('[')
-			for v2, v3 := range in.UsersAssign {
-				if v2 > 0 {
-					out.RawByte(',')
-				}
-				(v3).MarshalEasyJSON(out)
-			}
-			out.RawByte(']')
-		}
+		out.Bool(bool(in.Done))
 	}
 	{
 		const prefix string = ",\"id\":"
