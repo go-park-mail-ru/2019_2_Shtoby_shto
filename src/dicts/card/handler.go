@@ -3,6 +3,7 @@ package card
 import (
 	"2019_2_Shtoby_shto/src/customType"
 	сardUsers "2019_2_Shtoby_shto/src/dicts/cardUsers"
+	"2019_2_Shtoby_shto/src/dicts/task"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	errorsLib "2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/handle"
@@ -17,15 +18,17 @@ type Handler struct {
 	userService      user.HandlerUserService
 	cardService      HandlerCardService
 	cardUsersService сardUsers.HandlerCardUsersService
+	taskService      task.HandlerTaskService
 	securityService  security.HandlerSecurity
 	handle.HandlerImpl
 }
 
-func NewCardHandler(e *echo.Echo, userService user.HandlerUserService, cardService HandlerCardService, cardUsersService сardUsers.HandlerCardUsersService, securityService security.HandlerSecurity) {
+func NewCardHandler(e *echo.Echo, userService user.HandlerUserService, cardService HandlerCardService, cardUsersService сardUsers.HandlerCardUsersService, taskService task.HandlerTaskService, securityService security.HandlerSecurity) {
 	handler := Handler{
 		userService:      userService,
 		cardService:      cardService,
 		cardUsersService: cardUsersService,
+		taskService:      taskService,
 		securityService:  securityService,
 	}
 	e.GET("/cards/:id", handler.Get)
@@ -38,13 +41,19 @@ func NewCardHandler(e *echo.Echo, userService user.HandlerUserService, cardServi
 }
 
 func (h Handler) Get(ctx echo.Context) error {
-	data, err := h.cardService.FindCardByID(customType.StringUUID(ctx.Param("id")))
+	card, err := h.cardService.FindCardByID(customType.StringUUID(ctx.Param("id")))
 	if err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "GetCardById error", http.StatusBadRequest, err)
 		return err
 	}
-	return ctx.JSON(http.StatusOK, data)
+	//h.taskService.
+	if err := h.cardService.FillLookupFields(card); err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "Lookup fields add error", http.StatusBadRequest, err)
+		return err
+	}
+	return ctx.JSON(http.StatusOK, card)
 }
 
 func (h Handler) Fetch(ctx echo.Context) error {

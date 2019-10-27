@@ -63,3 +63,10 @@ func (s service) FetchTasks(limit, offset int) (tasks []Task, err error) {
 	_, err = s.db.FetchDict(&tasks, "tasks", limit, offset, nil, nil)
 	return tasks, err
 }
+
+func (s service) FetchTasksByCardID(cardID customType.StringUUID) (cards []Task, err error) {
+	where := []string{"card_id = ?"}
+	whereArgs := []string{cardID.String()}
+	_, err = s.db.FetchDict(&cards, "tasks", 10000, 0, where, whereArgs)
+	return cards, err
+}

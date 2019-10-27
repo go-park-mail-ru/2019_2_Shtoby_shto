@@ -3,16 +3,17 @@ package boardUsers
 import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
+	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/handle"
 	"errors"
 )
 
 type HandlerBoardUsersService interface {
 	FindBoardUsersByIDs(userID, boardID customType.StringUUID) (*BoardUsers, error)
-	CreateBoardUsers(userID, boardID customType.StringUUID) (*BoardUsers, error)
+	CreateBoardUsers(boardUsersID, userID, boardID customType.StringUUID) (*BoardUsers, error)
 	UpdateBoardUsers(userID, boardID customType.StringUUID, id customType.StringUUID) (*BoardUsers, error)
 	DeleteBoardUsers(id customType.StringUUID) error
-	FetchBoardUsers(limit, offset int) (users []BoardUsers, err error)
+	FetchBoardUsersByUserID(userID customType.StringUUID) (boardUsers []BoardUsers, err error)
 }
 
 type service struct {
@@ -34,8 +35,11 @@ func (s service) FindBoardUsersByIDs(userID, boardID customType.StringUUID) (*Bo
 	return boardUsers, err
 }
 
-func (s service) CreateBoardUsers(userID, boardID customType.StringUUID) (*BoardUsers, error) {
+func (s service) CreateBoardUsers(boardUsersID, userID, boardID customType.StringUUID) (*BoardUsers, error) {
 	boardUsers := &BoardUsers{
+		BaseInfo: dicts.BaseInfo{
+			ID: boardUsersID,
+		},
 		UserID:  userID,
 		BoardID: boardID,
 	}
@@ -63,7 +67,9 @@ func (s service) DeleteBoardUsers(id customType.StringUUID) error {
 	return s.db.DeleteRecord(boardUsers, id)
 }
 
-func (s service) FetchBoardUsers(limit, offset int) (boardUsers []BoardUsers, err error) {
-	_, err = s.db.FetchDict(&boardUsers, "board_users", limit, offset, nil, nil)
+func (s service) FetchBoardUsersByUserID(userID customType.StringUUID) (boardUsers []BoardUsers, err error) {
+	where := []string{"user_id = ?"}
+	whereArgs := []string{userID.String()}
+	_, err = s.db.FetchDict(&boardUsers, "board_users", 10000, 0, where, whereArgs)
 	return boardUsers, err
 }

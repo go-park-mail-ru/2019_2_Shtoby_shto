@@ -34,6 +34,7 @@ func NewBoardHandler(e *echo.Echo, userService user.HandlerUserService, boardSer
 	e.GET("/board/:id", handler.Get)
 	e.GET("/board", handler.Fetch)
 	e.POST("/board/cards", handler.FetchBoardCards)
+	e.GET("/board/user/:id", handler.FetchUserBoards)
 	e.POST("/board", handler.Post)
 	e.PUT("/board/:id", handler.Put)
 	e.DELETE("/board/:id", handler.Delete)
@@ -60,6 +61,30 @@ func (h Handler) Fetch(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, users)
 }
 
+func (h Handler) FetchUserBoards(ctx echo.Context) error {
+	userID := customType.StringUUID(ctx.Param("id"))
+	if !userID.IsUUID() {
+		return ctx.JSON(http.StatusBadRequest, errors.New("Not valid userID"))
+	}
+	boardUsers, err := h.boardUsersService.FetchBoardUsersByUserID(userID)
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "FetchBoardUsersByUserID error", http.StatusInternalServerError, err)
+		return err
+	}
+	resultBoardIDs := make([]string, 0)
+	for _, boardUser := range boardUsers {
+		resultBoardIDs = append(resultBoardIDs, boardUser.BoardID.String())
+	}
+	boards, err := h.boardService.FetchBoardsByIDs(resultBoardIDs)
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "FetchBoardUsersByUserID error", http.StatusInternalServerError, err)
+		return err
+	}
+	return ctx.JSON(http.StatusOK, boards)
+}
+
 func (h Handler) FetchBoardCards(ctx echo.Context) error {
 	body, err := h.ReadBody(ctx.Request().Body)
 	if err != nil {
@@ -78,7 +103,13 @@ func (h Handler) Post(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
 		return err
 	}
-	newBoard, err := h.boardService.CreateBoard(body)
+	newBoardUsersID, err := utils.GenerateUUID()
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "GenerateUUID error", http.StatusInternalServerError, err)
+		return err
+	}
+	newBoard, err := h.boardService.CreateBoard(body, customType.StringUUID(newBoardUsersID.String()))
 	if err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "Create error", http.StatusInternalServerError, err)
 		ctx.Logger().Error(err)
@@ -90,7 +121,7 @@ func (h Handler) Post(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "get user_id failed", http.StatusInternalServerError, errors.New("download fail"))
 		return errors.New("get user_id failed")
 	}
-	boardUser, err := h.boardUsersService.CreateBoardUsers(userID, newBoard.ID)
+	boardUser, err := h.boardUsersService.CreateBoardUsers(customType.StringUUID(newBoardUsersID.String()), userID, newBoard.ID)
 	if err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "Create error", http.StatusInternalServerError, err)
 		ctx.Logger().Error(err)

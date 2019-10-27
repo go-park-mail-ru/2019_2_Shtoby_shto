@@ -78,9 +78,6 @@ func (d DataManager) FindDictByColumn(p interface{}, where, whereArg []string) e
 }
 
 func (d DataManager) FetchDict(data interface{}, table string, limit, offset int, where, whereArg []string) (int, error) {
-	if len(where) != len(whereArg) {
-		return 0, errors.New("Not valid where ")
-	}
 	fetchLen := 0
 	whereResult := strings.Join(where, " and ")
 	res := d.db.Table(table).Where(whereResult, whereArg).Limit(limit).Offset(offset).Find(data)
@@ -94,11 +91,15 @@ func (d DataManager) FetchDict(data interface{}, table string, limit, offset int
 
 func (d DataManager) CreateRecord(p interface{}) error {
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
-	id, err := utils.GenerateUUID()
-	if err != nil {
-		return err
+	id := obj.GetId().String()
+	if obj.GetId().IsEmpty() {
+		newID, err := utils.GenerateUUID()
+		if err != nil {
+			return err
+		}
+		id = newID.String()
 	}
-	obj.SetId(customType.StringUUID(id.String()))
+	obj.SetId(customType.StringUUID(id))
 	res := d.db.Table(obj.GetTableName()).Create(p)
 	if res.Error != nil {
 		return res.Error

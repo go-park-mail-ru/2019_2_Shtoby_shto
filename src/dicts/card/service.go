@@ -16,6 +16,7 @@ type HandlerCardService interface {
 	UpdateCard(data []byte, id customType.StringUUID) (*Card, error)
 	DeleteCard(id customType.StringUUID) error
 	FetchCards(limit, offset int) (cards []Card, err error)
+	FillLookupFields(card *Card) error
 }
 
 type service struct {
@@ -92,4 +93,8 @@ func (s service) FetchCardsByBoardID(boardData []byte) (cards []Card, err error)
 	whereArgs := boardIDs.Boards
 	_, err = s.db.FetchDict(&cards, "cards", 10000, 0, where, whereArgs)
 	return cards, err
+}
+
+func (s service) FillLookupFields(card *Card) error {
+	return nil
 }

@@ -10,10 +10,11 @@ import (
 
 type HandlerBoardService interface {
 	FindBoardByID(id customType.StringUUID) (*Board, error)
-	CreateBoard(data []byte) (*Board, error)
+	CreateBoard(data []byte, boardUserID customType.StringUUID) (*Board, error)
 	UpdateBoard(data []byte, id customType.StringUUID) (*Board, error)
 	DeleteBoard(id customType.StringUUID) error
 	FetchBoards(limit, offset int) (boards []Board, err error)
+	FetchBoardsByIDs(boardsIDs []string) (boards []Board, err error)
 }
 
 type service struct {
@@ -37,8 +38,10 @@ func (s service) FindBoardByID(id customType.StringUUID) (*Board, error) {
 	return board, err
 }
 
-func (s service) CreateBoard(data []byte) (*Board, error) {
-	board := &Board{}
+func (s service) CreateBoard(data []byte, boardUserID customType.StringUUID) (*Board, error) {
+	board := &Board{
+		BoardUsersID: boardUserID,
+	}
 	if err := board.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
@@ -68,5 +71,11 @@ func (s service) DeleteBoard(id customType.StringUUID) error {
 
 func (s service) FetchBoards(limit, offset int) (boards []Board, err error) {
 	_, err = s.db.FetchDict(&boards, "boards", limit, offset, nil, nil)
+	return boards, err
+}
+
+func (s service) FetchBoardsByIDs(boardsIDs []string) (boards []Board, err error) {
+	where := []string{"id in(?)"}
+	_, err = s.db.FetchDict(&boards, "boards", 10000, 0, where, boardsIDs)
 	return boards, err
 }
