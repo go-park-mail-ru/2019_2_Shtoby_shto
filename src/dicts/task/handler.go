@@ -6,7 +6,6 @@ import (
 	errorsLib "2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/security"
-	"bytes"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -41,13 +40,13 @@ func (h Handler) Get(ctx echo.Context) error {
 }
 
 func (h Handler) Post(ctx echo.Context) error {
-	buf := bytes.Buffer{}
-	if _, err := buf.ReadFrom(ctx.Request().Body); err != nil {
+	body, err := h.ReadBody(ctx.Request().Body)
+	if err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
 		return err
 	}
-	responseData, err := h.taskService.CreateTask(buf.Bytes())
+	responseData, err := h.taskService.CreateTask(body)
 	if err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "Create error", http.StatusInternalServerError, err)
 		ctx.Logger().Error(err)
@@ -57,13 +56,13 @@ func (h Handler) Post(ctx echo.Context) error {
 }
 
 func (h Handler) Put(ctx echo.Context) error {
-	buf := bytes.Buffer{}
-	if _, err := buf.ReadFrom(ctx.Request().Body); err != nil {
+	body, err := h.ReadBody(ctx.Request().Body)
+	if err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
 		return err
 	}
-	board, err := h.taskService.UpdateTask(buf.Bytes(), customType.StringUUID(ctx.Param("id")))
+	board, err := h.taskService.UpdateTask(body, customType.StringUUID(ctx.Param("id")))
 	if err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "Update task error", http.StatusInternalServerError, err)

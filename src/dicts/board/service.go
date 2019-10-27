@@ -5,6 +5,7 @@ import (
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/handle"
+	"errors"
 )
 
 type HandlerBoardService interface {
@@ -40,6 +41,9 @@ func (s service) CreateBoard(data []byte) (*Board, error) {
 	if err := board.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
+	if !board.IsValid() {
+		return nil, errors.New("Board body is not valid")
+	}
 	err := s.db.CreateRecord(board)
 	return board, err
 }
@@ -48,6 +52,9 @@ func (s service) UpdateBoard(data []byte, id customType.StringUUID) (*Board, err
 	board := &Board{}
 	if err := board.UnmarshalJSON(data); err != nil {
 		return nil, err
+	}
+	if !board.IsValid() {
+		return nil, errors.New("Board body is not valid")
 	}
 	err := s.db.UpdateRecord(board, id)
 	return board, err

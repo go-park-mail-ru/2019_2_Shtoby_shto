@@ -2,8 +2,6 @@ package card
 
 import (
 	"2019_2_Shtoby_shto/src/dicts"
-	"2019_2_Shtoby_shto/src/dicts/user"
-	"2019_2_Shtoby_shto/src/dicts/task"
 )
 
 const cardTableName = "cards"
@@ -11,9 +9,8 @@ const cardTableName = "cards"
 //easyjson:json
 type Card struct {
 	dicts.BaseInfo
-	Caption 		string `json:"caption"`
-	Tasks 			[]task.Task `json:"tasks"`
-	UsersAssigned	[]user.User `json:"users" sql:"-"`
+	Caption string `json:"caption"`
+	TaskID  string `json:"task_id"`
 }
 
 func (b Card) GetTableName() string {

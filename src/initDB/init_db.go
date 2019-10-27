@@ -2,7 +2,10 @@ package initDB
 
 import (
 	"2019_2_Shtoby_shto/src/dicts/board"
+	"2019_2_Shtoby_shto/src/dicts/boardUsers"
 	"2019_2_Shtoby_shto/src/dicts/card"
+	"2019_2_Shtoby_shto/src/dicts/cardGroup"
+	сardUsers "2019_2_Shtoby_shto/src/dicts/cardUsers"
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/task"
 	"2019_2_Shtoby_shto/src/dicts/user"
@@ -32,6 +35,9 @@ var tables = []tabler{
 	&board.Board{},
 	&card.Card{},
 	&task.Task{},
+	&boardUsers.BoardUsers{},
+	&сardUsers.CardUsers{},
+	&cardGroup.CardGroup{},
 }
 
 func Tables() []tabler {

@@ -4,7 +4,10 @@ import (
 	"2019_2_Shtoby_shto/src/config"
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts/board"
+	"2019_2_Shtoby_shto/src/dicts/boardUsers"
 	"2019_2_Shtoby_shto/src/dicts/card"
+	"2019_2_Shtoby_shto/src/dicts/cardGroup"
+	сardUsers "2019_2_Shtoby_shto/src/dicts/cardUsers"
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/task"
 	"2019_2_Shtoby_shto/src/dicts/user"
@@ -31,13 +34,16 @@ var (
 )
 
 var (
-	securityService security.HandlerSecurity
-	userService     user.HandlerUserService
-	photoService    photo.HandlerPhotoService
-	boardService    board.HandlerBoardService
-	cardService     card.HandlerCardService
-	taskService     task.HandlerTaskService
-	dbService       initDB.InitDBManager
+	securityService   security.HandlerSecurity
+	userService       user.HandlerUserService
+	photoService      photo.HandlerPhotoService
+	boardService      board.HandlerBoardService
+	boardUsersService boardUsers.HandlerBoardUsersService
+	cardUsersService  сardUsers.HandlerCardUsersService
+	cardService       card.HandlerCardService
+	cardGroupService  cardGroup.HandlerCardGroupService
+	taskService       task.HandlerTaskService
+	dbService         initDB.InitDBManager
 )
 
 func main() {
@@ -123,12 +129,16 @@ func initService(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	userService = user.CreateInstance(db)
 	photoService = photo.CreateInstance(db)
 	boardService = board.CreateInstance(db)
+	boardUsersService = boardUsers.CreateInstance(db)
+	cardUsersService = сardUsers.CreateInstance(db)
 	cardService = card.CreateInstance(db)
+	cardGroupService = cardGroup.CreateInstance(db)
 	taskService = task.CreateInstance(db)
 	securityService = security.CreateInstance(sessionService)
-	user.NewUserHandler(e, userService, securityService)
+	user.NewUserHandler(e, userService, boardUsersService, cardUsersService, securityService)
 	photo.NewPhotoHandler(e, photoService, userService, securityService)
-	board.NewBoardHandler(e, userService, boardService, securityService)
-	card.NewCardHandler(e, userService, cardService, securityService)
+	board.NewBoardHandler(e, userService, boardService, boardUsersService, securityService)
+	card.NewCardHandler(e, userService, cardService, cardUsersService, securityService)
+	cardGroup.NewCardGroupHandler(e, cardGroupService, securityService)
 	task.NewTaskHandler(e, userService, taskService, securityService)
 }

@@ -3,8 +3,10 @@ package handle
 
 import (
 	"2019_2_Shtoby_shto/src/dicts"
+	"bytes"
 	"encoding/json"
 	"github.com/labstack/echo/v4"
+	"io"
 	"net/http"
 )
 
@@ -39,6 +41,7 @@ type Handler interface {
 	Put(c echo.Context)
 
 	CreateInstance() dicts.Dict
+	ReadBody(body io.ReadCloser) ([]byte, error)
 }
 
 // Класс реализующий транспортный уровень
@@ -84,4 +87,13 @@ func (h HandlerImpl) Put(c echo.Context) error {
 // Delete
 func (h HandlerImpl) Delete(c echo.Context) error {
 	return nil
+}
+
+func (h HandlerImpl) ReadBody(body io.ReadCloser) ([]byte, error) {
+	buf := bytes.Buffer{}
+	_, err := buf.ReadFrom(body)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }

@@ -2,6 +2,8 @@ package user
 
 import (
 	"2019_2_Shtoby_shto/src/customType"
+	"2019_2_Shtoby_shto/src/dicts/boardUsers"
+	сardUsers "2019_2_Shtoby_shto/src/dicts/cardUsers"
 	errorsLib "2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/security"
@@ -12,20 +14,24 @@ import (
 )
 
 type Handler struct {
-	userService     HandlerUserService
-	securityService security.HandlerSecurity
+	userService       HandlerUserService
+	boardUsersService boardUsers.HandlerBoardUsersService
+	cardUsersService  сardUsers.HandlerCardUsersService
+	securityService   security.HandlerSecurity
 	handle.HandlerImpl
 }
 
-func NewUserHandler(e *echo.Echo, userService HandlerUserService, securityService security.HandlerSecurity) {
+func NewUserHandler(e *echo.Echo, userService HandlerUserService, boardUsersService boardUsers.HandlerBoardUsersService, cardUsersService сardUsers.HandlerCardUsersService, securityService security.HandlerSecurity) {
 	handler := Handler{
-		userService:     userService,
-		securityService: securityService,
+		userService:       userService,
+		boardUsersService: boardUsersService,
+		cardUsersService:  cardUsersService,
+		securityService:   securityService,
 	}
 	e.POST("/login", handler.Login)
 	e.GET("/logout", handler.Logout)
-	e.GET("/users", handler.Fetch)
-	e.GET("/users/:id", handler.Get)
+	e.GET("/users/all", handler.Fetch)
+	e.GET("/users", handler.Get)
 	e.POST("/users/registration", handler.Post)
 	e.PUT("/users/:id", handler.Put)
 	e.DELETE("/users/:id", handler.Delete)
@@ -45,17 +51,19 @@ func (h Handler) Get(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "GetUserById error", http.StatusBadRequest, err)
 		return err
 	}
+	// response without password
+	user.Password = ""
 	return ctx.JSON(http.StatusOK, user)
 }
 
 func (h Handler) Post(ctx echo.Context) error {
-	buf := bytes.Buffer{}
-	if _, err := buf.ReadFrom(ctx.Request().Body); err != nil {
+	body, err := h.ReadBody(ctx.Request().Body)
+	if err != nil {
 		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "Invalid body", http.StatusInternalServerError, err)
+		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
 		return err
 	}
-	user, err := h.userService.CreateUser(buf.Bytes())
+	user, err := h.userService.CreateUser(body)
 	if err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "User not valid", http.StatusBadRequest, err)
 		ctx.Logger().Error(err)
@@ -67,9 +75,10 @@ func (h Handler) Post(ctx echo.Context) error {
 		return err
 	}
 	h.SecurityResponse(ctx.Response(), http.StatusOK, "Registration is success, user id: "+user.ID.String(), nil)
-	return nil
+	// response without password
+	user.Password = ""
+	return ctx.JSON(http.StatusOK, user)
 }
-
 func (h Handler) Put(ctx echo.Context) error {
 	userID, ok := ctx.Get("user_id").(customType.StringUUID)
 	if !ok {
@@ -91,13 +100,13 @@ func (h Handler) Put(ctx echo.Context) error {
 }
 
 func (h Handler) Login(ctx echo.Context) error {
-	buf := bytes.Buffer{}
-	if _, err := buf.ReadFrom(ctx.Request().Body); err != nil {
+	body, err := h.ReadBody(ctx.Request().Body)
+	if err != nil {
 		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "Invalid body", http.StatusInternalServerError, err)
+		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
 		return err
 	}
-	user, err := h.userService.GetUserByLogin(buf.Bytes())
+	user, err := h.userService.GetUserByLogin(body)
 	if err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "Please, reg yourself", http.StatusUnauthorized, err)

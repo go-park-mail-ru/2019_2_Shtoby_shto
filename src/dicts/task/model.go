@@ -2,7 +2,6 @@ package task
 
 import (
 	"2019_2_Shtoby_shto/src/dicts"
-	"2019_2_Shtoby_shto/src/dicts/user"
 )
 
 const taskTableName = "tasks"
@@ -10,8 +9,8 @@ const taskTableName = "tasks"
 //easyjson:json
 type Task struct {
 	dicts.BaseInfo
-	Text 			string 	`json:"text"`
-	Done			bool	`json:"done"`
+	Text string `json:"text"`
+	Done bool   `json:"done"`
 }
 
 func (b Task) GetTableName() string {
