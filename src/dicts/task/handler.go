@@ -25,6 +25,7 @@ func NewTaskHandler(e *echo.Echo, userService user.HandlerUserService, taskServi
 		securityService: securityService,
 	}
 	e.GET("/tasks/:id", handler.Get)
+	e.GET("/tasks", handler.Fetch)
 	e.POST("/tasks", handler.Post)
 	e.PUT("/tasks/:id", handler.Put)
 	e.DELETE("/tasks/:id", handler.Delete)
