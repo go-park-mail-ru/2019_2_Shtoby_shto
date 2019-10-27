@@ -3,30 +3,37 @@ package board
 import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts/boardUsers"
+	"2019_2_Shtoby_shto/src/dicts/card"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	errorsLib "2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/security"
+	"2019_2_Shtoby_shto/src/utils"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"net/http"
 )
 
 type Handler struct {
 	userService       user.HandlerUserService
 	boardService      HandlerBoardService
+	cardService       card.HandlerCardService
 	boardUsersService boardUsers.HandlerBoardUsersService
 	securityService   security.HandlerSecurity
 	handle.HandlerImpl
 }
 
-func NewBoardHandler(e *echo.Echo, userService user.HandlerUserService, boardService HandlerBoardService, boardUsersService boardUsers.HandlerBoardUsersService, securityService security.HandlerSecurity) {
+func NewBoardHandler(e *echo.Echo, userService user.HandlerUserService, boardService HandlerBoardService, boardUsersService boardUsers.HandlerBoardUsersService, cardService card.HandlerCardService, securityService security.HandlerSecurity) {
 	handler := Handler{
 		userService:       userService,
 		boardService:      boardService,
 		boardUsersService: boardUsersService,
+		cardService:       cardService,
 		securityService:   securityService,
 	}
 	e.GET("/board/:id", handler.Get)
+	e.GET("/board", handler.Fetch)
+	e.POST("/board/cards", handler.FetchBoardCards)
 	e.POST("/board", handler.Post)
 	e.PUT("/board/:id", handler.Put)
 	e.DELETE("/board/:id", handler.Delete)
@@ -42,6 +49,28 @@ func (h Handler) Get(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, data)
 }
 
+func (h Handler) Fetch(ctx echo.Context) error {
+	params := utils.ParseRequestParams(*ctx.Request().URL)
+	users, err := h.boardService.FetchBoards(params.Limit, params.Offset)
+	if err != nil {
+		errorsLib.ErrorHandler(ctx.Response(), "Fetch error ", http.StatusBadRequest, err)
+		ctx.Logger().Error(err)
+		return err
+	}
+	return ctx.JSON(http.StatusOK, users)
+}
+
+func (h Handler) FetchBoardCards(ctx echo.Context) error {
+	body, err := h.ReadBody(ctx.Request().Body)
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
+		return err
+	}
+	cards, err := h.cardService.FetchCardsByBoardID(body)
+	return ctx.JSON(http.StatusOK, cards)
+}
+
 func (h Handler) Post(ctx echo.Context) error {
 	body, err := h.ReadBody(ctx.Request().Body)
 	if err != nil {
@@ -49,13 +78,26 @@ func (h Handler) Post(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
 		return err
 	}
-	responseData, err := h.boardService.CreateBoard(body)
+	newBoard, err := h.boardService.CreateBoard(body)
 	if err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "Create error", http.StatusInternalServerError, err)
 		ctx.Logger().Error(err)
 		return err
 	}
-	return ctx.JSON(http.StatusOK, responseData)
+	userID, ok := ctx.Get("user_id").(customType.StringUUID)
+	if !ok {
+		ctx.Logger().Error("get user_id failed")
+		errorsLib.ErrorHandler(ctx.Response(), "get user_id failed", http.StatusInternalServerError, errors.New("download fail"))
+		return errors.New("get user_id failed")
+	}
+	boardUser, err := h.boardUsersService.CreateBoardUsers(userID, newBoard.ID)
+	if err != nil {
+		errorsLib.ErrorHandler(ctx.Response(), "Create error", http.StatusInternalServerError, err)
+		ctx.Logger().Error(err)
+		return err
+	}
+	newBoard.BoardUsersID = boardUser.ID
+	return ctx.JSON(http.StatusOK, newBoard)
 }
 
 func (h Handler) Put(ctx echo.Context) error {

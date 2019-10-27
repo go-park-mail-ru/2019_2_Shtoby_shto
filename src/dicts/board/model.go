@@ -1,6 +1,7 @@
 package board
 
 import (
+	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts"
 )
 
@@ -9,8 +10,8 @@ const boardTableName = "boards"
 //easyjson:json
 type Board struct {
 	dicts.BaseInfo
-	Name         string `json:"name"`
-	BoardUsersID string `json:"board_users_id"`
+	Name         string                `json:"name"`
+	BoardUsersID customType.StringUUID `json:"board_users_id"`
 	//Users 	[]user.User `json:"users" sql:"-"`
 }
 

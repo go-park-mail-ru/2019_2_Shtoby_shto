@@ -12,6 +12,7 @@ type HandlerTaskService interface {
 	CreateTask(data []byte) (*Task, error)
 	UpdateTask(data []byte, id customType.StringUUID) (*Task, error)
 	DeleteTask(id customType.StringUUID) error
+	FetchTasks(limit, offset int) (tasks []Task, err error)
 }
 
 type service struct {
@@ -56,4 +57,9 @@ func (s service) UpdateTask(data []byte, id customType.StringUUID) (*Task, error
 func (s service) DeleteTask(id customType.StringUUID) error {
 	task := Task{}
 	return s.db.DeleteRecord(&task, id)
+}
+
+func (s service) FetchTasks(limit, offset int) (tasks []Task, err error) {
+	_, err = s.db.FetchDict(&tasks, "tasks", limit, offset, nil, nil)
+	return tasks, err
 }

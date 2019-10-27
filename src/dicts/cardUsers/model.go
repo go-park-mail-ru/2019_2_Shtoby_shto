@@ -1,22 +1,28 @@
 package сardUsers
 
 import (
+	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts"
 )
 
-const cardUsersTableName = "cardUsers"
+const cardUsersTableName = "card_users"
 
 //easyjson:json
 type CardUsers struct {
 	dicts.BaseInfo
-	CardID string `json:"card_id"`
-	UserID string `json:"user_id"`
+	CardID customType.StringUUID `json:"card_id"`
+	UserID customType.StringUUID `json:"user_id"`
 }
 
-func (b CardUsers) GetTableName() string {
+func (c CardUsers) GetTableName() string {
 	return cardUsersTableName
 }
 
-func (b CardUsers) IsValid() bool {
-	return b.CardID != "" && b.UserID != ""
+func (c CardUsers) IsValid() bool {
+	return c.CardID != "" && c.UserID != ""
+}
+
+//easyjson:json
+type CardsUserRequest struct {
+	Users []string `json:"users"`
 }

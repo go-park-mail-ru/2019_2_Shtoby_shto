@@ -13,6 +13,7 @@ type HandlerCardGroupService interface {
 	CreateCardGroup(data []byte) (*CardGroup, error)
 	UpdateCardGroup(data []byte, id customType.StringUUID) (*CardGroup, error)
 	DeleteCardGroup(id customType.StringUUID) error
+	FetchCardGroup(limit, offset int) (cardGroup []CardGroup, err error)
 }
 
 type service struct {
@@ -63,4 +64,9 @@ func (s service) UpdateCardGroup(data []byte, id customType.StringUUID) (*CardGr
 func (s service) DeleteCardGroup(id customType.StringUUID) error {
 	card := CardGroup{}
 	return s.db.DeleteRecord(&card, id)
+}
+
+func (s service) FetchCardGroup(limit, offset int) (cardGroup []CardGroup, err error) {
+	_, err = s.db.FetchDict(&cardGroup, "card_groups", limit, offset, nil, nil)
+	return cardGroup, err
 }

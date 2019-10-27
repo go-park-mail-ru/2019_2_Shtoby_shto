@@ -12,6 +12,7 @@ type HandlerUserService interface {
 	UpdateUser(data []byte, id StringUUID) error
 	GetUserById(id StringUUID) (User, error)
 	GetUserByLogin(data []byte) (*User, error)
+	FetchUsers(limit, offset int) (users []User, err error)
 }
 
 type service struct {
@@ -46,7 +47,9 @@ func (s *service) GetUserByLogin(data []byte) (*User, error) {
 		return nil, err
 	}
 	user := &User{}
-	err := s.db.FindDictByColumn(user, "login", curUser.Login)
+	where := []string{"login = ?"}
+	whereArgs := []string{curUser.Login}
+	err := s.db.FindDictByColumn(user, where, whereArgs)
 	if err != nil {
 		return nil, err
 	}
@@ -68,4 +71,9 @@ func (s *service) UpdateUser(data []byte, id StringUUID) error {
 		return err
 	}
 	return nil
+}
+
+func (s service) FetchUsers(limit, offset int) (users []User, err error) {
+	_, err = s.db.FetchDict(&users, "users", limit, offset, nil, nil)
+	return users, err
 }

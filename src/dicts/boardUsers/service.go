@@ -3,16 +3,16 @@ package boardUsers
 import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
-	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/handle"
 	"errors"
 )
 
 type HandlerBoardUsersService interface {
-	FindBoardUsersByID(id customType.StringUUID) (*BoardUsers, error)
-	CreateBoardUsers(userID, boardID string) (*BoardUsers, error)
-	UpdateBoardUsers(userID, boardID string, id customType.StringUUID) (*BoardUsers, error)
+	FindBoardUsersByIDs(userID, boardID customType.StringUUID) (*BoardUsers, error)
+	CreateBoardUsers(userID, boardID customType.StringUUID) (*BoardUsers, error)
+	UpdateBoardUsers(userID, boardID customType.StringUUID, id customType.StringUUID) (*BoardUsers, error)
 	DeleteBoardUsers(id customType.StringUUID) error
+	FetchBoardUsers(limit, offset int) (users []BoardUsers, err error)
 }
 
 type service struct {
@@ -26,17 +26,15 @@ func CreateInstance(db database.IDataManager) HandlerBoardUsersService {
 	}
 }
 
-func (s service) FindBoardUsersByID(id customType.StringUUID) (*BoardUsers, error) {
-	boardUsers := &BoardUsers{
-		BaseInfo: dicts.BaseInfo{
-			ID: id,
-		},
-	}
-	err := s.db.FindDictById(boardUsers)
+func (s service) FindBoardUsersByIDs(userID, boardID customType.StringUUID) (*BoardUsers, error) {
+	boardUsers := &BoardUsers{}
+	where := []string{"user_id = ?", "board_id = ?"}
+	whereArgs := []string{userID.String(), boardID.String()}
+	err := s.db.FindDictByColumn(boardUsers, where, whereArgs)
 	return boardUsers, err
 }
 
-func (s service) CreateBoardUsers(userID, boardID string) (*BoardUsers, error) {
+func (s service) CreateBoardUsers(userID, boardID customType.StringUUID) (*BoardUsers, error) {
 	boardUsers := &BoardUsers{
 		UserID:  userID,
 		BoardID: boardID,
@@ -48,7 +46,7 @@ func (s service) CreateBoardUsers(userID, boardID string) (*BoardUsers, error) {
 	return boardUsers, err
 }
 
-func (s service) UpdateBoardUsers(userID, boardID string, id customType.StringUUID) (*BoardUsers, error) {
+func (s service) UpdateBoardUsers(userID, boardID customType.StringUUID, id customType.StringUUID) (*BoardUsers, error) {
 	boardUsers := &BoardUsers{
 		UserID:  userID,
 		BoardID: boardID,
@@ -63,4 +61,9 @@ func (s service) UpdateBoardUsers(userID, boardID string, id customType.StringUU
 func (s service) DeleteBoardUsers(id customType.StringUUID) error {
 	boardUsers := BoardUsers{}
 	return s.db.DeleteRecord(boardUsers, id)
+}
+
+func (s service) FetchBoardUsers(limit, offset int) (boardUsers []BoardUsers, err error) {
+	_, err = s.db.FetchDict(&boardUsers, "board_users", limit, offset, nil, nil)
+	return boardUsers, err
 }

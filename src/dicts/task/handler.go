@@ -6,6 +6,7 @@ import (
 	errorsLib "2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/security"
+	"2019_2_Shtoby_shto/src/utils"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -37,6 +38,17 @@ func (h Handler) Get(ctx echo.Context) error {
 		return err
 	}
 	return ctx.JSON(http.StatusOK, data)
+}
+
+func (h Handler) Fetch(ctx echo.Context) error {
+	params := utils.ParseRequestParams(*ctx.Request().URL)
+	tasks, err := h.taskService.FetchTasks(params.Limit, params.Offset)
+	if err != nil {
+		errorsLib.ErrorHandler(ctx.Response(), "Fetch error ", http.StatusBadRequest, err)
+		ctx.Logger().Error(err)
+		return err
+	}
+	return ctx.JSON(http.StatusOK, tasks)
 }
 
 func (h Handler) Post(ctx echo.Context) error {

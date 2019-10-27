@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/satori/go.uuid"
 	"math/rand"
+	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -12,6 +14,12 @@ const (
 	hexPattern = "^(urn\\:uuid\\:)?\\{?([a-z0-9]{8})-([a-z0-9]{4})-" +
 		"([1-5][a-z0-9]{3})-([a-z0-9]{4})-([a-z0-9]{12})\\}?$"
 )
+
+type RequestParams struct {
+	Limit  int      `json:"limit"`
+	Offset int      `json:"offset"`
+	Sort   []string `json:"sort"`
+}
 
 func IsUUID(str string) bool {
 	md := regexp.MustCompile(hexPattern).FindStringSubmatch(str)
@@ -34,4 +42,24 @@ func GenerateUUID() (uuid.UUID, error) {
 
 func Join(args ...string) string {
 	return strings.Join(args, "/")
+}
+
+func ParseRequestParams(params url.URL) RequestParams {
+	requestParams := RequestParams{}
+	lim := params.Query().Get("limit")
+	limit, err := strconv.Atoi(lim)
+	if err != nil {
+		limit = 100
+	}
+	requestParams.Limit = limit
+	off := params.Query().Get("offset")
+	offset, err := strconv.Atoi(off)
+	if err != nil {
+		offset = 0
+	}
+	requestParams.Offset = offset
+	s := params.Query().Get("sort")
+	sort := strings.Split(s, ",")
+	requestParams.Sort = sort
+	return requestParams
 }

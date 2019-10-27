@@ -10,8 +10,9 @@ import (
 
 type HandlerCardUsersService interface {
 	FindCardUsersByID(id customType.StringUUID) (*CardUsers, error)
-	CreateCardUsers(userID, сardID string) (*CardUsers, error)
-	UpdateCardUsers(userID, сardID string, id customType.StringUUID) (*CardUsers, error)
+	FindCardUsersByUserID(userData []byte) ([]CardUsers, error)
+	CreateCardUsers(userID, сardID customType.StringUUID) (*CardUsers, error)
+	UpdateCardUsers(userID, сardID customType.StringUUID, id customType.StringUUID) (*CardUsers, error)
 	DeleteCardUsers(id customType.StringUUID) error
 }
 
@@ -26,6 +27,20 @@ func CreateInstance(db database.IDataManager) HandlerCardUsersService {
 	}
 }
 
+func (s service) FindCardUsersByUserID(userData []byte) (cardUsers []CardUsers, err error) {
+	userIDs := CardsUserRequest{}
+	if err = userIDs.UnmarshalJSON(userData); err != nil {
+		return nil, err
+	}
+	if len(userIDs.Users) == 0 {
+		return nil, errors.New("User id is empty! ")
+	}
+	where := []string{"user_id in (?)"}
+	whereArgs := userIDs.Users
+	_, err = s.db.FetchDict(&cardUsers, "card_users", 10000, 0, where, whereArgs)
+	return cardUsers, err
+}
+
 func (s service) FindCardUsersByID(id customType.StringUUID) (*CardUsers, error) {
 	сardUsers := &CardUsers{
 		BaseInfo: dicts.BaseInfo{
@@ -36,7 +51,7 @@ func (s service) FindCardUsersByID(id customType.StringUUID) (*CardUsers, error)
 	return сardUsers, err
 }
 
-func (s service) CreateCardUsers(userID, сardID string) (*CardUsers, error) {
+func (s service) CreateCardUsers(userID, сardID customType.StringUUID) (*CardUsers, error) {
 	сardUsers := &CardUsers{
 		CardID: сardID,
 		UserID: userID,
@@ -48,7 +63,7 @@ func (s service) CreateCardUsers(userID, сardID string) (*CardUsers, error) {
 	return сardUsers, err
 }
 
-func (s service) UpdateCardUsers(userID, сardID string, id customType.StringUUID) (*CardUsers, error) {
+func (s service) UpdateCardUsers(userID, сardID customType.StringUUID, id customType.StringUUID) (*CardUsers, error) {
 	boardUsers := &CardUsers{
 		UserID: userID,
 		CardID: сardID,
@@ -63,4 +78,9 @@ func (s service) UpdateCardUsers(userID, сardID string, id customType.StringUUI
 func (s service) DeleteCardUsers(id customType.StringUUID) error {
 	boardUsers := CardUsers{}
 	return s.db.DeleteRecord(boardUsers, id)
+}
+
+func (s service) FetchCardUsers(limit, offset int) (cardUsers []CardUsers, err error) {
+	_, err = s.db.FetchDict(&cardUsers, "card_users", limit, offset, nil, nil)
+	return cardUsers, err
 }

@@ -18,7 +18,105 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCard(in *jlexer.Lexer, out *Card) {
+func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCard(in *jlexer.Lexer, out *CardsBoardRequest) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeString()
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "boards":
+			if in.IsNull() {
+				in.Skip()
+				out.Boards = nil
+			} else {
+				in.Delim('[')
+				if out.Boards == nil {
+					if !in.IsDelim(']') {
+						out.Boards = make([]string, 0, 4)
+					} else {
+						out.Boards = []string{}
+					}
+				} else {
+					out.Boards = (out.Boards)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v1 string
+					v1 = string(in.String())
+					out.Boards = append(out.Boards, v1)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCard(out *jwriter.Writer, in CardsBoardRequest) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"boards\":"
+		out.RawString(prefix[1:])
+		if in.Boards == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+			out.RawString("null")
+		} else {
+			out.RawByte('[')
+			for v2, v3 := range in.Boards {
+				if v2 > 0 {
+					out.RawByte(',')
+				}
+				out.String(string(v3))
+			}
+			out.RawByte(']')
+		}
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v CardsBoardRequest) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCard(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v CardsBoardRequest) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCard(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *CardsBoardRequest) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCard(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *CardsBoardRequest) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCard(l, v)
+}
+func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCard1(in *jlexer.Lexer, out *Card) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -42,9 +140,11 @@ func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCard(in *jlexer.Lexer, out *Ca
 		case "priority":
 			out.Priority = int(in.Int())
 		case "board_id":
-			out.BoardID = string(in.String())
+			out.BoardID = customType.StringUUID(in.String())
+		case "card_user_id":
+			out.CardUserID = customType.StringUUID(in.String())
 		case "card_group_id":
-			out.CardGroupID = string(in.String())
+			out.CardGroupID = customType.StringUUID(in.String())
 		case "id":
 			out.ID = customType.StringUUID(in.String())
 		default:
@@ -57,7 +157,7 @@ func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCard(in *jlexer.Lexer, out *Ca
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCard(out *jwriter.Writer, in Card) {
+func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCard1(out *jwriter.Writer, in Card) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -77,6 +177,11 @@ func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCard(out *jwriter.Writer, in C
 		out.String(string(in.BoardID))
 	}
 	{
+		const prefix string = ",\"card_user_id\":"
+		out.RawString(prefix)
+		out.String(string(in.CardUserID))
+	}
+	{
 		const prefix string = ",\"card_group_id\":"
 		out.RawString(prefix)
 		out.String(string(in.CardGroupID))
@@ -92,23 +197,23 @@ func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCard(out *jwriter.Writer, in C
 // MarshalJSON supports json.Marshaler interface
 func (v Card) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCard(&w, v)
+	easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCard1(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Card) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCard(w, v)
+	easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCard1(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Card) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCard(&r, v)
+	easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCard1(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Card) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCard(l, v)
+	easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCard1(l, v)
 }

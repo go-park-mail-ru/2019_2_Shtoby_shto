@@ -13,6 +13,7 @@ type HandlerBoardService interface {
 	CreateBoard(data []byte) (*Board, error)
 	UpdateBoard(data []byte, id customType.StringUUID) (*Board, error)
 	DeleteBoard(id customType.StringUUID) error
+	FetchBoards(limit, offset int) (boards []Board, err error)
 }
 
 type service struct {
@@ -63,4 +64,9 @@ func (s service) UpdateBoard(data []byte, id customType.StringUUID) (*Board, err
 func (s service) DeleteBoard(id customType.StringUUID) error {
 	board := Board{}
 	return s.db.DeleteRecord(board, id)
+}
+
+func (s service) FetchBoards(limit, offset int) (boards []Board, err error) {
+	_, err = s.db.FetchDict(&boards, "boards", limit, offset, nil, nil)
+	return boards, err
 }

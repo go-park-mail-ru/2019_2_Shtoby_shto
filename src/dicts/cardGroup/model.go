@@ -4,7 +4,7 @@ import (
 	"2019_2_Shtoby_shto/src/dicts"
 )
 
-const cardGroupsTableName = "cardGroups"
+const cardGroupsTableName = "card_groups"
 
 //easyjson:json
 type CardGroup struct {

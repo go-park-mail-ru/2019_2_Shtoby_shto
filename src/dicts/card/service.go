@@ -10,9 +10,12 @@ import (
 
 type HandlerCardService interface {
 	FindCardByID(id customType.StringUUID) (*Card, error)
+	FetchCardsByIDs(ids []string) (cards []Card, err error)
+	FetchCardsByBoardID(boardData []byte) (cards []Card, err error)
 	CreateCard(data []byte) (*Card, error)
 	UpdateCard(data []byte, id customType.StringUUID) (*Card, error)
 	DeleteCard(id customType.StringUUID) error
+	FetchCards(limit, offset int) (cards []Card, err error)
 }
 
 type service struct {
@@ -63,4 +66,30 @@ func (s service) UpdateCard(data []byte, id customType.StringUUID) (*Card, error
 func (s service) DeleteCard(id customType.StringUUID) error {
 	card := Card{}
 	return s.db.DeleteRecord(&card, id)
+}
+
+func (s service) FetchCards(limit, offset int) (cards []Card, err error) {
+	_, err = s.db.FetchDict(&cards, "cards", limit, offset, nil, nil)
+	return cards, err
+}
+
+func (s service) FetchCardsByIDs(ids []string) (cards []Card, err error) {
+	where := []string{"id in (?)"}
+	whereArgs := ids
+	_, err = s.db.FetchDict(&cards, "cards", 10000, 0, where, whereArgs)
+	return cards, err
+}
+
+func (s service) FetchCardsByBoardID(boardData []byte) (cards []Card, err error) {
+	boardIDs := CardsBoardRequest{}
+	if err = boardIDs.UnmarshalJSON(boardData); err != nil {
+		return nil, err
+	}
+	if len(boardIDs.Boards) == 0 {
+		return nil, errors.New("User id is empty! ")
+	}
+	where := []string{"board_id in(?)"}
+	whereArgs := boardIDs.Boards
+	_, err = s.db.FetchDict(&cards, "cards", 10000, 0, where, whereArgs)
+	return cards, err
 }

@@ -5,10 +5,10 @@ import (
 	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/utils"
 	"errors"
-	"fmt"
 	"github.com/jinzhu/gorm"
 	"log"
 	"reflect"
+	"strings"
 )
 
 type IDataManager interface {
@@ -17,10 +17,11 @@ type IDataManager interface {
 	CloseConnection() error
 	ExecuteQuery(sql string, args ...string) error
 	FindDictById(p interface{}) error
-	FindDictByColumn(p interface{}, where, whereArg string) error
+	FindDictByColumn(p interface{}, where, whereArg []string) error
 	CreateRecord(p interface{}) error
 	UpdateRecord(p interface{}, id customType.StringUUID) error
 	DeleteRecord(p interface{}, id customType.StringUUID) error
+	FetchDict(data interface{}, table string, limit, offset int, where, whereArg []string) (int, error)
 }
 
 type DataManager struct {
@@ -52,7 +53,7 @@ func (d DataManager) ExecuteQuery(sql string, args ...string) error {
 func (d DataManager) FindDictById(p interface{}) error {
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
 	if !obj.GetId().IsUUID() {
-		return errors.New("Not valid ID!")
+		return errors.New("Not valid ID! ")
 	}
 	res := d.db.Table(obj.GetTableName()).Where("id = ?", obj.GetId()).First(p)
 	if res.RecordNotFound() || res.Error != nil {
@@ -62,14 +63,33 @@ func (d DataManager) FindDictById(p interface{}) error {
 	return nil
 }
 
-func (d DataManager) FindDictByColumn(p interface{}, where, whereArg string) error {
+func (d DataManager) FindDictByColumn(p interface{}, where, whereArg []string) error {
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
-	res := d.db.Table(obj.GetTableName()).Where(fmt.Sprintf("%s = ?", where), whereArg).First(p)
+	if len(where) != len(whereArg) {
+		return errors.New("Not valid where ")
+	}
+	whereResult := strings.Join(where, " and ")
+	res := d.db.Table(obj.GetTableName()).Where(whereResult, whereArg).First(p)
 	if res.RecordNotFound() || res.Error != nil {
 		log.Println(res)
 		return res.Error
 	}
 	return nil
+}
+
+func (d DataManager) FetchDict(data interface{}, table string, limit, offset int, where, whereArg []string) (int, error) {
+	if len(where) != len(whereArg) {
+		return 0, errors.New("Not valid where ")
+	}
+	fetchLen := 0
+	whereResult := strings.Join(where, " and ")
+	res := d.db.Table(table).Where(whereResult, whereArg).Limit(limit).Offset(offset).Find(data)
+	if res.RecordNotFound() {
+		return 0, nil
+	} else if res.Error != nil {
+		return 0, res.Error
+	}
+	return fetchLen, nil
 }
 
 func (d DataManager) CreateRecord(p interface{}) error {

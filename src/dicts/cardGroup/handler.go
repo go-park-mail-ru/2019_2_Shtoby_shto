@@ -5,6 +5,7 @@ import (
 	errorsLib "2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/handle"
 	"2019_2_Shtoby_shto/src/security"
+	"2019_2_Shtoby_shto/src/utils"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -21,6 +22,7 @@ func NewCardGroupHandler(e *echo.Echo, cardGroupService HandlerCardGroupService,
 		securityService:  securityService,
 	}
 	e.GET("/card-group/:id", handler.Get)
+	e.GET("/card-group", handler.Fetch)
 	e.POST("/card-group", handler.Post)
 	e.PUT("/card-group/:id", handler.Put)
 	e.DELETE("/card-group/:id", handler.Delete)
@@ -34,6 +36,17 @@ func (h Handler) Get(ctx echo.Context) error {
 		return err
 	}
 	return ctx.JSON(http.StatusOK, data)
+}
+
+func (h Handler) Fetch(ctx echo.Context) error {
+	params := utils.ParseRequestParams(*ctx.Request().URL)
+	users, err := h.cardGroupService.FetchCardGroup(params.Limit, params.Offset)
+	if err != nil {
+		errorsLib.ErrorHandler(ctx.Response(), "Fetch error ", http.StatusBadRequest, err)
+		ctx.Logger().Error(err)
+		return err
+	}
+	return ctx.JSON(http.StatusOK, users)
 }
 
 func (h Handler) Post(ctx echo.Context) error {

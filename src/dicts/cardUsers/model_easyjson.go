@@ -18,7 +18,105 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCardUsers(in *jlexer.Lexer, out *CardUsers) {
+func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCardUsers(in *jlexer.Lexer, out *CardsUserRequest) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeString()
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "users":
+			if in.IsNull() {
+				in.Skip()
+				out.Users = nil
+			} else {
+				in.Delim('[')
+				if out.Users == nil {
+					if !in.IsDelim(']') {
+						out.Users = make([]string, 0, 4)
+					} else {
+						out.Users = []string{}
+					}
+				} else {
+					out.Users = (out.Users)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v1 string
+					v1 = string(in.String())
+					out.Users = append(out.Users, v1)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCardUsers(out *jwriter.Writer, in CardsUserRequest) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"users\":"
+		out.RawString(prefix[1:])
+		if in.Users == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+			out.RawString("null")
+		} else {
+			out.RawByte('[')
+			for v2, v3 := range in.Users {
+				if v2 > 0 {
+					out.RawByte(',')
+				}
+				out.String(string(v3))
+			}
+			out.RawByte(']')
+		}
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v CardsUserRequest) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCardUsers(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v CardsUserRequest) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCardUsers(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *CardsUserRequest) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCardUsers(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *CardsUserRequest) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCardUsers(l, v)
+}
+func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCardUsers1(in *jlexer.Lexer, out *CardUsers) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -38,9 +136,9 @@ func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCardUsers(in *jlexer.Lexer, ou
 		}
 		switch key {
 		case "card_id":
-			out.CardID = string(in.String())
+			out.CardID = customType.StringUUID(in.String())
 		case "user_id":
-			out.UserID = string(in.String())
+			out.UserID = customType.StringUUID(in.String())
 		case "id":
 			out.ID = customType.StringUUID(in.String())
 		default:
@@ -53,7 +151,7 @@ func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCardUsers(in *jlexer.Lexer, ou
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCardUsers(out *jwriter.Writer, in CardUsers) {
+func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCardUsers1(out *jwriter.Writer, in CardUsers) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -78,23 +176,23 @@ func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCardUsers(out *jwriter.Writer,
 // MarshalJSON supports json.Marshaler interface
 func (v CardUsers) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCardUsers(&w, v)
+	easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCardUsers1(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v CardUsers) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCardUsers(w, v)
+	easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCardUsers1(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *CardUsers) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCardUsers(&r, v)
+	easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCardUsers1(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *CardUsers) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCardUsers(l, v)
+	easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCardUsers1(l, v)
 }
