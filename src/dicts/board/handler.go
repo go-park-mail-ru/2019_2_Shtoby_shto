@@ -44,13 +44,29 @@ func NewBoardHandler(e *echo.Echo, userService user.HandlerUserService, boardSer
 }
 
 func (h Handler) Get(ctx echo.Context) error {
-	data, err := h.boardService.FindBoardByID(customType.StringUUID(ctx.Param("id")))
+	board, err := h.boardService.FindBoardByID(customType.StringUUID(ctx.Param("id")))
 	if err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "GetUserById error", http.StatusBadRequest, err)
 		return err
 	}
-	return ctx.JSON(http.StatusOK, data)
+	cards, err := h.cardService.FetchCardsByBoardIDs([]string{board.ID.String()})
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "FetchCardsByBoardIDs error", http.StatusBadRequest, err)
+		return err
+	}
+	for i, card := range cards {
+		tasks, err := h.taskService.FetchTasksByCardID(card.ID)
+		if err != nil {
+			ctx.Logger().Error(err)
+			errorsLib.ErrorHandler(ctx.Response(), "GetCardById error", http.StatusBadRequest, err)
+			return err
+		}
+		cards[i].Tasks = tasks
+	}
+	board.Cards = cards
+	return ctx.JSON(http.StatusOK, board)
 }
 
 func (h Handler) Fetch(ctx echo.Context) error {
@@ -95,7 +111,16 @@ func (h Handler) FetchBoardCards(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
 		return err
 	}
-	cards, err := h.cardService.FetchCardsByBoardID(body)
+	boardIDs := card.CardsBoardRequest{}
+	if err = boardIDs.UnmarshalJSON(body); err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "UnmarshalJSON error", http.StatusInternalServerError, err)
+		return err
+	}
+	if len(boardIDs.Boards) == 0 {
+		return ctx.JSON(http.StatusBadRequest, errors.New("User id is empty! "))
+	}
+	cards, err := h.cardService.FetchCardsByBoardIDs(boardIDs.Boards)
 	for i, c := range cards {
 		tasks, err := h.taskService.FetchTasksByCardID(c.ID)
 		if err != nil {

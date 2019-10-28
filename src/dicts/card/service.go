@@ -12,7 +12,7 @@ import (
 type HandlerCardService interface {
 	FindCardByID(id customType.StringUUID) (*Card, error)
 	FetchCardsByIDs(ids []string) (cards []Card, err error)
-	FetchCardsByBoardID(boardData []byte) (cards []Card, err error)
+	FetchCardsByBoardIDs(boardIDs []string) (cards []Card, err error)
 	CreateCard(data []byte) (*Card, error)
 	UpdateCard(data []byte, id customType.StringUUID) (*Card, error)
 	DeleteCard(id customType.StringUUID) error
@@ -82,16 +82,9 @@ func (s service) FetchCardsByIDs(ids []string) (cards []Card, err error) {
 	return cards, err
 }
 
-func (s service) FetchCardsByBoardID(boardData []byte) (cards []Card, err error) {
-	boardIDs := CardsBoardRequest{}
-	if err = boardIDs.UnmarshalJSON(boardData); err != nil {
-		return nil, err
-	}
-	if len(boardIDs.Boards) == 0 {
-		return nil, errors.New("User id is empty! ")
-	}
+func (s service) FetchCardsByBoardIDs(boardIDs []string) (cards []Card, err error) {
 	where := []string{"board_id in(?)"}
-	whereArgs := boardIDs.Boards
+	whereArgs := boardIDs
 	_, err = s.db.FetchDict(&cards, "cards", 10000, 0, where, whereArgs)
 	return cards, err
 }

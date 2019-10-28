@@ -3,6 +3,7 @@ package board
 import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts"
+	"2019_2_Shtoby_shto/src/dicts/card"
 )
 
 const boardTableName = "boards"
@@ -12,7 +13,7 @@ type Board struct {
 	dicts.BaseInfo
 	Name         string                `json:"name"`
 	BoardUsersID customType.StringUUID `json:"board_users_id"`
-	//Users 	[]user.User `json:"users" sql:"-"`
+	Cards        []card.Card           `json:"cards" sql:"-"`
 }
 
 func (b Board) GetTableName() string {
