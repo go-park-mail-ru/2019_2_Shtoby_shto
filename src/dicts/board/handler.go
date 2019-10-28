@@ -4,6 +4,7 @@ import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts/boardUsers"
 	"2019_2_Shtoby_shto/src/dicts/card"
+	"2019_2_Shtoby_shto/src/dicts/task"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	errorsLib "2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/handle"
@@ -18,17 +19,19 @@ type Handler struct {
 	userService       user.HandlerUserService
 	boardService      HandlerBoardService
 	cardService       card.HandlerCardService
+	taskService       task.HandlerTaskService
 	boardUsersService boardUsers.HandlerBoardUsersService
 	securityService   security.HandlerSecurity
 	handle.HandlerImpl
 }
 
-func NewBoardHandler(e *echo.Echo, userService user.HandlerUserService, boardService HandlerBoardService, boardUsersService boardUsers.HandlerBoardUsersService, cardService card.HandlerCardService, securityService security.HandlerSecurity) {
+func NewBoardHandler(e *echo.Echo, userService user.HandlerUserService, boardService HandlerBoardService, boardUsersService boardUsers.HandlerBoardUsersService, cardService card.HandlerCardService, taskService task.HandlerTaskService, securityService security.HandlerSecurity) {
 	handler := Handler{
 		userService:       userService,
 		boardService:      boardService,
 		boardUsersService: boardUsersService,
 		cardService:       cardService,
+		taskService:       taskService,
 		securityService:   securityService,
 	}
 	e.GET("/board/:id", handler.Get)
@@ -93,6 +96,15 @@ func (h Handler) FetchBoardCards(ctx echo.Context) error {
 		return err
 	}
 	cards, err := h.cardService.FetchCardsByBoardID(body)
+	for i, c := range cards {
+		tasks, err := h.taskService.FetchTasksByCardID(c.ID)
+		if err != nil {
+			ctx.Logger().Error(err)
+			errorsLib.ErrorHandler(ctx.Response(), "GetCardById error", http.StatusBadRequest, err)
+			return err
+		}
+		cards[i].Tasks = tasks
+	}
 	return ctx.JSON(http.StatusOK, cards)
 }
 
