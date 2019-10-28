@@ -4,6 +4,7 @@ package card
 
 import (
 	customType "2019_2_Shtoby_shto/src/customType"
+	task "2019_2_Shtoby_shto/src/dicts/task"
 	json "encoding/json"
 	easyjson "github.com/mailru/easyjson"
 	jlexer "github.com/mailru/easyjson/jlexer"
@@ -145,6 +146,29 @@ func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCard1(in *jlexer.Lexer, out *C
 			out.CardUserID = customType.StringUUID(in.String())
 		case "card_group_id":
 			out.CardGroupID = customType.StringUUID(in.String())
+		case "tasks":
+			if in.IsNull() {
+				in.Skip()
+				out.Tasks = nil
+			} else {
+				in.Delim('[')
+				if out.Tasks == nil {
+					if !in.IsDelim(']') {
+						out.Tasks = make([]task.Task, 0, 1)
+					} else {
+						out.Tasks = []task.Task{}
+					}
+				} else {
+					out.Tasks = (out.Tasks)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v4 task.Task
+					(v4).UnmarshalEasyJSON(in)
+					out.Tasks = append(out.Tasks, v4)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
 		case "id":
 			out.ID = customType.StringUUID(in.String())
 		default:
@@ -185,6 +209,22 @@ func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCard1(out *jwriter.Writer, in 
 		const prefix string = ",\"card_group_id\":"
 		out.RawString(prefix)
 		out.String(string(in.CardGroupID))
+	}
+	{
+		const prefix string = ",\"tasks\":"
+		out.RawString(prefix)
+		if in.Tasks == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+			out.RawString("null")
+		} else {
+			out.RawByte('[')
+			for v5, v6 := range in.Tasks {
+				if v5 > 0 {
+					out.RawByte(',')
+				}
+				(v6).MarshalEasyJSON(out)
+			}
+			out.RawByte(']')
+		}
 	}
 	{
 		const prefix string = ",\"id\":"
