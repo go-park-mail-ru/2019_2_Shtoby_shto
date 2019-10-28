@@ -108,7 +108,6 @@ func newServer(e *echo.Echo, httpAddr string) {
 	e.Logger.Info("serving on", httpAddr)
 
 	apiURL := config.GetInstance().FrontendURL
-	// securityService.CheckSession,
 	e.Use(middleware.Logger(), middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{apiURL},
 		AllowCredentials: true,
