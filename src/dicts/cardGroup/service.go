@@ -10,6 +10,7 @@ import (
 
 type HandlerCardGroupService interface {
 	FindCardGroupByID(id customType.StringUUID) (*CardGroup, error)
+	FetchCardGroupsByBoardIDs(boardID []string) (cardGroups []CardGroup, err error)
 	CreateCardGroup(data []byte) (*CardGroup, error)
 	UpdateCardGroup(data []byte, id customType.StringUUID) (*CardGroup, error)
 	DeleteCardGroup(id customType.StringUUID) error
@@ -69,4 +70,11 @@ func (s service) DeleteCardGroup(id customType.StringUUID) error {
 func (s service) FetchCardGroup(limit, offset int) (cardGroup []CardGroup, err error) {
 	_, err = s.db.FetchDict(&cardGroup, "card_groups", limit, offset, nil, nil)
 	return cardGroup, err
+}
+
+func (s service) FetchCardGroupsByBoardIDs(boardID []string) (cardGroups []CardGroup, err error) {
+	where := []string{"board_id in(?)"}
+	whereArgs := boardID
+	_, err = s.db.FetchDict(&cardGroups, "card_groups", 10000, 0, where, whereArgs)
+	return cardGroups, err
 }

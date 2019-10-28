@@ -22,7 +22,10 @@ type Handler struct {
 	handle.HandlerImpl
 }
 
-func NewUserHandler(e *echo.Echo, userService HandlerUserService, boardUsersService boardUsers.HandlerBoardUsersService, cardUsersService сardUsers.HandlerCardUsersService, securityService security.HandlerSecurity) {
+func NewUserHandler(e *echo.Echo, userService HandlerUserService,
+	boardUsersService boardUsers.HandlerBoardUsersService,
+	cardUsersService сardUsers.HandlerCardUsersService,
+	securityService security.HandlerSecurity) {
 	handler := Handler{
 		userService:       userService,
 		boardUsersService: boardUsersService,

@@ -16,7 +16,8 @@ type Handler struct {
 	handle.HandlerImpl
 }
 
-func NewCardGroupHandler(e *echo.Echo, cardGroupService HandlerCardGroupService, securityService security.HandlerSecurity) {
+func NewCardGroupHandler(e *echo.Echo, cardGroupService HandlerCardGroupService,
+	securityService security.HandlerSecurity) {
 	handler := Handler{
 		cardGroupService: cardGroupService,
 		securityService:  securityService,
@@ -29,13 +30,13 @@ func NewCardGroupHandler(e *echo.Echo, cardGroupService HandlerCardGroupService,
 }
 
 func (h Handler) Get(ctx echo.Context) error {
-	data, err := h.cardGroupService.FindCardGroupByID(customType.StringUUID(ctx.Param("id")))
+	cardGroup, err := h.cardGroupService.FindCardGroupByID(customType.StringUUID(ctx.Param("id")))
 	if err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "GetCardGroupById error", http.StatusBadRequest, err)
 		return err
 	}
-	return ctx.JSON(http.StatusOK, data)
+	return ctx.JSON(http.StatusOK, cardGroup)
 }
 
 func (h Handler) Fetch(ctx echo.Context) error {

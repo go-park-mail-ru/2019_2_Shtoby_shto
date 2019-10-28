@@ -65,7 +65,7 @@ func (s service) UpdateBoard(data []byte, id customType.StringUUID) (*Board, err
 }
 
 func (s service) DeleteBoard(id customType.StringUUID) error {
-	board := Board{}
+	board := &Board{}
 	return s.db.DeleteRecord(board, id)
 }
 

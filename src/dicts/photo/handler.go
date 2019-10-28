@@ -19,7 +19,9 @@ type Handler struct {
 	handle.HandlerImpl
 }
 
-func NewPhotoHandler(e *echo.Echo, photoService HandlerPhotoService, userService user.HandlerUserService, securityService security.HandlerSecurity) {
+func NewPhotoHandler(e *echo.Echo, photoService HandlerPhotoService,
+	userService user.HandlerUserService,
+	securityService security.HandlerSecurity) {
 	handler := Handler{
 		photoService:    photoService,
 		userService:     userService,

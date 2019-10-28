@@ -12,7 +12,7 @@ import (
 type HandlerCardService interface {
 	FindCardByID(id customType.StringUUID) (*Card, error)
 	FetchCardsByIDs(ids []string) (cards []Card, err error)
-	FetchCardsByBoardIDs(boardIDs []string) (cards []Card, err error)
+	FetchCardsByCardGroupIDs(cardGroupIDs []string) (cards []Card, err error)
 	CreateCard(data []byte) (*Card, error)
 	UpdateCard(data []byte, id customType.StringUUID) (*Card, error)
 	DeleteCard(id customType.StringUUID) error
@@ -82,9 +82,9 @@ func (s service) FetchCardsByIDs(ids []string) (cards []Card, err error) {
 	return cards, err
 }
 
-func (s service) FetchCardsByBoardIDs(boardIDs []string) (cards []Card, err error) {
-	where := []string{"board_id in(?)"}
-	whereArgs := boardIDs
+func (s service) FetchCardsByCardGroupIDs(cardGroupIDs []string) (cards []Card, err error) {
+	where := []string{"card_group_id in(?)"}
+	whereArgs := cardGroupIDs
 	_, err = s.db.FetchDict(&cards, "cards", 10000, 0, where, whereArgs)
 	return cards, err
 }

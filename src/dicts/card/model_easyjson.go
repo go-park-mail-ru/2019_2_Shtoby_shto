@@ -140,8 +140,6 @@ func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsCard1(in *jlexer.Lexer, out *C
 			out.Caption = string(in.String())
 		case "priority":
 			out.Priority = int(in.Int())
-		case "board_id":
-			out.BoardID = customType.StringUUID(in.String())
 		case "card_user_id":
 			out.CardUserID = customType.StringUUID(in.String())
 		case "card_group_id":
@@ -194,11 +192,6 @@ func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsCard1(out *jwriter.Writer, in 
 		const prefix string = ",\"priority\":"
 		out.RawString(prefix)
 		out.Int(int(in.Priority))
-	}
-	{
-		const prefix string = ",\"board_id\":"
-		out.RawString(prefix)
-		out.String(string(in.BoardID))
 	}
 	{
 		const prefix string = ",\"card_user_id\":"

@@ -18,7 +18,9 @@ type Handler struct {
 	handle.HandlerImpl
 }
 
-func NewTaskHandler(e *echo.Echo, userService user.HandlerUserService, taskService HandlerTaskService, securityService security.HandlerSecurity) {
+func NewTaskHandler(e *echo.Echo, userService user.HandlerUserService,
+	taskService HandlerTaskService,
+	securityService security.HandlerSecurity) {
 	handler := Handler{
 		userService:     userService,
 		taskService:     taskService,
