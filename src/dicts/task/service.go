@@ -9,6 +9,7 @@ import (
 
 type HandlerTaskService interface {
 	FindTaskByID(id customType.StringUUID) (*Task, error)
+	FetchTasksByCardID(cardID customType.StringUUID) (tasks []Task, err error)
 	CreateTask(data []byte) (*Task, error)
 	UpdateTask(data []byte, id customType.StringUUID) (*Task, error)
 	DeleteTask(id customType.StringUUID) error
@@ -64,9 +65,9 @@ func (s service) FetchTasks(limit, offset int) (tasks []Task, err error) {
 	return tasks, err
 }
 
-func (s service) FetchTasksByCardID(cardID customType.StringUUID) (cards []Task, err error) {
+func (s service) FetchTasksByCardID(cardID customType.StringUUID) (tasks []Task, err error) {
 	where := []string{"card_id = ?"}
 	whereArgs := []string{cardID.String()}
-	_, err = s.db.FetchDict(&cards, "tasks", 10000, 0, where, whereArgs)
-	return cards, err
+	_, err = s.db.FetchDict(&tasks, "tasks", 10000, 0, where, whereArgs)
+	return tasks, err
 }

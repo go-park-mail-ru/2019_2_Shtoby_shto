@@ -47,24 +47,34 @@ func (h Handler) Get(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "GetCardById error", http.StatusBadRequest, err)
 		return err
 	}
-	//h.taskService.
-	if err := h.cardService.FillLookupFields(card); err != nil {
+	tasks, err := h.taskService.FetchTasksByCardID(card.ID)
+	if err != nil {
 		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "Lookup fields add error", http.StatusBadRequest, err)
+		errorsLib.ErrorHandler(ctx.Response(), "GetCardById error", http.StatusBadRequest, err)
 		return err
 	}
+	card.Tasks = tasks
 	return ctx.JSON(http.StatusOK, card)
 }
 
 func (h Handler) Fetch(ctx echo.Context) error {
 	params := utils.ParseRequestParams(*ctx.Request().URL)
-	users, err := h.cardService.FetchCards(params.Limit, params.Offset)
+	cards, err := h.cardService.FetchCards(params.Limit, params.Offset)
 	if err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "Fetch error ", http.StatusBadRequest, err)
 		ctx.Logger().Error(err)
 		return err
 	}
-	return ctx.JSON(http.StatusOK, users)
+	for i, card := range cards {
+		tasks, err := h.taskService.FetchTasksByCardID(card.ID)
+		if err != nil {
+			ctx.Logger().Error(err)
+			errorsLib.ErrorHandler(ctx.Response(), "GetCardById error", http.StatusBadRequest, err)
+			return err
+		}
+		cards[i].Tasks = tasks
+	}
+	return ctx.JSON(http.StatusOK, cards)
 }
 
 func (h Handler) FetchUserCards(ctx echo.Context) error {

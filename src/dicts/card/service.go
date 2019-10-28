@@ -4,6 +4,7 @@ import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts"
+	"2019_2_Shtoby_shto/src/dicts/task"
 	"2019_2_Shtoby_shto/src/handle"
 	"github.com/pkg/errors"
 )
@@ -16,7 +17,7 @@ type HandlerCardService interface {
 	UpdateCard(data []byte, id customType.StringUUID) (*Card, error)
 	DeleteCard(id customType.StringUUID) error
 	FetchCards(limit, offset int) (cards []Card, err error)
-	FillLookupFields(card *Card) error
+	FillLookupFields(card *Card, tasks []task.Task) error
 }
 
 type service struct {
@@ -95,6 +96,6 @@ func (s service) FetchCardsByBoardID(boardData []byte) (cards []Card, err error)
 	return cards, err
 }
 
-func (s service) FillLookupFields(card *Card) error {
+func (s service) FillLookupFields(card *Card, tasks []task.Task) error {
 	return nil
 }
