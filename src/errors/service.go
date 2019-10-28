@@ -1,9 +1,8 @@
 package errors
 
 import (
-	"encoding/json"
-	"log"
-	"net/http"
+	"github.com/labstack/echo/v4"
+	"github.com/prometheus/common/log"
 )
 
 // Описание структуры ответа при ошибке
@@ -13,17 +12,23 @@ type ErrorResponse struct {
 	Error   string `json:"error"`
 }
 
-func ErrorHandler(w http.ResponseWriter, message string, status int, err error) {
+func ErrorHandler(response *echo.Response, message string, status int, err error) {
 	errorMessage := "Error!"
 	if err != nil {
 		errorMessage = err.Error()
 	}
-	b, _ := json.Marshal(&ErrorResponse{
+	resp := &ErrorResponse{
 		Status:  status,
 		Message: message,
 		Error:   errorMessage,
-	})
-	log.Println(message)
-	w.WriteHeader(status)
-	w.Write([]byte(b))
+	}
+	r, err := resp.MarshalJSON()
+	response.WriteHeader(status)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	if _, err := response.Write(r); err != nil {
+		log.Error(err)
+	}
 }

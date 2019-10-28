@@ -10,3 +10,8 @@ create table photo (
                        time_load timestamp with time zone,
                        path varchar(50)
 );
+
+create table board (
+                       id uuid primary key,
+                       caption varchar(50)
+);

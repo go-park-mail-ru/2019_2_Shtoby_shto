@@ -3,28 +3,35 @@ package user
 import (
 	. "2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
+	"github.com/pkg/errors"
+	"strings"
 )
 
 type HandlerUserService interface {
-	CreateUser(user User) error
-	UpdateUser(user User, id StringUUID) error
+	CreateUser(data []byte) (*User, error)
+	UpdateUser(data []byte, id StringUUID) error
 	GetUserById(id StringUUID) (User, error)
-	GetUserByLogin(login string) (User, error)
+	GetUserByLogin(data []byte) (*User, error)
+	FetchUsers(limit, offset int) (users []User, err error)
 }
 
 type service struct {
-	db *database.DataManager
+	db database.IDataManager
 }
 
-func CreateInstance(db *database.DataManager) HandlerUserService {
+func CreateInstance(db database.IDataManager) HandlerUserService {
 	return &service{
 		db: db,
 	}
 }
 
-func (s *service) CreateUser(user User) error {
-	//err := s.db.ExecuteQuery("insert into users(id, login, password) values($1, $2, $3)", user.ID.String(), user.Login, user.Password)
-	return s.db.CreateRecord(&user)
+func (s *service) CreateUser(data []byte) (*User, error) {
+	user := &User{}
+	if err := user.UnmarshalJSON(data); err != nil {
+		return nil, err
+	}
+	err := s.db.CreateRecord(user)
+	return user, err
 }
 
 func (s *service) GetUserById(id StringUUID) (User, error) {
@@ -34,15 +41,39 @@ func (s *service) GetUserById(id StringUUID) (User, error) {
 	return user, err
 }
 
-func (s *service) GetUserByLogin(login string) (User, error) {
-	user := User{}
-	err := s.db.FindDictByLogin(&user, "login", login)
+func (s *service) GetUserByLogin(data []byte) (*User, error) {
+	curUser := User{}
+	if err := curUser.UnmarshalJSON(data); err != nil {
+		return nil, err
+	}
+	user := &User{}
+	where := []string{"login = ?"}
+	whereArgs := []string{curUser.Login}
+	err := s.db.FindDictByColumn(user, where, whereArgs)
+	if err != nil {
+		return nil, err
+	}
+	if strings.Compare(user.Password, curUser.Password) != 0 {
+		return nil, errors.New("Ne tot password )0))")
+	}
 	return user, err
 }
 
-func (s *service) UpdateUser(user User, id StringUUID) error {
+func (s *service) UpdateUser(data []byte, id StringUUID) error {
+	user := User{}
+	if err := user.UnmarshalJSON(data); err != nil {
+		return err
+	}
+	if !user.IsValid() {
+		return errors.New("User not valid!")
+	}
 	if err := s.db.UpdateRecord(&user, id); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (s service) FetchUsers(limit, offset int) (users []User, err error) {
+	_, err = s.db.FetchDict(&users, "users", limit, offset, nil, nil)
+	return users, err
 }

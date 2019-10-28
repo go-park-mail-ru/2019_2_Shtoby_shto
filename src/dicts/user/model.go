@@ -7,6 +7,7 @@ import (
 
 const userTableName = "users"
 
+//easyjson:json
 type User struct {
 	dicts.BaseInfo
 	Login    string                 `json:"login, omitempty" sql:"not null;unique"`
@@ -19,4 +20,8 @@ type User struct {
 
 func (u User) GetTableName() string {
 	return userTableName
+}
+
+func (u User) IsValid() bool {
+	return u.Login != ""
 }

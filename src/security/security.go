@@ -1,250 +1,50 @@
 package security
 
 import (
-	"2019_2_Shtoby_shto/src/config"
-	. "2019_2_Shtoby_shto/src/customType"
-	"2019_2_Shtoby_shto/src/dicts/photo"
-	"2019_2_Shtoby_shto/src/dicts/user"
+	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/errors"
-	"2019_2_Shtoby_shto/src/utils"
-	"bufio"
-	"encoding/json"
+	"github.com/labstack/echo/v4"
 	"net/http"
-	"strings"
+	"sync"
 	"time"
 )
 
-type Security interface {
-	Login(w http.ResponseWriter, r *http.Request)
-	Logout(w http.ResponseWriter, r *http.Request)
-	Registration(w http.ResponseWriter, r *http.Request)
-	CheckSession(h http.HandlerFunc) http.HandlerFunc
-	UserSecurity(w http.ResponseWriter, r *http.Request)
-	ImageSecurity(w http.ResponseWriter, r *http.Request)
+type HandlerSecurity interface {
+	CheckSession(h echo.HandlerFunc) echo.HandlerFunc
+	CreateSession(w http.ResponseWriter, userID customType.StringUUID) error
+	DeleteSession(ctx echo.Context) error
 }
 
 type service struct {
-	Sm    *SessionManager
-	User  user.HandlerUserService
-	Photo photo.HandlerPhotoService
+	Sm                *SessionManager
+	noSecurityRouters map[string]struct{}
+	mx                sync.Mutex
 }
 
-type ResponseSecurity struct {
-	Message string `json:"message"`
-	Error   error  `json:"error"`
-}
-
-func CreateInstance(sm *SessionManager, user user.HandlerUserService, p photo.HandlerPhotoService) Security {
+func CreateInstance(sm *SessionManager) HandlerSecurity {
 	return &service{
-		Sm:    sm,
-		User:  user,
-		Photo: p,
+		Sm: sm,
+		noSecurityRouters: map[string]struct{}{
+			"/users/registration": {},
+			"/login":              {},
+			"/swagger/index.html": {},
+		},
 	}
 }
 
-// TODO::replace into handler
-func (s *service) ImageSecurity(w http.ResponseWriter, r *http.Request) {
-	// TODO:: get this from config!!!
-	//photoPath := "D:/Projects/Home_Projects/2019_2_Shtoby_shto/image"
-	photoPath := config.GetInstance().ImagePath
-	switch r.Method {
-	case http.MethodPost:
-		rr := bufio.NewReader(r.Body)
-		// TODO:: replace in config
-		photoID, err := s.Photo.DownloadPhoto(photoPath, rr)
-		if err != nil {
-			errors.ErrorHandler(w, "download fail", http.StatusInternalServerError, err)
-			return
-		}
-
-		// TODO:: add context with session and user values
-		cookieId, err := r.Cookie("session_id")
-		if err != nil {
-			errors.ErrorHandler(w, "Session error", http.StatusUnauthorized, err)
-			return
-		}
-
-		userId, err := s.Sm.getSession(cookieId.Value)
-		if err != nil {
-			errors.ErrorHandler(w, "Session error", http.StatusBadRequest, err)
-			return
-		}
-		user, err := s.User.GetUserById(StringUUID(userId))
-		if err != nil {
-			errors.ErrorHandler(w, "GetUserById error", http.StatusInternalServerError, err)
-			return
-		}
-		user.PhotoID = &photoID
-		if err := s.User.UpdateUser(user, StringUUID(userId)); err != nil {
-			errors.ErrorHandler(w, "Update user error", http.StatusInternalServerError, err)
-			return
-		}
-	case http.MethodGet:
-		cookieId, err := r.Cookie("session_id")
-		if err != nil {
-			errors.ErrorHandler(w, "Session error", http.StatusUnauthorized, err)
-			return
-		}
-
-		userId, err := s.Sm.getSession(cookieId.Value)
-		if err != nil {
-			errors.ErrorHandler(w, "Session error", http.StatusBadRequest, err)
-			return
-		}
-
-		user, err := s.User.GetUserById(StringUUID(userId))
-		if err != nil {
-			errors.ErrorHandler(w, "GetUserById error", http.StatusInternalServerError, err)
-			return
-		}
-		photo, err := s.Photo.GetPhotoByUser(*user.PhotoID, photoPath)
-		if err != nil {
-			errors.ErrorHandler(w, "GetPhotoByUser error", http.StatusInternalServerError, err)
-			return
-		}
-		w.Header().Add("Content-Type", "multipart/form-data")
-		if _, err := w.Write([]byte(photo)); err != nil {
-			return
-		}
-	default:
-		errors.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed, nil)
+func (s *service) DeleteSession(ctx echo.Context) error {
+	if err := s.Sm.Delete(ctx); err != nil {
+		return err
 	}
+	return nil
 }
 
-func (s *service) UserSecurity(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		s.getUserSecurity(w, r)
-	case http.MethodPut:
-		s.putUserSecurity(w, r)
-	default:
-		errors.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed, nil)
-	}
-}
-
-func (s *service) putUserSecurity(w http.ResponseWriter, r *http.Request) {
-	user := user.User{}
-	cookieId, err := r.Cookie("session_id")
-	if err != nil {
-		errors.ErrorHandler(w, "Session error", http.StatusUnauthorized, err)
-		return
-	}
-
-	userId, err := s.Sm.getSession(cookieId.Value)
-	if err != nil {
-		errors.ErrorHandler(w, "Session error", http.StatusBadRequest, err)
-		return
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		errors.ErrorHandler(w, "Decode error", http.StatusInternalServerError, err)
-		return
-	}
-	if err := s.User.UpdateUser(user, StringUUID(userId)); err != nil {
-		errors.ErrorHandler(w, "Update user error", http.StatusBadRequest, err)
-		return
-	}
-	s.securityResponse(w, http.StatusOK, "Update is success", nil)
-}
-
-func (s *service) getUserSecurity(w http.ResponseWriter, r *http.Request) {
-	cookieId, err := r.Cookie("session_id")
-	if err != nil {
-		errors.ErrorHandler(w, "Session error", http.StatusUnauthorized, err)
-		return
-	}
-
-	userId, err := s.Sm.getSession(cookieId.Value)
-	if err != nil {
-		errors.ErrorHandler(w, "Session error", http.StatusBadRequest, err)
-		return
-	}
-
-	user, err := s.User.GetUserById(StringUUID(userId))
-	if err != nil {
-		errors.ErrorHandler(w, "Update user error", http.StatusBadRequest, err)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	b, err := json.Marshal(&user)
-	if _, err := w.Write([]byte(b)); err != nil {
-		return
-	}
-}
-
-func (s *service) Registration(w http.ResponseWriter, r *http.Request) {
-	user := user.User{}
-
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		errors.ErrorHandler(w, "Decode error", http.StatusInternalServerError, err)
-		return
-	}
-	id, err := utils.GenerateUUID()
-	if err != nil || id.String() == "" {
-		errors.ErrorHandler(w, "Error create UUID", http.StatusInternalServerError, err)
-		return
-	}
-	user.ID = StringUUID(id.String())
-	if err := s.User.CreateUser(user); err != nil {
-		errors.ErrorHandler(w, "User not valid", http.StatusBadRequest, err)
-		return
-	}
-	if err := s.createSession(w, user); err != nil {
-		errors.ErrorHandler(w, "Create session error", http.StatusInternalServerError, err)
-		return
-	}
-	s.securityResponse(w, http.StatusOK, "Registration is success", err)
-
-}
-func (s *service) Logout(w http.ResponseWriter, r *http.Request) {
-	ok, session := s.check(r, w)
-	if !ok || session.ID == "" {
-		errors.ErrorHandler(w, "Error unauthorized", http.StatusUnauthorized, nil)
-		return
-	}
-	err := s.Sm.Delete(session)
-	if err != nil {
-		errors.ErrorHandler(w, "Error delete session", http.StatusInternalServerError, err)
-		return
-	}
-	w.Header().Del("session_id")
-	s.securityResponse(w, http.StatusOK, "Logout", err)
-}
-
-func (s *service) Login(w http.ResponseWriter, r *http.Request) {
-	curUser := user.User{}
-
-	if err := json.NewDecoder(r.Body).Decode(&curUser); err != nil {
-		errors.ErrorHandler(w, "Decode error", http.StatusInternalServerError, err)
-		return
-	}
-
-	user, err := s.User.GetUserByLogin(curUser.Login)
-	if err != nil {
-		errors.ErrorHandler(w, "Please, reg yourself", http.StatusUnauthorized, err)
-		return
-	}
-
-	if strings.Compare(user.Password, curUser.Password) != 0 {
-		errors.ErrorHandler(w, "Ne tot password )0))", http.StatusBadRequest, err)
-		return
-	}
-
-	if err := s.createSession(w, user); err != nil {
-		errors.ErrorHandler(w, "Create session error", http.StatusInternalServerError, err)
-		return
-	}
-
-	s.securityResponse(w, http.StatusOK, "Login", err)
-}
-
-func (s *service) createSession(w http.ResponseWriter, user user.User) error {
-	expiration := time.Now().Add(24 * time.Hour)
-	sessionId, err := s.Sm.Create(user)
+func (s *service) CreateSession(w http.ResponseWriter, userID customType.StringUUID) error {
+	sessionId, err := s.Sm.Create(userID)
 	if err != nil {
 		return err
 	}
-	// TODO:: add token in cookie and expire time for session_id
+	expiration := time.Now().Add(24 * time.Hour)
 	cookie := http.Cookie{
 		Name:    "session_id",
 		Value:   sessionId.ID.String(),
@@ -254,39 +54,32 @@ func (s *service) createSession(w http.ResponseWriter, user user.User) error {
 	return nil
 }
 
-func (s *service) securityResponse(w http.ResponseWriter, status int, respMessage string, err error) {
-	w.WriteHeader(status)
-	b, err := json.Marshal(&ResponseSecurity{
-		Message: respMessage,
-		Error:   err,
-	})
-	if _, err := w.Write([]byte(b)); err != nil {
-		return
-	}
+func (s service) checkNotSecurity(route string) bool {
+	s.mx.Lock()
+	defer s.mx.Unlock()
+	_, ok := s.noSecurityRouters[route]
+	return ok
 }
 
-func (s *service) CheckSession(h http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if ok, _ := s.check(r, w); !ok {
-			return
+func (s *service) CheckSession(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) (err error) {
+		if s.checkNotSecurity(ctx.Request().RequestURI) {
+			return h(ctx)
 		}
-		h.ServeHTTP(w, r)
-	})
-}
-
-func (s *service) check(r *http.Request, w http.ResponseWriter) (bool, *SessionID) {
-	cookieSessionID, err := r.Cookie("session_id")
-	if err == http.ErrNoCookie {
-		errors.ErrorHandler(w, "No session_id", http.StatusUnauthorized, err)
-		return false, nil
-	} else if err != nil {
-		errors.ErrorHandler(w, "Error cookie", http.StatusUnauthorized, err)
-		return false, nil
+		cookieSessionID, err := ctx.Cookie("session_id")
+		if err == http.ErrNoCookie {
+			errors.ErrorHandler(ctx.Response(), "No session_id", http.StatusUnauthorized, err)
+			return err
+		} else if err != nil {
+			errors.ErrorHandler(ctx.Response(), "Error cookie", http.StatusUnauthorized, err)
+			return err
+		}
+		ctx.Set("session_id", cookieSessionID.Value)
+		ctx.Logger().Info(ctx.Request().Host, ctx.Request().RequestURI)
+		if err := s.Sm.Check(&ctx); err != nil {
+			errors.ErrorHandler(ctx.Response(), "Error check session", http.StatusUnauthorized, err)
+			return err
+		}
+		return h(ctx)
 	}
-	ok, err := s.Sm.Check(&SessionID{ID: StringUUID(cookieSessionID.Value)})
-	if err != nil {
-		errors.ErrorHandler(w, "Error check session", http.StatusUnauthorized, err)
-		return false, nil
-	}
-	return ok, &SessionID{ID: StringUUID(cookieSessionID.Value)}
 }
