@@ -18,7 +18,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoLog "github.com/labstack/gommon/log"
-	"github.com/swaggo/echo-swagger"
 	"net/http"
 	"os"
 	"os/signal"
@@ -27,10 +26,6 @@ import (
 	// TODO::"github.com/microcosm-cc/bluemonday"
 	//"github.com/prometheus/client_golang/prometheus"
 	//"github.com/prometheus/client_golang/prometheus/promhttp"
-)
-
-var (
-	initFlag = flag.Bool("initial start", false, "Check your service")
 )
 
 var (
@@ -50,7 +45,7 @@ func main() {
 	flag.Parse()
 	e := echo.New()
 
-	e.GET("/swagger/*", echoSwagger.WrapHandler)
+	e.GET("/swagger/*", swagger)
 
 	if err := config.InitConfig(); err != nil {
 		e.Logger.Error(err)
@@ -74,9 +69,6 @@ func main() {
 	e.Logger.SetLevel(echoLog.INFO)
 	initService(e, dm, conf)
 	newServer(e, httpAddr)
-	if *initFlag {
-		return
-	}
 
 	// great shutdown
 	go func() {
@@ -102,6 +94,10 @@ func main() {
 	if err := e.Shutdown(ctx); err != nil {
 		e.Logger.Fatal(err)
 	}
+}
+
+func swagger(ctx echo.Context) error {
+	return ctx.Redirect(http.StatusPermanentRedirect, "https://app.swaggerhub.com/apis/aleksandrkhoroshenin/trello-api/4.0")
 }
 
 func newServer(e *echo.Echo, httpAddr string) {
