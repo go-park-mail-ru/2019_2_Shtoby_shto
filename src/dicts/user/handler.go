@@ -37,7 +37,7 @@ func NewUserHandler(e *echo.Echo, userService HandlerUserService,
 	e.GET("/users/all", handler.Fetch)
 	e.GET("/users", handler.Get)
 	e.POST("/users/registration", handler.Post)
-	e.PUT("/users/:id", handler.Put)
+	e.PUT("/users", handler.Put)
 	e.DELETE("/users/:id", handler.Delete)
 }
 
