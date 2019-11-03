@@ -55,8 +55,6 @@ func (h Handler) Get(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "GetUserById error", http.StatusBadRequest, err)
 		return err
 	}
-	// response without password
-	user.Password = ""
 	return ctx.JSON(http.StatusOK, user)
 }
 
@@ -90,10 +88,9 @@ func (h Handler) Post(ctx echo.Context) error {
 		return err
 	}
 	h.SecurityResponse(ctx.Response(), http.StatusOK, "Registration is success, user id: "+user.ID.String(), nil)
-	// response without password
-	user.Password = ""
-	return ctx.JSON(http.StatusOK, user)
+	return err
 }
+
 func (h Handler) Put(ctx echo.Context) error {
 	userID, ok := ctx.Get("user_id").(customType.StringUUID)
 	if !ok {

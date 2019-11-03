@@ -45,7 +45,9 @@ func main() {
 	flag.Parse()
 	e := echo.New()
 
-	e.GET("/swagger/*", swagger)
+	e.GET("/swagger/*", func(ctx echo.Context) error {
+		return ctx.Redirect(http.StatusPermanentRedirect, "https://app.swaggerhub.com/apis/aleksandrkhoroshenin/trello-api/4.0")
+	})
 
 	if err := config.InitConfig(); err != nil {
 		e.Logger.Error(err)
@@ -96,20 +98,29 @@ func main() {
 	}
 }
 
-func swagger(ctx echo.Context) error {
-	return ctx.Redirect(http.StatusPermanentRedirect, "https://app.swaggerhub.com/apis/aleksandrkhoroshenin/trello-api/4.0")
-}
-
 func newServer(e *echo.Echo, httpAddr string) {
 	e.Logger.Info("serving on", httpAddr)
 
 	apiURL := config.GetInstance().FrontendURL
-	e.Use(middleware.Logger(), middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{apiURL},
-		AllowCredentials: true,
-		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete, http.MethodOptions},
-		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
-	}), securityService.CheckSession)
+	e.Use(
+		middleware.Logger(),
+		middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins:     []string{apiURL},
+			AllowCredentials: true,
+			AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete, http.MethodOptions},
+			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		}),
+		middleware.CSRFWithConfig(middleware.CSRFConfig{
+			Skipper: func(ctx echo.Context) bool {
+				return true
+			},
+			TokenLength:  32,
+			TokenLookup:  "header:" + echo.HeaderXCSRFToken,
+			ContextKey:   "csrf",
+			CookieName:   "_csrf",
+			CookieMaxAge: 86400,
+		}),
+		securityService.CheckSession)
 
 	e.Server = &http.Server{
 		Addr:           httpAddr,
