@@ -12,3 +12,5 @@ bin/
 *.rar
 *.iml
 *.zip
+*.json
+*.jpg

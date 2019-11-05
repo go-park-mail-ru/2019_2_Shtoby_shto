@@ -5,8 +5,9 @@ import (
 	"time"
 )
 
-const photoTableName = "photo"
+const photoTableName = "photos"
 
+//easyjson:json
 type Photo struct {
 	dicts.BaseInfo
 	TimeLoad time.Time `json:"time_load" sql:"type:time"`
@@ -15,4 +16,8 @@ type Photo struct {
 
 func (p Photo) GetTableName() string {
 	return photoTableName
+}
+
+func (p Photo) IsValid() bool {
+	return p.Path != ""
 }

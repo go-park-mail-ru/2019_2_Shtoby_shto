@@ -1,10 +1,12 @@
 package photo
 
 import (
-	"2019_2_Shtoby_shto/src/custom_type"
+	"2019_2_Shtoby_shto/src/config"
+	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
-	"2019_2_Shtoby_shto/src/utils"
+	transport "2019_2_Shtoby_shto/src/handle"
 	"bufio"
+	"bytes"
 	"io/ioutil"
 	"os"
 	"path"
@@ -12,21 +14,23 @@ import (
 )
 
 type HandlerPhotoService interface {
-	DownloadPhoto(photoPath string, photo *bufio.Reader) (custom_type.StringUUID, error)
-	GetPhotoByUser(photoID custom_type.StringUUID, photoPath string) ([]byte, error)
+	DownloadPhoto(photo *bufio.Reader) (customType.StringUUID, error)
+	GetPhotoByUser(photoID customType.StringUUID) ([]byte, error)
 }
 
 type service struct {
-	db *database.DataManager
+	transport.HandlerImpl
+	db database.IDataManager
 }
 
-func CreateInstance(db *database.DataManager) HandlerPhotoService {
-	return service{
+func CreateInstance(db database.IDataManager) HandlerPhotoService {
+	return &service{
 		db: db,
 	}
 }
 
-func (s service) DownloadPhoto(photoPath string, photo *bufio.Reader) (custom_type.StringUUID, error) {
+func (s service) DownloadPhoto(photo *bufio.Reader) (customType.StringUUID, error) {
+	photoPath := config.GetInstance().ImagePath
 	if err := os.MkdirAll(photoPath, os.ModePerm); err != nil {
 		return "", err
 	}
@@ -34,29 +38,24 @@ func (s service) DownloadPhoto(photoPath string, photo *bufio.Reader) (custom_ty
 		TimeLoad: time.Now(),
 		Path:     photoPath,
 	}
-	id, err := utils.GenerateUUID()
-	if err != nil {
+	if err := s.db.CreateRecord(&newPhoto); err != nil {
 		return "", err
 	}
-	newPhoto.ID = custom_type.StringUUID(id.String())
 	file, err := os.Create(path.Join(photoPath, newPhoto.ID.String()+".jpg"))
 	if err != nil {
 		return "", err
 	}
-	defer file.Close()
-	photoData, err := ioutil.ReadAll(photo)
-	if err != nil {
+	buf := bytes.Buffer{}
+	if _, err := buf.ReadFrom(photo); err != nil {
 		return "", err
 	}
-	if _, err := bufio.NewWriter(file).Write(photoData); err != nil {
-		return "", err
-	}
-	if err := s.db.CreateRecord(newPhoto); err != nil {
+	if _, err := bufio.NewWriter(file).Write(buf.Bytes()); err != nil {
 		return "", err
 	}
 	return newPhoto.ID, nil
 }
 
-func (s service) GetPhotoByUser(photoID custom_type.StringUUID, photoPath string) ([]byte, error) {
+func (s service) GetPhotoByUser(photoID customType.StringUUID) ([]byte, error) {
+	photoPath := config.GetInstance().ImagePath
 	return ioutil.ReadFile(path.Join(photoPath, photoID.String()+".jpg"))
 }

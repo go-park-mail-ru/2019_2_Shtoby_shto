@@ -11,16 +11,17 @@ services:
         - VER=1.0
     ports:
       - "80:8080"
-    restart: on-failure
+      - "443:443"
     depends_on:
       - postgres
       - redis
     networks:
       - hohoho
+    environment:
+      - DEPLOYAPI
 
   postgres:
     image: postgres:latest
-    restart: on-failure
     volumes:
       - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
     environment:
