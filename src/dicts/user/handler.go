@@ -87,6 +87,7 @@ func (h Handler) Post(ctx echo.Context) error {
 		ctx.Logger().Error(err)
 		return err
 	}
+	ctx.Set("user_id", user.ID)
 	h.SecurityResponse(ctx.Response(), http.StatusOK, "Registration is success, user id: "+user.ID.String(), nil)
 	return err
 }
