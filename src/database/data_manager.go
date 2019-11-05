@@ -110,7 +110,7 @@ func (d DataManager) CreateRecord(p interface{}) error {
 func (d DataManager) UpdateRecord(p interface{}, id customType.StringUUID) error {
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
 	obj.SetId(id)
-	res := d.db.Table(obj.GetTableName()).Save(p)
+	res := d.db.Model(obj).UpdateColumns(p)
 	if res.Error != nil {
 		return res.Error
 	}

@@ -10,9 +10,11 @@ const userTableName = "users"
 //easyjson:json
 type User struct {
 	dicts.BaseInfo
-	Login    string                 `json:"login, omitempty" sql:"not null;unique"`
-	Password string                 `json:"password,omitempty" sql:"not null"`
-	PhotoID  *customType.StringUUID `json:"photo_id,omitempty" sql:"type:uuid"`
+	Login         string                 `json:"login, omitempty" sql:"not null;unique"`
+	PasswordCrypt []byte                 `json:"-" sql:"password, not null"`
+	Salt          []byte                 `json:"-" sql:"default=1111,not null"`
+	Password      string                 `json:"password,omitempty" sql:"-"`
+	PhotoID       *customType.StringUUID `json:"photo_id,omitempty" sql:"type:uuid"`
 	//FirstName string `json:"first_name"`
 	//LastName  string `json:"last_name"`
 	//Email     string `json:"email"`

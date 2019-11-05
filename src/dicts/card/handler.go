@@ -47,7 +47,7 @@ func (h Handler) Get(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "GetCardById error", http.StatusBadRequest, err)
 		return err
 	}
-	tasks, err := h.taskService.FetchTasksByCardID(card.ID)
+	tasks, err := h.taskService.FetchTasksByCardIDs([]string{card.ID.String()})
 	if err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "GetCardById error", http.StatusBadRequest, err)
@@ -66,7 +66,7 @@ func (h Handler) Fetch(ctx echo.Context) error {
 		return err
 	}
 	for i, card := range cards {
-		tasks, err := h.taskService.FetchTasksByCardID(card.ID)
+		tasks, err := h.taskService.FetchTasksByCardIDs([]string{card.ID.String()})
 		if err != nil {
 			ctx.Logger().Error(err)
 			errorsLib.ErrorHandler(ctx.Response(), "GetCardById error", http.StatusBadRequest, err)
@@ -74,7 +74,13 @@ func (h Handler) Fetch(ctx echo.Context) error {
 		}
 		cards[i].Tasks = tasks
 	}
+
 	return ctx.JSON(http.StatusOK, cards)
+}
+
+func (h Handler) GetCardsWithTasks(ctx echo.Context, cardID customType.StringUUID) (card Card, err error) {
+
+	return card, nil
 }
 
 func (h Handler) FetchUserCards(ctx echo.Context) error {

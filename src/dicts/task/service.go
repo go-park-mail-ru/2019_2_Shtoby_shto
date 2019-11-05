@@ -5,11 +5,12 @@ import (
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/handle"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 type HandlerTaskService interface {
 	FindTaskByID(id customType.StringUUID) (*Task, error)
-	FetchTasksByCardID(cardID customType.StringUUID) (tasks []Task, err error)
+	FetchTasksByCardIDs(cardIDs []string) (tasks []Task, err error)
 	CreateTask(data []byte) (*Task, error)
 	UpdateTask(data []byte, id customType.StringUUID) (*Task, error)
 	DeleteTask(id customType.StringUUID) error
@@ -18,12 +19,15 @@ type HandlerTaskService interface {
 
 type service struct {
 	handle.HandlerImpl
-	db database.IDataManager
+	db        database.IDataManager
+	sanitizer *bluemonday.Policy
 }
 
 func CreateInstance(db database.IDataManager) HandlerTaskService {
+	sanitizer := bluemonday.UGCPolicy()
 	return &service{
-		db: db,
+		db:        db,
+		sanitizer: sanitizer,
 	}
 }
 
@@ -42,6 +46,7 @@ func (s service) CreateTask(data []byte) (*Task, error) {
 	if err := task.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
+	task.Text = s.sanitizer.Sanitize(task.Text)
 	err := s.db.CreateRecord(task)
 	return task, err
 }
@@ -51,6 +56,7 @@ func (s service) UpdateTask(data []byte, id customType.StringUUID) (*Task, error
 	if err := task.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
+	task.Text = s.sanitizer.Sanitize(task.Text)
 	err := s.db.UpdateRecord(task, id)
 	return task, err
 }
@@ -65,9 +71,9 @@ func (s service) FetchTasks(limit, offset int) (tasks []Task, err error) {
 	return tasks, err
 }
 
-func (s service) FetchTasksByCardID(cardID customType.StringUUID) (tasks []Task, err error) {
+func (s service) FetchTasksByCardIDs(cardIDs []string) (tasks []Task, err error) {
 	where := []string{"card_id = ?"}
-	whereArgs := []string{cardID.String()}
+	whereArgs := cardIDs
 	_, err = s.db.FetchDict(&tasks, "tasks", 10000, 0, where, whereArgs)
 	return tasks, err
 }

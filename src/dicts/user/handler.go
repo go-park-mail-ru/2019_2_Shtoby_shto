@@ -22,7 +22,10 @@ type Handler struct {
 	handle.HandlerImpl
 }
 
-func NewUserHandler(e *echo.Echo, userService HandlerUserService, boardUsersService boardUsers.HandlerBoardUsersService, cardUsersService сardUsers.HandlerCardUsersService, securityService security.HandlerSecurity) {
+func NewUserHandler(e *echo.Echo, userService HandlerUserService,
+	boardUsersService boardUsers.HandlerBoardUsersService,
+	cardUsersService сardUsers.HandlerCardUsersService,
+	securityService security.HandlerSecurity) {
 	handler := Handler{
 		userService:       userService,
 		boardUsersService: boardUsersService,
@@ -34,7 +37,7 @@ func NewUserHandler(e *echo.Echo, userService HandlerUserService, boardUsersServ
 	e.GET("/users/all", handler.Fetch)
 	e.GET("/users", handler.Get)
 	e.POST("/users/registration", handler.Post)
-	e.PUT("/users/:id", handler.Put)
+	e.PUT("/users", handler.Put)
 	e.DELETE("/users/:id", handler.Delete)
 }
 
@@ -52,8 +55,6 @@ func (h Handler) Get(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "GetUserById error", http.StatusBadRequest, err)
 		return err
 	}
-	// response without password
-	user.Password = ""
 	return ctx.JSON(http.StatusOK, user)
 }
 
@@ -87,10 +88,9 @@ func (h Handler) Post(ctx echo.Context) error {
 		return err
 	}
 	h.SecurityResponse(ctx.Response(), http.StatusOK, "Registration is success, user id: "+user.ID.String(), nil)
-	// response without password
-	user.Password = ""
-	return ctx.JSON(http.StatusOK, user)
+	return err
 }
+
 func (h Handler) Put(ctx echo.Context) error {
 	userID, ok := ctx.Get("user_id").(customType.StringUUID)
 	if !ok {

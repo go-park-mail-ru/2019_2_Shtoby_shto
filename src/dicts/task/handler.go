@@ -18,7 +18,9 @@ type Handler struct {
 	handle.HandlerImpl
 }
 
-func NewTaskHandler(e *echo.Echo, userService user.HandlerUserService, taskService HandlerTaskService, securityService security.HandlerSecurity) {
+func NewTaskHandler(e *echo.Echo, userService user.HandlerUserService,
+	taskService HandlerTaskService,
+	securityService security.HandlerSecurity) {
 	handler := Handler{
 		userService:     userService,
 		taskService:     taskService,
@@ -75,13 +77,13 @@ func (h Handler) Put(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
 		return err
 	}
-	board, err := h.taskService.UpdateTask(body, customType.StringUUID(ctx.Param("id")))
+	task, err := h.taskService.UpdateTask(body, customType.StringUUID(ctx.Param("id")))
 	if err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "Update task error", http.StatusInternalServerError, err)
 		return err
 	}
-	return ctx.JSON(http.StatusOK, board)
+	return ctx.JSON(http.StatusOK, task)
 }
 
 func (h Handler) Delete(ctx echo.Context) error {

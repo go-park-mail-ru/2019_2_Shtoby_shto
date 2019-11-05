@@ -4,7 +4,7 @@ package board
 
 import (
 	customType "2019_2_Shtoby_shto/src/customType"
-	card "2019_2_Shtoby_shto/src/dicts/card"
+	cardGroup "2019_2_Shtoby_shto/src/dicts/cardGroup"
 	json "encoding/json"
 	easyjson "github.com/mailru/easyjson"
 	jlexer "github.com/mailru/easyjson/jlexer"
@@ -42,25 +42,25 @@ func easyjsonC80ae7adDecode20192ShtobyShtoSrcDictsBoard(in *jlexer.Lexer, out *B
 			out.Name = string(in.String())
 		case "board_users_id":
 			out.BoardUsersID = customType.StringUUID(in.String())
-		case "cards":
+		case "card_groups":
 			if in.IsNull() {
 				in.Skip()
-				out.Cards = nil
+				out.CardGroups = nil
 			} else {
 				in.Delim('[')
-				if out.Cards == nil {
+				if out.CardGroups == nil {
 					if !in.IsDelim(']') {
-						out.Cards = make([]card.Card, 0, 1)
+						out.CardGroups = make([]cardGroup.CardGroup, 0, 1)
 					} else {
-						out.Cards = []card.Card{}
+						out.CardGroups = []cardGroup.CardGroup{}
 					}
 				} else {
-					out.Cards = (out.Cards)[:0]
+					out.CardGroups = (out.CardGroups)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v1 card.Card
+					var v1 cardGroup.CardGroup
 					(v1).UnmarshalEasyJSON(in)
-					out.Cards = append(out.Cards, v1)
+					out.CardGroups = append(out.CardGroups, v1)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -92,13 +92,13 @@ func easyjsonC80ae7adEncode20192ShtobyShtoSrcDictsBoard(out *jwriter.Writer, in 
 		out.String(string(in.BoardUsersID))
 	}
 	{
-		const prefix string = ",\"cards\":"
+		const prefix string = ",\"card_groups\":"
 		out.RawString(prefix)
-		if in.Cards == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+		if in.CardGroups == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v2, v3 := range in.Cards {
+			for v2, v3 := range in.CardGroups {
 				if v2 > 0 {
 					out.RawByte(',')
 				}

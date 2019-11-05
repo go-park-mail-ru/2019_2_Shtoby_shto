@@ -18,7 +18,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoLog "github.com/labstack/gommon/log"
-	"github.com/swaggo/echo-swagger"
 	"net/http"
 	"os"
 	"os/signal"
@@ -27,10 +26,6 @@ import (
 	// TODO::"github.com/microcosm-cc/bluemonday"
 	//"github.com/prometheus/client_golang/prometheus"
 	//"github.com/prometheus/client_golang/prometheus/promhttp"
-)
-
-var (
-	initFlag = flag.Bool("initial start", false, "Check your service")
 )
 
 var (
@@ -50,7 +45,9 @@ func main() {
 	flag.Parse()
 	e := echo.New()
 
-	e.GET("/swagger/*", echoSwagger.WrapHandler)
+	e.GET("/swagger/*", func(ctx echo.Context) error {
+		return ctx.Redirect(http.StatusPermanentRedirect, "https://app.swaggerhub.com/apis/aleksandrkhoroshenin/trello-api/4.0")
+	})
 
 	if err := config.InitConfig(); err != nil {
 		e.Logger.Error(err)
@@ -74,9 +71,6 @@ func main() {
 	e.Logger.SetLevel(echoLog.INFO)
 	initService(e, dm, conf)
 	newServer(e, httpAddr)
-	if *initFlag {
-		return
-	}
 
 	// great shutdown
 	go func() {
@@ -108,12 +102,25 @@ func newServer(e *echo.Echo, httpAddr string) {
 	e.Logger.Info("serving on", httpAddr)
 
 	apiURL := config.GetInstance().FrontendURL
-	e.Use(middleware.Logger(), middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{apiURL},
-		AllowCredentials: true,
-		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete, http.MethodOptions},
-		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
-	}), securityService.CheckSession)
+	e.Use(
+		middleware.Logger(),
+		middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins:     []string{apiURL},
+			AllowCredentials: true,
+			AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete, http.MethodOptions},
+			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		}),
+		middleware.CSRFWithConfig(middleware.CSRFConfig{
+			Skipper: func(ctx echo.Context) bool {
+				return true
+			},
+			TokenLength:  32,
+			TokenLookup:  "header:" + echo.HeaderXCSRFToken,
+			ContextKey:   "csrf",
+			CookieName:   "_csrf",
+			CookieMaxAge: 86400,
+		}),
+		securityService.CheckSession)
 
 	e.Server = &http.Server{
 		Addr:           httpAddr,
@@ -136,7 +143,7 @@ func initService(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	securityService = security.CreateInstance(sessionService)
 	user.NewUserHandler(e, userService, boardUsersService, cardUsersService, securityService)
 	photo.NewPhotoHandler(e, photoService, userService, securityService)
-	board.NewBoardHandler(e, userService, boardService, boardUsersService, cardService, taskService, securityService)
+	board.NewBoardHandler(e, userService, boardService, boardUsersService, cardService, cardGroupService, taskService, securityService)
 	card.NewCardHandler(e, userService, cardService, cardUsersService, taskService, securityService)
 	cardGroup.NewCardGroupHandler(e, cardGroupService, securityService)
 	task.NewTaskHandler(e, userService, taskService, securityService)
