@@ -9,22 +9,7 @@ import (
 )
 
 func TestNewUserHandler(t *testing.T) {
-	type args struct {
-		e               *echo.Echo
-		userService     HandlerUserService
-		securityService security.HandlerSecurity
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			NewUserHandler(tt.args.e, tt.args.userService, tt.args.securityService)
-		})
-	}
+
 }
 
 func TestHandler_Get(t *testing.T) {
