@@ -108,7 +108,8 @@ func newServer(e *echo.Echo, httpAddr string) {
 			AllowOrigins:     []string{apiURL},
 			AllowCredentials: true,
 			AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete, http.MethodOptions},
-			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderXCSRFToken},
+			ExposeHeaders:    []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderXCSRFToken},
 		}),
 		securityService.CheckSession,
 		middleware.CSRFWithConfig(middleware.CSRFConfig{
