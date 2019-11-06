@@ -3,22 +3,24 @@ package security
 import (
 	. "2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/utils"
-	"context"
 	"errors"
 	"github.com/go-redis/redis"
 	"github.com/labstack/echo/v4"
+	"time"
 )
 
 // Обработчик сессий
 type SessionHandler interface {
-	Create(userID StringUUID) (*SessionID, error)
+	Create(userID StringUUID) (*Session, error)
 	Check(ctx *echo.Context) error
-	Delete(ctx context.Context) error
+	Delete(ctx echo.Context) error
 }
 
-// id сессии
-type SessionID struct {
-	ID StringUUID `json:"session_id"`
+//easyjson:json
+type Session struct {
+	ID        StringUUID `json:"session_id"`
+	UserID    StringUUID `json:"user_id"`
+	CsrfToken string     `json:"csrf_token"`
 }
 
 type SessionManager struct {
@@ -36,19 +38,35 @@ func NewSessionManager(addr, password string, dbNumber int) *SessionManager {
 	}
 }
 
-func (sm SessionManager) Create(userID StringUUID) (*SessionID, error) {
+func (sm SessionManager) Create(userID StringUUID) (*Session, error) {
 	id, err := utils.GenerateUUID()
-	if err != nil || id.String() == "" {
+	if err != nil {
 		return nil, err
 	}
-	session := SessionID{StringUUID(id.String())}
-	return &session, sm.putSession(session.ID, userID)
+	HMACHashToken, err := utils.NewHMACHashToken("1111")
+	if err != nil {
+		return nil, err
+	}
+	token, err := HMACHashToken.Create(id.String(), userID.String(), time.Now().AddDate(0, 0, 7).Unix())
+	if err != nil {
+		return nil, err
+	}
+	session := &Session{
+		ID:        StringUUID(id.String()),
+		UserID:    userID,
+		CsrfToken: token,
+	}
+	sessData, err := session.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return session, sm.putSession(session.ID.String(), sessData)
 }
 
-func (sm *SessionManager) putSession(sessionID StringUUID, userID StringUUID) error {
+func (sm *SessionManager) putSession(sessionID string, sessionInfo []byte) error {
 	//todo::set expire
 	//expire := time.Duration(24 * time.Hour)
-	return sm.cache.Set(sessionID.String(), userID.String(), 0).Err()
+	return sm.cache.Set(sessionID, sessionInfo, 0).Err()
 }
 
 func (sm *SessionManager) getSession(cacheID string) (string, error) {
@@ -67,17 +85,35 @@ func (sm *SessionManager) Delete(ctx echo.Context) error {
 	if s == nil {
 		return errors.New("Error session")
 	}
+	ctx.Set("session_id", "")
 	return sm.cache.Del(s.(string)).Err()
 }
 
 func (sm *SessionManager) Check(ctx *echo.Context) error {
-	userId, err := sm.getSession((*ctx).Get("session_id").(string))
+	s := Session{}
+	sessionID := (*ctx).Get("session_id").(string)
+	sessionInfo, err := sm.getSession(sessionID)
 	if err != nil {
 		return err
 	}
-	if userId == "" {
-		return errors.New("Missing user id")
+	if sessionInfo == "" {
+		return errors.New("Missing session info")
 	}
-	(*ctx).Set("user_id", StringUUID(userId))
+	if err := s.UnmarshalJSON([]byte(sessionInfo)); err != nil {
+		return err
+	}
+	(*ctx).Set("user_id", s.UserID)
+	HMACHashToken, err := utils.NewHMACHashToken("1111")
+	if err != nil {
+		return err
+	}
+	_, err = HMACHashToken.Check(sessionID, s.UserID.String(), s.CsrfToken)
+	if err != nil {
+		return err
+	}
+	//if !isValid {
+	//	return errors.New("invalid csrf token")
+	//}
+	(*ctx).Set("csrf_token", s.CsrfToken)
 	return nil
 }

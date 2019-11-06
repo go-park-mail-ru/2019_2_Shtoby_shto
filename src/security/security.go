@@ -11,7 +11,7 @@ import (
 
 type HandlerSecurity interface {
 	CheckSession(h echo.HandlerFunc) echo.HandlerFunc
-	CreateSession(w http.ResponseWriter, userID customType.StringUUID) error
+	CreateSession(ctx *echo.Context, userID customType.StringUUID) error
 	DeleteSession(ctx echo.Context) error
 }
 
@@ -39,18 +39,19 @@ func (s *service) DeleteSession(ctx echo.Context) error {
 	return nil
 }
 
-func (s *service) CreateSession(w http.ResponseWriter, userID customType.StringUUID) error {
-	sessionId, err := s.Sm.Create(userID)
+func (s *service) CreateSession(ctx *echo.Context, userID customType.StringUUID) error {
+	session, err := s.Sm.Create(userID)
 	if err != nil {
 		return err
 	}
 	expiration := time.Now().Add(24 * time.Hour)
 	cookie := http.Cookie{
 		Name:    "session_id",
-		Value:   sessionId.ID.String(),
+		Value:   session.ID.String(),
 		Expires: expiration,
 	}
-	http.SetCookie(w, &cookie)
+	(*ctx).Response().Header().Add(echo.HeaderXCSRFToken, session.CsrfToken)
+	http.SetCookie((*ctx).Response(), &cookie)
 	return nil
 }
 
