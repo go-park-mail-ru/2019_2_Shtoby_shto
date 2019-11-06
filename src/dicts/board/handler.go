@@ -99,6 +99,15 @@ func (h Handler) Fetch(ctx echo.Context) error {
 
 func (h Handler) FetchUserBoards(ctx echo.Context) error {
 	userID := customType.StringUUID(ctx.Param("id"))
+	curUserID, ok := ctx.Get("user_id").(customType.StringUUID)
+	if !ok {
+		ctx.Logger().Error("get user_id failed")
+		errorsLib.ErrorHandler(ctx.Response(), "get user_id failed", http.StatusInternalServerError, errors.New("download fail"))
+		return errors.New("get user_id failed")
+	}
+	if curUserID != userID {
+		return errors.New("It is not your data, man")
+	}
 	if !userID.IsUUID() {
 		return ctx.JSON(http.StatusBadRequest, errors.New("Not valid userID"))
 	}

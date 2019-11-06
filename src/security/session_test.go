@@ -38,7 +38,7 @@ func TestSessionManager_Create(t *testing.T) {
 		name    string
 		sm      SessionManager
 		args    args
-		want    *SessionID
+		want    *Session
 		wantErr bool
 	}{
 		// TODO: Add test cases.
@@ -72,7 +72,7 @@ func TestSessionManager_putSession(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.sm.putSession(tt.args.sessionID, tt.args.userID); (err != nil) != tt.wantErr {
+			if err := tt.sm.putSession(tt.args.sessionID.String(), []byte{}); (err != nil) != tt.wantErr {
 				t.Errorf("SessionManager.putSession() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
