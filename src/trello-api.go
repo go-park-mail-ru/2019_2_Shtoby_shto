@@ -29,7 +29,16 @@ import (
 )
 
 var (
-	securityService security.HandlerSecurity
+	securityService   security.HandlerSecurity
+	userService       user.HandlerUserService
+	photoService      photo.HandlerPhotoService
+	boardService      board.HandlerBoardService
+	boardUsersService boardUsers.HandlerBoardUsersService
+	cardUsersService  сardUsers.HandlerCardUsersService
+	cardService       card.HandlerCardService
+	cardGroupService  cardGroup.HandlerCardGroupService
+	taskService       task.HandlerTaskService
+	dbService         initDB.InitDBManager
 )
 
 func main() {
@@ -50,7 +59,7 @@ func main() {
 	httpAddr := ":" + strconv.Itoa(conf.Port)
 	e.Logger.Info("API Url:", httpAddr)
 
-	dbService := initDB.Init()
+	dbService = initDB.Init()
 	db, err := dbService.DbConnect("postgres", conf.DbConfig)
 	if err != nil {
 		e.Logger.Error(err)
@@ -124,15 +133,15 @@ func newServer(e *echo.Echo, httpAddr string) {
 
 func initService(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	sessionService := security.NewSessionManager(conf.RedisConfig, conf.RedisPass, conf.RedisDbNumber)
-	userService := user.CreateInstance(db)
-	photoService := photo.CreateInstance(db)
-	boardService := board.CreateInstance(db)
-	boardUsersService := boardUsers.CreateInstance(db)
-	cardUsersService := сardUsers.CreateInstance(db)
-	cardService := card.CreateInstance(db)
-	cardGroupService := cardGroup.CreateInstance(db)
-	taskService := task.CreateInstance(db)
-	securityService := security.CreateInstance(sessionService)
+	userService = user.CreateInstance(db)
+	photoService = photo.CreateInstance(db)
+	boardService = board.CreateInstance(db)
+	boardUsersService = boardUsers.CreateInstance(db)
+	cardUsersService = сardUsers.CreateInstance(db)
+	cardService = card.CreateInstance(db)
+	cardGroupService = cardGroup.CreateInstance(db)
+	taskService = task.CreateInstance(db)
+	securityService = security.CreateInstance(sessionService)
 	user.NewUserHandler(e, userService, boardUsersService, cardUsersService, securityService)
 	photo.NewPhotoHandler(e, photoService, userService, securityService)
 	board.NewBoardHandler(e, userService, boardService, boardUsersService, cardService, cardGroupService, taskService, securityService)

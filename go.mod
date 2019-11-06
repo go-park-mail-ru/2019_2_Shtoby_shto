@@ -7,6 +7,7 @@ require (
 	github.com/go-openapi/jsonpointer v0.18.0 // indirect
 	github.com/go-openapi/swag v0.18.0 // indirect
 	github.com/go-redis/redis v6.15.5+incompatible
+	github.com/golang/mock v1.2.0
 	github.com/gorilla/csrf v1.6.1 // indirect
 	github.com/gyepisam/mcf v0.0.0-20181020145543-a4d14a7af431
 	github.com/jinzhu/gorm v1.9.10
