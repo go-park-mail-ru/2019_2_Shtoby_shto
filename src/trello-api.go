@@ -114,8 +114,8 @@ func newServer(e *echo.Echo, httpAddr string) {
 		middleware.CSRFWithConfig(middleware.CSRFConfig{
 			Skipper: func(ctx echo.Context) bool {
 				csrfRequest := ctx.Request().Header.Get(echo.HeaderXCSRFToken)
-				csrfContext := ctx.Get("csrf_token")
-				return csrfRequest == csrfContext
+				csrfCurrent := ctx.Get("csrf_token")
+				return csrfRequest == csrfCurrent || ctx.Get("not_security") == "done"
 			},
 			TokenLength:  32,
 			TokenLookup:  "header:" + echo.HeaderXCSRFToken,

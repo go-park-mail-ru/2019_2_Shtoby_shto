@@ -65,6 +65,7 @@ func (s service) checkNotSecurity(route string) bool {
 func (s *service) CheckSession(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) (err error) {
 		if s.checkNotSecurity(ctx.Request().RequestURI) {
+			ctx.Set("not_security", "done")
 			return h(ctx)
 		}
 		cookieSessionID, err := ctx.Cookie("session_id")
