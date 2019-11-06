@@ -90,7 +90,7 @@ func (sm *SessionManager) Delete(ctx echo.Context) error {
 }
 
 func (sm *SessionManager) Check(ctx *echo.Context) error {
-	s := Session{}
+	s := &Session{}
 	sessionID := (*ctx).Get("session_id").(string)
 	sessionInfo, err := sm.getSession(sessionID)
 	if err != nil {

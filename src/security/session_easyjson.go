@@ -39,6 +39,8 @@ func easyjsonA818f49aDecode20192ShtobyShtoSrcSecurity(in *jlexer.Lexer, out *Ses
 		switch key {
 		case "session_id":
 			out.ID = customType.StringUUID(in.String())
+		case "user_id":
+			out.UserID = customType.StringUUID(in.String())
 		case "csrf_token":
 			out.CsrfToken = string(in.String())
 		default:
@@ -59,6 +61,11 @@ func easyjsonA818f49aEncode20192ShtobyShtoSrcSecurity(out *jwriter.Writer, in Se
 		const prefix string = ",\"session_id\":"
 		out.RawString(prefix[1:])
 		out.String(string(in.ID))
+	}
+	{
+		const prefix string = ",\"user_id\":"
+		out.RawString(prefix)
+		out.String(string(in.UserID))
 	}
 	{
 		const prefix string = ",\"csrf_token\":"
