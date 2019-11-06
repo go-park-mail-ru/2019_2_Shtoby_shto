@@ -120,7 +120,6 @@ func newServer(e *echo.Echo, httpAddr string) {
 			TokenLength:  32,
 			TokenLookup:  "header:" + echo.HeaderXCSRFToken,
 			ContextKey:   "csrf",
-			CookieName:   "_csrf",
 			CookieMaxAge: 86400,
 		}))
 
