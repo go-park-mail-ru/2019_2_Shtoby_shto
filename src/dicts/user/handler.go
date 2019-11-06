@@ -82,11 +82,12 @@ func (h Handler) Post(ctx echo.Context) error {
 		ctx.Logger().Error(err)
 		return err
 	}
-	if err := h.securityService.CreateSession(ctx.Response(), user.ID); err != nil {
+	if err := h.securityService.CreateSession(&ctx, user.ID); err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "Create session error", http.StatusInternalServerError, err)
 		ctx.Logger().Error(err)
 		return err
 	}
+	ctx.Set("user_id", user.ID)
 	h.SecurityResponse(ctx.Response(), http.StatusOK, "Registration is success, user id: "+user.ID.String(), nil)
 	return err
 }
@@ -125,7 +126,7 @@ func (h Handler) Login(ctx echo.Context) error {
 		return err
 	}
 
-	if err := h.securityService.CreateSession(ctx.Response(), user.ID); err != nil {
+	if err := h.securityService.CreateSession(&ctx, user.ID); err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "Create session error", http.StatusInternalServerError, err)
 		return err

@@ -39,6 +39,9 @@ func (s *service) CreateUser(data []byte) (*User, error) {
 	if err := user.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
+	if !user.IsValid() {
+		return nil, errors.New("User not valid!")
+	}
 	if err := s.setPasswordPBKDF2(user); err != nil {
 		return nil, err
 	}

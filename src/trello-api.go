@@ -110,17 +110,19 @@ func newServer(e *echo.Echo, httpAddr string) {
 			AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete, http.MethodOptions},
 			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 		}),
+		securityService.CheckSession,
 		middleware.CSRFWithConfig(middleware.CSRFConfig{
 			Skipper: func(ctx echo.Context) bool {
-				return true
+				csrfRequest := ctx.Request().Header.Get(echo.HeaderXCSRFToken)
+				csrfCurrent := ctx.Get("csrf_token")
+				return csrfRequest == csrfCurrent || ctx.Get("not_security") == "done"
 			},
 			TokenLength:  32,
 			TokenLookup:  "header:" + echo.HeaderXCSRFToken,
 			ContextKey:   "csrf",
 			CookieName:   "_csrf",
 			CookieMaxAge: 86400,
-		}),
-		securityService.CheckSession)
+		}))
 
 	e.Server = &http.Server{
 		Addr:           httpAddr,
