@@ -14,6 +14,7 @@ import (
 	"2019_2_Shtoby_shto/src/initDB"
 	"2019_2_Shtoby_shto/src/security"
 	"context"
+	"errors"
 	"flag"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -111,23 +112,27 @@ func newServer(e *echo.Echo, httpAddr string) {
 			ExposeHeaders:    []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderXCSRFToken},
 		}),
 		securityService.CheckSession,
-		middleware.CSRFWithConfig(middleware.CSRFConfig{
-			Skipper: func(ctx echo.Context) bool {
-				csrfRequest := ctx.Request().Header.Get(echo.HeaderXCSRFToken)
-				csrfCurrent := ctx.Get("csrf_token")
-				return csrfRequest == csrfCurrent || ctx.Get("not_security") == "done"
-			},
-			TokenLength:  32,
-			TokenLookup:  "header:" + echo.HeaderXCSRFToken,
-			ContextKey:   "csrf",
-			CookieMaxAge: 86400,
-		}))
+		checkCSRF)
 
 	e.Server = &http.Server{
 		Addr:           httpAddr,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
+	}
+}
+
+func checkCSRF(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) (err error) {
+		csrfRequest := ctx.Request().Header.Get(echo.HeaderXCSRFToken)
+		csrfCurrent := ctx.Get("csrf_token")
+		if ctx.Get("not_security") == "done" {
+			return h(ctx)
+		}
+		if csrfRequest != csrfCurrent {
+			return errors.New("csrf error")
+		}
+		return h(ctx)
 	}
 }
 
