@@ -68,9 +68,9 @@ func (s service) UpdateCardUsers(userID, сardID customType.StringUUID, id custo
 		UserID: userID,
 		CardID: сardID,
 	}
-	if !boardUsers.IsValid() {
-		return nil, errors.New("Board body is not valid")
-	}
+	//if !boardUsers.IsValid() {
+	//	return nil, errors.New("Board body is not valid")
+	//}
 	err := s.db.UpdateRecord(boardUsers, id)
 	return boardUsers, err
 }

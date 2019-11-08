@@ -55,9 +55,9 @@ func (s service) UpdateCardGroup(data []byte, id customType.StringUUID) (*CardGr
 	if err := card.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
-	if !card.IsValid() {
-		return nil, errors.New("CardGroup body is not valid")
-	}
+	//if !card.IsValid() {
+	//	return nil, errors.New("CardGroup body is not valid")
+	//}
 	err := s.db.UpdateRecord(card, id)
 	return card, err
 }

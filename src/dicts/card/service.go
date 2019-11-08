@@ -58,9 +58,9 @@ func (s service) UpdateCard(data []byte, id customType.StringUUID) (*Card, error
 	if err := card.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
-	if !card.IsValid() {
-		return nil, errors.New("Card body is not valid")
-	}
+	//if !card.IsValid() {
+	//	return nil, errors.New("Card body is not valid")
+	//}
 	err := s.db.UpdateRecord(card, id)
 	return card, err
 }

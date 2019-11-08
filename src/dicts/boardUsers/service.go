@@ -55,9 +55,9 @@ func (s service) UpdateBoardUsers(userID, boardID customType.StringUUID, id cust
 		UserID:  userID,
 		BoardID: boardID,
 	}
-	if !boardUsers.IsValid() {
-		return nil, errors.New("Board body is not valid")
-	}
+	//if !boardUsers.IsValid() {
+	//	return nil, errors.New("Board body is not valid")
+	//}
 	err := s.db.UpdateRecord(boardUsers, id)
 	return boardUsers, err
 }

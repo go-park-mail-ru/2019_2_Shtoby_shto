@@ -105,9 +105,9 @@ func (s *service) UpdateUser(data []byte, id StringUUID) error {
 	if err := user.UnmarshalJSON(data); err != nil {
 		return err
 	}
-	if !user.IsValid() {
-		return errors.New("User not valid!")
-	}
+	//if !user.IsValid() {
+	//	return errors.New("User not valid!")
+	//}
 	if err := s.setPasswordPBKDF2(user); err != nil {
 		return err
 	}

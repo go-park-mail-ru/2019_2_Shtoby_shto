@@ -57,9 +57,9 @@ func (s service) UpdateBoard(data []byte, id customType.StringUUID) (*Board, err
 	if err := board.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
-	if !board.IsValid() {
-		return nil, errors.New("Board body is not valid")
-	}
+	//if !board.IsValid() {
+	//	return nil, errors.New("Board body is not valid")
+	//}
 	err := s.db.UpdateRecord(board, id)
 	return board, err
 }
