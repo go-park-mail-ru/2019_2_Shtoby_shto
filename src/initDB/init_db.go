@@ -51,6 +51,7 @@ func Init() InitDBManager {
 func (d *InitDB) DbConnect(dialect, args string) (*gorm.DB, error) {
 	// TODO:: add timeout for docker
 	db, err := gorm.Open(dialect, args)
+	db.LogMode(true)
 	if err != nil {
 		log.Println(err)
 		return nil, err

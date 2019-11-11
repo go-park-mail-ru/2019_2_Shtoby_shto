@@ -108,8 +108,11 @@ func (s *service) UpdateUser(data []byte, id StringUUID) error {
 	//if !user.IsValid() {
 	//	return errors.New("User not valid!")
 	//}
-	if err := s.setPasswordPBKDF2(user); err != nil {
-		return err
+	if len(user.Password) > 0 {
+		err := s.setPasswordPBKDF2(user)
+		if err != nil {
+			return err
+		}
 	}
 	if err := s.db.UpdateRecord(user, id); err != nil {
 		return err
