@@ -7,9 +7,11 @@ import (
 	"2019_2_Shtoby_shto/src/dicts/boardUsers"
 	"2019_2_Shtoby_shto/src/dicts/card"
 	"2019_2_Shtoby_shto/src/dicts/cardGroup"
+	"2019_2_Shtoby_shto/src/dicts/cardTags"
 	сardUsers "2019_2_Shtoby_shto/src/dicts/cardUsers"
+	"2019_2_Shtoby_shto/src/dicts/comment"
 	"2019_2_Shtoby_shto/src/dicts/photo"
-	"2019_2_Shtoby_shto/src/dicts/task"
+	"2019_2_Shtoby_shto/src/dicts/tag"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	"2019_2_Shtoby_shto/src/initDB"
 	"2019_2_Shtoby_shto/src/security"
@@ -38,7 +40,9 @@ var (
 	cardUsersService  сardUsers.HandlerCardUsersService
 	cardService       card.HandlerCardService
 	cardGroupService  cardGroup.HandlerCardGroupService
-	taskService       task.HandlerTaskService
+	commentService    comment.HandlerCommentService
+	tagService        tag.HandlerTagService
+	cardTagsService   cardTags.HandlerCardTagsService
 	dbService         initDB.InitDBManager
 )
 
@@ -145,12 +149,15 @@ func initService(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	cardUsersService = сardUsers.CreateInstance(db)
 	cardService = card.CreateInstance(db)
 	cardGroupService = cardGroup.CreateInstance(db)
-	taskService = task.CreateInstance(db)
+	commentService = comment.CreateInstance(db)
+	tagService = tag.CreateInstance(db)
+	cardTagsService = cardTags.CreateInstance(db)
 	securityService = security.CreateInstance(sessionService)
 	user.NewUserHandler(e, userService, boardUsersService, cardUsersService, securityService)
 	photo.NewPhotoHandler(e, photoService, userService, securityService)
-	board.NewBoardHandler(e, userService, boardService, boardUsersService, cardService, cardGroupService, taskService, securityService)
-	card.NewCardHandler(e, userService, cardService, cardUsersService, taskService, securityService)
+	board.NewBoardHandler(e, userService, boardService, boardUsersService, cardService, cardGroupService, tagService, cardTagsService, commentService, securityService)
+	card.NewCardHandler(e, userService, cardService, cardUsersService, tagService, cardTagsService, commentService, securityService)
 	cardGroup.NewCardGroupHandler(e, cardGroupService, securityService)
-	task.NewTaskHandler(e, userService, taskService, securityService)
+	comment.NewCommentHandler(e, userService, commentService, securityService)
+	tag.NewTagHandler(e, userService, tagService, cardTagsService, securityService)
 }

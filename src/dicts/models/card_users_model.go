@@ -1,4 +1,4 @@
-package сardUsers
+package models
 
 import (
 	"2019_2_Shtoby_shto/src/customType"

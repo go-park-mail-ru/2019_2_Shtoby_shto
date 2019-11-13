@@ -2,8 +2,11 @@ package card
 
 import (
 	"2019_2_Shtoby_shto/src/customType"
+	"2019_2_Shtoby_shto/src/dicts/cardTags"
 	сardUsers "2019_2_Shtoby_shto/src/dicts/cardUsers"
-	"2019_2_Shtoby_shto/src/dicts/task"
+	"2019_2_Shtoby_shto/src/dicts/comment"
+	"2019_2_Shtoby_shto/src/dicts/models"
+	"2019_2_Shtoby_shto/src/dicts/tag"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	errorsLib "2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/handle"
@@ -18,17 +21,26 @@ type Handler struct {
 	userService      user.HandlerUserService
 	cardService      HandlerCardService
 	cardUsersService сardUsers.HandlerCardUsersService
-	taskService      task.HandlerTaskService
+	tagService       tag.HandlerTagService
+	cardTagsService  cardTags.HandlerCardTagsService
+	commentService   comment.HandlerCommentService
 	securityService  security.HandlerSecurity
 	handle.HandlerImpl
 }
 
-func NewCardHandler(e *echo.Echo, userService user.HandlerUserService, cardService HandlerCardService, cardUsersService сardUsers.HandlerCardUsersService, taskService task.HandlerTaskService, securityService security.HandlerSecurity) {
+func NewCardHandler(e *echo.Echo, userService user.HandlerUserService,
+	cardService HandlerCardService,
+	cardUsersService сardUsers.HandlerCardUsersService,
+	tagService tag.HandlerTagService,
+	cardTagsService cardTags.HandlerCardTagsService,
+	commentService comment.HandlerCommentService, securityService security.HandlerSecurity) {
 	handler := Handler{
 		userService:      userService,
 		cardService:      cardService,
 		cardUsersService: cardUsersService,
-		taskService:      taskService,
+		tagService:       tagService,
+		cardTagsService:  cardTagsService,
+		commentService:   commentService,
 		securityService:  securityService,
 	}
 	e.GET("/cards/:id", handler.Get)
@@ -44,16 +56,33 @@ func (h Handler) Get(ctx echo.Context) error {
 	card, err := h.cardService.FindCardByID(customType.StringUUID(ctx.Param("id")))
 	if err != nil {
 		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "GetCardById error", http.StatusBadRequest, err)
+		errorsLib.ErrorHandler(ctx.Response(), "FindCardByID error", http.StatusBadRequest, err)
 		return err
 	}
-	tasks, err := h.taskService.FetchTasksByCardIDs([]string{card.ID.String()})
+	comments, err := h.commentService.FetchCommentsByCardIDs([]string{card.ID.String()})
 	if err != nil {
 		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "GetCardById error", http.StatusBadRequest, err)
+		errorsLib.ErrorHandler(ctx.Response(), "FetchCommentsByCardIDs error", http.StatusBadRequest, err)
 		return err
 	}
-	card.Tasks = tasks
+	card.Comments = comments
+	cardTags, err := h.cardTagsService.FindCardTagsByCardID(card.ID.String())
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "FindCardTagsByCardID error", http.StatusBadRequest, err)
+		return err
+	}
+	resultTagIDs := make([]string, 0)
+	for _, ct := range cardTags {
+		resultTagIDs = append(resultTagIDs, ct.TagID.String())
+	}
+	tags, err := h.tagService.FetchTagsByIDs(resultTagIDs)
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "FetchTagsByIDs error", http.StatusBadRequest, err)
+		return err
+	}
+	card.Tags = tags
 	return ctx.JSON(http.StatusOK, card)
 }
 
@@ -66,19 +95,36 @@ func (h Handler) Fetch(ctx echo.Context) error {
 		return err
 	}
 	for i, card := range cards {
-		tasks, err := h.taskService.FetchTasksByCardIDs([]string{card.ID.String()})
+		comments, err := h.commentService.FetchCommentsByCardIDs([]string{card.ID.String()})
 		if err != nil {
 			ctx.Logger().Error(err)
 			errorsLib.ErrorHandler(ctx.Response(), "GetCardById error", http.StatusBadRequest, err)
 			return err
 		}
-		cards[i].Tasks = tasks
+		cardTags, err := h.cardTagsService.FindCardTagsByCardID(card.ID.String())
+		if err != nil {
+			ctx.Logger().Error(err)
+			errorsLib.ErrorHandler(ctx.Response(), "FindCardTagsByCardID error", http.StatusBadRequest, err)
+			return err
+		}
+		resultTagIDs := make([]string, 0)
+		for _, ct := range cardTags {
+			resultTagIDs = append(resultTagIDs, ct.TagID.String())
+		}
+		tags, err := h.tagService.FetchTagsByIDs(resultTagIDs)
+		if err != nil {
+			ctx.Logger().Error(err)
+			errorsLib.ErrorHandler(ctx.Response(), "FetchTagsByIDs error", http.StatusBadRequest, err)
+			return err
+		}
+		cards[i].Comments = comments
+		cards[i].Tags = tags
 	}
 
 	return ctx.JSON(http.StatusOK, cards)
 }
 
-func (h Handler) GetCardsWithTasks(ctx echo.Context, cardID customType.StringUUID) (card Card, err error) {
+func (h Handler) GetCardsWithComments(ctx echo.Context, cardID customType.StringUUID) (card models.Card, err error) {
 
 	return card, nil
 }

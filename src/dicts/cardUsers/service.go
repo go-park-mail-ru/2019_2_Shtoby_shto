@@ -4,15 +4,16 @@ import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts"
+	"2019_2_Shtoby_shto/src/dicts/models"
 	"2019_2_Shtoby_shto/src/handle"
 	"errors"
 )
 
 type HandlerCardUsersService interface {
-	FindCardUsersByID(id customType.StringUUID) (*CardUsers, error)
-	FindCardUsersByUserID(userData []byte) ([]CardUsers, error)
-	CreateCardUsers(userID, сardID customType.StringUUID) (*CardUsers, error)
-	UpdateCardUsers(userID, сardID customType.StringUUID, id customType.StringUUID) (*CardUsers, error)
+	FindCardUsersByID(id customType.StringUUID) (*models.CardUsers, error)
+	FindCardUsersByUserID(userData []byte) ([]models.CardUsers, error)
+	CreateCardUsers(userID, сardID customType.StringUUID) (*models.CardUsers, error)
+	UpdateCardUsers(userID, сardID customType.StringUUID, id customType.StringUUID) (*models.CardUsers, error)
 	DeleteCardUsers(id customType.StringUUID) error
 }
 
@@ -27,8 +28,8 @@ func CreateInstance(db database.IDataManager) HandlerCardUsersService {
 	}
 }
 
-func (s service) FindCardUsersByUserID(userData []byte) (cardUsers []CardUsers, err error) {
-	userIDs := CardsUserRequest{}
+func (s service) FindCardUsersByUserID(userData []byte) (cardUsers []models.CardUsers, err error) {
+	userIDs := models.CardsUserRequest{}
 	if err = userIDs.UnmarshalJSON(userData); err != nil {
 		return nil, err
 	}
@@ -41,8 +42,8 @@ func (s service) FindCardUsersByUserID(userData []byte) (cardUsers []CardUsers, 
 	return cardUsers, err
 }
 
-func (s service) FindCardUsersByID(id customType.StringUUID) (*CardUsers, error) {
-	сardUsers := &CardUsers{
+func (s service) FindCardUsersByID(id customType.StringUUID) (*models.CardUsers, error) {
+	сardUsers := &models.CardUsers{
 		BaseInfo: dicts.BaseInfo{
 			ID: id,
 		},
@@ -51,8 +52,8 @@ func (s service) FindCardUsersByID(id customType.StringUUID) (*CardUsers, error)
 	return сardUsers, err
 }
 
-func (s service) CreateCardUsers(userID, сardID customType.StringUUID) (*CardUsers, error) {
-	сardUsers := &CardUsers{
+func (s service) CreateCardUsers(userID, сardID customType.StringUUID) (*models.CardUsers, error) {
+	сardUsers := &models.CardUsers{
 		CardID: сardID,
 		UserID: userID,
 	}
@@ -63,8 +64,8 @@ func (s service) CreateCardUsers(userID, сardID customType.StringUUID) (*CardUs
 	return сardUsers, err
 }
 
-func (s service) UpdateCardUsers(userID, сardID customType.StringUUID, id customType.StringUUID) (*CardUsers, error) {
-	boardUsers := &CardUsers{
+func (s service) UpdateCardUsers(userID, сardID customType.StringUUID, id customType.StringUUID) (*models.CardUsers, error) {
+	boardUsers := &models.CardUsers{
 		UserID: userID,
 		CardID: сardID,
 	}
@@ -76,11 +77,11 @@ func (s service) UpdateCardUsers(userID, сardID customType.StringUUID, id custo
 }
 
 func (s service) DeleteCardUsers(id customType.StringUUID) error {
-	boardUsers := CardUsers{}
+	boardUsers := models.CardUsers{}
 	return s.db.DeleteRecord(boardUsers, id)
 }
 
-func (s service) FetchCardUsers(limit, offset int) (cardUsers []CardUsers, err error) {
+func (s service) FetchCardUsers(limit, offset int) (cardUsers []models.CardUsers, err error) {
 	_, err = s.db.FetchDict(&cardUsers, "card_users", limit, offset, nil, nil)
 	return cardUsers, err
 }

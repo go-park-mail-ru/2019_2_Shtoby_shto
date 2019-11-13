@@ -4,6 +4,7 @@ import (
 	"2019_2_Shtoby_shto/src/config"
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
+	"2019_2_Shtoby_shto/src/dicts/models"
 	transport "2019_2_Shtoby_shto/src/handle"
 	"bufio"
 	"bytes"
@@ -34,7 +35,7 @@ func (s service) DownloadPhoto(photo *bufio.Reader) (customType.StringUUID, erro
 	if err := os.MkdirAll(photoPath, os.ModePerm); err != nil {
 		return "", err
 	}
-	newPhoto := Photo{
+	newPhoto := models.Photo{
 		TimeLoad: time.Now(),
 		Path:     photoPath,
 	}

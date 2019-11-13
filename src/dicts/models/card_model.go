@@ -1,9 +1,8 @@
-package card
+package models
 
 import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts"
-	"2019_2_Shtoby_shto/src/dicts/task"
 )
 
 const cardTableName = "cards"
@@ -15,7 +14,8 @@ type Card struct {
 	Priority    int                   `json:"priority"`
 	CardUserID  customType.StringUUID `json:"card_user_id"`
 	CardGroupID customType.StringUUID `json:"card_group_id"`
-	Tasks       []task.Task           `json:"tasks" sql:"-"`
+	Comments    []Comment             `json:"comments" sql:"-"`
+	Tags        []Tag                 `json:"tags" sql:"-"`
 }
 
 func (b Card) GetTableName() string {

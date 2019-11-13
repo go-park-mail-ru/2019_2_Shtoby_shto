@@ -1,14 +1,7 @@
 package initDB
 
 import (
-	"2019_2_Shtoby_shto/src/dicts/board"
-	"2019_2_Shtoby_shto/src/dicts/boardUsers"
-	"2019_2_Shtoby_shto/src/dicts/card"
-	"2019_2_Shtoby_shto/src/dicts/cardGroup"
-	сardUsers "2019_2_Shtoby_shto/src/dicts/cardUsers"
-	"2019_2_Shtoby_shto/src/dicts/photo"
-	"2019_2_Shtoby_shto/src/dicts/task"
-	"2019_2_Shtoby_shto/src/dicts/user"
+	"2019_2_Shtoby_shto/src/dicts/models"
 	"flag"
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
@@ -30,14 +23,16 @@ type tabler interface {
 }
 
 var tables = []tabler{
-	&user.User{},
-	&photo.Photo{},
-	&board.Board{},
-	&card.Card{},
-	&task.Task{},
-	&boardUsers.BoardUsers{},
-	&сardUsers.CardUsers{},
-	&cardGroup.CardGroup{},
+	&models.User{},
+	&models.Photo{},
+	&models.Board{},
+	&models.Card{},
+	&models.Comment{},
+	&models.Tag{},
+	&models.BoardUsers{},
+	&models.CardUsers{},
+	&models.CardGroup{},
+	&models.CardTags{},
 }
 
 func Tables() []tabler {

@@ -1,4 +1,4 @@
-package task
+package comment
 
 import (
 	"2019_2_Shtoby_shto/src/customType"
@@ -13,31 +13,31 @@ import (
 
 type Handler struct {
 	userService     user.HandlerUserService
-	taskService     HandlerTaskService
+	commentService  HandlerCommentService
 	securityService security.HandlerSecurity
 	handle.HandlerImpl
 }
 
-func NewTaskHandler(e *echo.Echo, userService user.HandlerUserService,
-	taskService HandlerTaskService,
+func NewCommentHandler(e *echo.Echo, userService user.HandlerUserService,
+	commentService HandlerCommentService,
 	securityService security.HandlerSecurity) {
 	handler := Handler{
 		userService:     userService,
-		taskService:     taskService,
+		commentService:  commentService,
 		securityService: securityService,
 	}
-	e.GET("/tasks/:id", handler.Get)
-	e.GET("/tasks", handler.Fetch)
-	e.POST("/tasks", handler.Post)
-	e.PUT("/tasks/:id", handler.Put)
-	e.DELETE("/tasks/:id", handler.Delete)
+	e.GET("/comments/:id", handler.Get)
+	e.GET("/comments", handler.Fetch)
+	e.POST("/comments", handler.Post)
+	e.PUT("/comments/:id", handler.Put)
+	e.DELETE("/comments/:id", handler.Delete)
 }
 
 func (h Handler) Get(ctx echo.Context) error {
-	data, err := h.taskService.FindTaskByID(customType.StringUUID(ctx.Param("id")))
+	data, err := h.commentService.FindCommentByID(customType.StringUUID(ctx.Param("id")))
 	if err != nil {
 		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "GetTaskById error", http.StatusBadRequest, err)
+		errorsLib.ErrorHandler(ctx.Response(), "GetCommentById error", http.StatusBadRequest, err)
 		return err
 	}
 	return ctx.JSON(http.StatusOK, data)
@@ -45,13 +45,13 @@ func (h Handler) Get(ctx echo.Context) error {
 
 func (h Handler) Fetch(ctx echo.Context) error {
 	params := utils.ParseRequestParams(*ctx.Request().URL)
-	tasks, err := h.taskService.FetchTasks(params.Limit, params.Offset)
+	comments, err := h.commentService.FetchComments(params.Limit, params.Offset)
 	if err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "Fetch error ", http.StatusBadRequest, err)
 		ctx.Logger().Error(err)
 		return err
 	}
-	return ctx.JSON(http.StatusOK, tasks)
+	return ctx.JSON(http.StatusOK, comments)
 }
 
 func (h Handler) Post(ctx echo.Context) error {
@@ -61,7 +61,7 @@ func (h Handler) Post(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
 		return err
 	}
-	responseData, err := h.taskService.CreateTask(body)
+	responseData, err := h.commentService.CreateComment(body)
 	if err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "Create error", http.StatusInternalServerError, err)
 		ctx.Logger().Error(err)
@@ -77,19 +77,19 @@ func (h Handler) Put(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
 		return err
 	}
-	task, err := h.taskService.UpdateTask(body, customType.StringUUID(ctx.Param("id")))
+	comment, err := h.commentService.UpdateComment(body, customType.StringUUID(ctx.Param("id")))
 	if err != nil {
 		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "Update task error", http.StatusInternalServerError, err)
+		errorsLib.ErrorHandler(ctx.Response(), "Update comment error", http.StatusInternalServerError, err)
 		return err
 	}
-	return ctx.JSON(http.StatusOK, task)
+	return ctx.JSON(http.StatusOK, comment)
 }
 
 func (h Handler) Delete(ctx echo.Context) error {
-	if err := h.taskService.DeleteTask(customType.StringUUID(ctx.Param("id"))); err != nil {
+	if err := h.commentService.DeleteComment(customType.StringUUID(ctx.Param("id"))); err != nil {
 		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "Delete task error", http.StatusInternalServerError, err)
+		errorsLib.ErrorHandler(ctx.Response(), "Delete comment error", http.StatusInternalServerError, err)
 		return err
 	}
 	return nil

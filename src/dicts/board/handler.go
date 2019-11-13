@@ -5,7 +5,9 @@ import (
 	"2019_2_Shtoby_shto/src/dicts/boardUsers"
 	"2019_2_Shtoby_shto/src/dicts/card"
 	"2019_2_Shtoby_shto/src/dicts/cardGroup"
-	"2019_2_Shtoby_shto/src/dicts/task"
+	"2019_2_Shtoby_shto/src/dicts/cardTags"
+	"2019_2_Shtoby_shto/src/dicts/comment"
+	"2019_2_Shtoby_shto/src/dicts/tag"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	errorsLib "2019_2_Shtoby_shto/src/errors"
 	"2019_2_Shtoby_shto/src/handle"
@@ -21,7 +23,9 @@ type Handler struct {
 	boardService      HandlerBoardService
 	cardService       card.HandlerCardService
 	cardGroupService  cardGroup.HandlerCardGroupService
-	taskService       task.HandlerTaskService
+	tagService        tag.HandlerTagService
+	cardTagsService   cardTags.HandlerCardTagsService
+	commentService    comment.HandlerCommentService
 	boardUsersService boardUsers.HandlerBoardUsersService
 	securityService   security.HandlerSecurity
 	handle.HandlerImpl
@@ -32,7 +36,9 @@ func NewBoardHandler(e *echo.Echo, userService user.HandlerUserService,
 	boardUsersService boardUsers.HandlerBoardUsersService,
 	cardService card.HandlerCardService,
 	cardGroupService cardGroup.HandlerCardGroupService,
-	taskService task.HandlerTaskService,
+	tagService tag.HandlerTagService,
+	cardTagService cardTags.HandlerCardTagsService,
+	commentService comment.HandlerCommentService,
 	securityService security.HandlerSecurity) {
 	handler := Handler{
 		userService:       userService,
@@ -40,7 +46,9 @@ func NewBoardHandler(e *echo.Echo, userService user.HandlerUserService,
 		boardUsersService: boardUsersService,
 		cardService:       cardService,
 		cardGroupService:  cardGroupService,
-		taskService:       taskService,
+		tagService:        tagService,
+		cardTagsService:   cardTagService,
+		commentService:    commentService,
 		securityService:   securityService,
 	}
 	e.GET("/board/:id", handler.Get)
@@ -72,13 +80,30 @@ func (h Handler) Get(ctx echo.Context) error {
 			return err
 		}
 		for j, card := range cards {
-			tasks, err := h.taskService.FetchTasksByCardIDs([]string{card.ID.String()})
+			comments, err := h.commentService.FetchCommentsByCardIDs([]string{card.ID.String()})
 			if err != nil {
 				ctx.Logger().Error(err)
 				errorsLib.ErrorHandler(ctx.Response(), "FetchCardsByCardGroupIDs error", http.StatusBadRequest, err)
 				return err
 			}
-			cards[j].Tasks = tasks
+			cards[j].Comments = comments
+			cardTags, err := h.cardTagsService.FindCardTagsByCardID(card.ID.String())
+			if err != nil {
+				ctx.Logger().Error(err)
+				errorsLib.ErrorHandler(ctx.Response(), "FindCardTagsByCardID error", http.StatusBadRequest, err)
+				return err
+			}
+			resultTagIDs := make([]string, 0)
+			for _, ct := range cardTags {
+				resultTagIDs = append(resultTagIDs, ct.TagID.String())
+			}
+			tags, err := h.tagService.FetchTagsByIDs(resultTagIDs)
+			if err != nil {
+				ctx.Logger().Error(err)
+				errorsLib.ErrorHandler(ctx.Response(), "FetchTagsByIDs error", http.StatusBadRequest, err)
+				return err
+			}
+			cards[j].Tags = tags
 		}
 		cardGroups[i].Cards = cards
 	}
