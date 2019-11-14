@@ -41,7 +41,7 @@ func (s service) FindCardUsersByUserID(userData []byte) (cardUsers []models.Card
 	}
 	where := []string{"user_id in (?)"}
 	whereArgs := userIDs.Users
-	_, err = s.db.FetchDict(&cardUsers, "card_users", 10000, 0, where, whereArgs)
+	_, err = s.db.FetchDictBySlice(&cardUsers, "card_users", 10000, 0, where, whereArgs)
 	return cardUsers, err
 }
 
@@ -104,14 +104,16 @@ func (s service) DeleteCardUsers(id customType.StringUUID) error {
 }
 
 func (s service) FetchCardUsers(limit, offset int) (cardUsers []models.CardUsers, err error) {
-	_, err = s.db.FetchDict(&cardUsers, "card_users", limit, offset, nil, nil)
+	cardUser := &models.CardUsers{}
+	_, err = s.db.FetchDict(&cardUsers, cardUser, limit, offset)
 	return cardUsers, err
 }
 
 func (s service) FetchCardUsersByCardID(cardID customType.StringUUID) (cardUsers []models.CardUsers, err error) {
-	where := []string{"card_id = ?"}
-	whereArgs := []string{cardID.String()}
-	_, err = s.db.FetchDict(&cardUsers, "card_users", 10000, 0, where, whereArgs)
+	cardUser := &models.CardUsers{
+		CardID: cardID,
+	}
+	_, err = s.db.FetchDict(&cardUsers, cardUser, 10000, 0)
 	return cardUsers, err
 }
 

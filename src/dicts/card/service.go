@@ -76,21 +76,22 @@ func (s service) DeleteCard(id customType.StringUUID) error {
 }
 
 func (s service) FetchCards(limit, offset int) (cards []models.Card, err error) {
-	_, err = s.db.FetchDict(&cards, "cards", limit, offset, nil, nil)
+	cardModel := &models.Card{}
+	_, err = s.db.FetchDict(&cards, cardModel, limit, offset)
 	return cards, err
 }
 
 func (s service) FetchCardsByIDs(ids []string) (cards []models.Card, err error) {
 	where := []string{"id in (?)"}
 	whereArgs := ids
-	_, err = s.db.FetchDict(&cards, "cards", 10000, 0, where, whereArgs)
+	_, err = s.db.FetchDictBySlice(&cards, "cards", 10000, 0, where, whereArgs)
 	return cards, err
 }
 
 func (s service) FetchCardsByCardGroupIDs(cardGroupIDs []string) (cards []models.Card, err error) {
 	where := []string{"card_group_id in(?)"}
 	whereArgs := cardGroupIDs
-	_, err = s.db.FetchDict(&cards, "cards", 10000, 0, where, whereArgs)
+	_, err = s.db.FetchDictBySlice(&cards, "cards", 10000, 0, where, whereArgs)
 	return cards, err
 }
 

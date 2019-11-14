@@ -81,15 +81,17 @@ func (s service) DeleteBoardUsers(id customType.StringUUID) error {
 }
 
 func (s service) FetchBoardUsersByUserID(userID customType.StringUUID) (boardUsers []models.BoardUsers, err error) {
-	where := []string{"user_id = ?"}
-	whereArgs := []string{userID.String()}
-	_, err = s.db.FetchDict(&boardUsers, "board_users", 10000, 0, where, whereArgs)
+	boardUserModel := &models.BoardUsers{
+		UserID: userID,
+	}
+	_, err = s.db.FetchDict(&boardUsers, boardUserModel, 10000, 0)
 	return boardUsers, err
 }
 
 func (s service) FetchBoardUsersByBoardID(boardID customType.StringUUID) (boardUsers []models.BoardUsers, err error) {
-	where := []string{"board_id = ?"}
-	whereArgs := []string{boardID.String()}
-	_, err = s.db.FetchDict(&boardUsers, "board_users", 10000, 0, where, whereArgs)
+	boardUserModel := &models.BoardUsers{
+		BoardID: boardID,
+	}
+	_, err = s.db.FetchDict(&boardUsers, boardUserModel, 10000, 0)
 	return boardUsers, err
 }

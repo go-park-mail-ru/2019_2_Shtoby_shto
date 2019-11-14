@@ -126,6 +126,7 @@ func (s *service) UpdateUser(data []byte, id StringUUID) error {
 }
 
 func (s service) FetchUsers(limit, offset int) (users []models.User, err error) {
-	_, err = s.db.FetchDict(&users, "users", limit, offset, nil, nil)
+	userModel := &models.User{}
+	_, err = s.db.FetchDict(&users, userModel, limit, offset)
 	return users, err
 }

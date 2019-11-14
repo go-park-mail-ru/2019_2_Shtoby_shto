@@ -74,13 +74,14 @@ func (s service) DeleteCardGroup(id customType.StringUUID) error {
 }
 
 func (s service) FetchCardGroup(limit, offset int) (cardGroup []models.CardGroup, err error) {
-	_, err = s.db.FetchDict(&cardGroup, "card_groups", limit, offset, nil, nil)
+	cardModel := &models.CardGroup{}
+	_, err = s.db.FetchDict(&cardGroup, cardModel, limit, offset)
 	return cardGroup, err
 }
 
 func (s service) FetchCardGroupsByBoardIDs(boardID []string) (cardGroups []models.CardGroup, err error) {
 	where := []string{"board_id in(?)"}
 	whereArgs := boardID
-	_, err = s.db.FetchDict(&cardGroups, "card_groups", 10000, 0, where, whereArgs)
+	_, err = s.db.FetchDictBySlice(&cardGroups, "card_groups", 10000, 0, where, whereArgs)
 	return cardGroups, err
 }

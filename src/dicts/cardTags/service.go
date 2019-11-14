@@ -11,7 +11,8 @@ import (
 
 type HandlerCardTagsService interface {
 	FindCardTagsByID(id customType.StringUUID) (*models.CardTags, error)
-	FindCardTagsByCardID(cardID string) (cardTags []models.CardTags, err error)
+	FindCardTagsByCardID(cardID customType.StringUUID) (cardTags []models.CardTags, err error)
+	FetchCardTags(limit, offset int) (cardTags []models.CardTags, err error)
 	CreateCardTags(tagID, сardID customType.StringUUID) (*models.CardTags, error)
 	UpdateCardTags(tagID, сardID customType.StringUUID, id customType.StringUUID) (*models.CardTags, error)
 	DeleteCardTags(id customType.StringUUID) error
@@ -28,10 +29,11 @@ func CreateInstance(db database.IDataManager) HandlerCardTagsService {
 	}
 }
 
-func (s service) FindCardTagsByCardID(cardID string) (cardTags []models.CardTags, err error) {
-	where := []string{"card_id in (?)"}
-	whereArgs := []string{cardID}
-	_, err = s.db.FetchDict(&cardTags, "card_tags", 10000, 0, where, whereArgs)
+func (s service) FindCardTagsByCardID(cardID customType.StringUUID) (cardTags []models.CardTags, err error) {
+	cardTag := &models.CardTags{
+		CardID: cardID,
+	}
+	_, err = s.db.FetchDict(&cardTags, cardTag, 10000, 0)
 	return cardTags, err
 }
 
@@ -82,6 +84,7 @@ func (s service) DeleteCardTags(id customType.StringUUID) error {
 }
 
 func (s service) FetchCardTags(limit, offset int) (cardTags []models.CardTags, err error) {
-	_, err = s.db.FetchDict(&cardTags, "card_tags", limit, offset, nil, nil)
+	cardTag := &models.CardTags{}
+	_, err = s.db.FetchDict(&cardTags, cardTag, limit, offset)
 	return cardTags, err
 }

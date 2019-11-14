@@ -61,14 +61,14 @@ func (h Handler) Get(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "FindCardByID error", http.StatusBadRequest, err)
 		return err
 	}
-	comments, err := h.commentService.FetchCommentsByCardIDs([]string{card.ID.String()})
+	comments, err := h.commentService.FetchCommentsByCardID(card.ID.String())
 	if err != nil {
 		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "FetchCommentsByCardIDs error", http.StatusBadRequest, err)
+		errorsLib.ErrorHandler(ctx.Response(), "FetchCommentsByCardID error", http.StatusBadRequest, err)
 		return err
 	}
 	card.Comments = comments
-	cardTags, err := h.cardTagsService.FindCardTagsByCardID(card.ID.String())
+	cardTags, err := h.cardTagsService.FindCardTagsByCardID(card.ID)
 	if err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "FindCardTagsByCardID error", http.StatusBadRequest, err)
@@ -103,13 +103,13 @@ func (h Handler) Fetch(ctx echo.Context) error {
 		return err
 	}
 	for i, card := range cards {
-		comments, err := h.commentService.FetchCommentsByCardIDs([]string{card.ID.String()})
+		comments, err := h.commentService.FetchCommentsByCardID(card.ID.String())
 		if err != nil {
 			ctx.Logger().Error(err)
 			errorsLib.ErrorHandler(ctx.Response(), "GetCardById error", http.StatusBadRequest, err)
 			return err
 		}
-		cardTags, err := h.cardTagsService.FindCardTagsByCardID(card.ID.String())
+		cardTags, err := h.cardTagsService.FindCardTagsByCardID(card.ID)
 		if err != nil {
 			ctx.Logger().Error(err)
 			errorsLib.ErrorHandler(ctx.Response(), "FindCardTagsByCardID error", http.StatusBadRequest, err)

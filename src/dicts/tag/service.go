@@ -73,13 +73,14 @@ func (s service) DeleteTag(id customType.StringUUID) error {
 }
 
 func (s service) FetchTags(limit, offset int) (tags []models.Tag, err error) {
-	_, err = s.db.FetchDict(&tags, "tags", limit, offset, nil, nil)
+	tag := &models.Tag{}
+	_, err = s.db.FetchDict(&tags, tag, limit, offset)
 	return tags, err
 }
 
 func (s service) FetchTagsByIDs(tagIDs []string) (tags []models.Tag, err error) {
 	where := []string{"id in(?)"}
 	whereArgs := tagIDs
-	_, err = s.db.FetchDict(&tags, "tags", 10000, 0, where, whereArgs)
+	_, err = s.db.FetchDictBySlice(&tags, "tags", 10000, 0, where, whereArgs)
 	return tags, err
 }

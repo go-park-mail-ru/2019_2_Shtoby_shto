@@ -76,12 +76,13 @@ func (s service) DeleteBoard(id customType.StringUUID) error {
 }
 
 func (s service) FetchBoards(limit, offset int) (boards []models.Board, err error) {
-	_, err = s.db.FetchDict(&boards, "boards", limit, offset, nil, nil)
+	boardModel := &models.Board{}
+	_, err = s.db.FetchDict(&boards, boardModel, limit, offset)
 	return boards, err
 }
 
 func (s service) FetchBoardsByIDs(boardsIDs []string) (boards []models.Board, err error) {
 	where := []string{"id in(?)"}
-	_, err = s.db.FetchDict(&boards, "boards", 10000, 0, where, boardsIDs)
+	_, err = s.db.FetchDictBySlice(&boards, "boards", 10000, 0, where, boardsIDs)
 	return boards, err
 }

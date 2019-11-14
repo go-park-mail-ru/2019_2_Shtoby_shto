@@ -11,7 +11,7 @@ import (
 
 type HandlerCommentService interface {
 	FindCommentByID(id customType.StringUUID) (*models.Comment, error)
-	FetchCommentsByCardIDs(cardIDs []string) (comments []models.Comment, err error)
+	FetchCommentsByCardID(cardID string) (comments []models.Comment, err error)
 	CreateComment(data []byte) (*models.Comment, error)
 	UpdateComment(data []byte, id customType.StringUUID) (*models.Comment, error)
 	DeleteComment(id customType.StringUUID) error
@@ -73,13 +73,15 @@ func (s service) DeleteComment(id customType.StringUUID) error {
 }
 
 func (s service) FetchComments(limit, offset int) (comments []models.Comment, err error) {
-	_, err = s.db.FetchDict(&comments, "comments", limit, offset, nil, nil)
+	comment := &models.Comment{}
+	_, err = s.db.FetchDict(&comments, comment, limit, offset)
 	return comments, err
 }
 
-func (s service) FetchCommentsByCardIDs(cardIDs []string) (comments []models.Comment, err error) {
-	where := []string{"card_id = ?"}
-	whereArgs := cardIDs
-	_, err = s.db.FetchDict(&comments, "comments", 10000, 0, where, whereArgs)
+func (s service) FetchCommentsByCardID(cardID string) (comments []models.Comment, err error) {
+	comment := &models.Comment{
+		CardID: cardID,
+	}
+	_, err = s.db.FetchDict(&comments, comment, 10000, 0)
 	return comments, err
 }
