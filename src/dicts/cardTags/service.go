@@ -59,19 +59,26 @@ func (s service) CreateCardTags(tagID, сardID customType.StringUUID) (*models.C
 
 func (s service) UpdateCardTags(tagID, сardID customType.StringUUID, id customType.StringUUID) (*models.CardTags, error) {
 	cardTags := &models.CardTags{
+		BaseInfo: dicts.BaseInfo{
+			ID: id,
+		},
 		TagID:  tagID,
 		CardID: сardID,
 	}
 	//if !cardTags.IsValid() {
 	//	return nil, errors.New("Board body is not valid")
 	//}
-	err := s.db.UpdateRecord(cardTags, id)
+	err := s.db.UpdateRecord(cardTags)
 	return cardTags, err
 }
 
 func (s service) DeleteCardTags(id customType.StringUUID) error {
-	cardTags := models.CardTags{}
-	return s.db.DeleteRecord(cardTags, id)
+	cardTags := &models.CardTags{
+		BaseInfo: dicts.BaseInfo{
+			ID: id,
+		},
+	}
+	return s.db.DeleteRecord(cardTags)
 }
 
 func (s service) FetchCardTags(limit, offset int) (cardTags []models.CardTags, err error) {

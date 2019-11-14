@@ -56,16 +56,21 @@ func (s service) UpdateCardGroup(data []byte, id customType.StringUUID) (*models
 	if err := card.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
+	card.ID = id
 	//if !card.IsValid() {
 	//	return nil, errors.New("CardGroup body is not valid")
 	//}
-	err := s.db.UpdateRecord(card, id)
+	err := s.db.UpdateRecord(card)
 	return card, err
 }
 
 func (s service) DeleteCardGroup(id customType.StringUUID) error {
-	card := models.CardGroup{}
-	return s.db.DeleteRecord(&card, id)
+	card := &models.CardGroup{
+		BaseInfo: dicts.BaseInfo{
+			ID: id,
+		},
+	}
+	return s.db.DeleteRecord(card)
 }
 
 func (s service) FetchCardGroup(limit, offset int) (cardGroup []models.CardGroup, err error) {

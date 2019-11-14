@@ -58,16 +58,21 @@ func (s service) UpdateCard(data []byte, id customType.StringUUID) (*models.Card
 	if err := card.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
+	card.ID = id
 	//if !card.IsValid() {
 	//	return nil, errors.New("Card body is not valid")
 	//}
-	err := s.db.UpdateRecord(card, id)
+	err := s.db.UpdateRecord(card)
 	return card, err
 }
 
 func (s service) DeleteCard(id customType.StringUUID) error {
-	card := models.Card{}
-	return s.db.DeleteRecord(&card, id)
+	card := &models.Card{
+		BaseInfo: dicts.BaseInfo{
+			ID: id,
+		},
+	}
+	return s.db.DeleteRecord(card)
 }
 
 func (s service) FetchCards(limit, offset int) (cards []models.Card, err error) {

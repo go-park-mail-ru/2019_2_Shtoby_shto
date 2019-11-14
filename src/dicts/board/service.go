@@ -58,16 +58,21 @@ func (s service) UpdateBoard(data []byte, id customType.StringUUID) (*models.Boa
 	if err := board.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
+	board.ID = id
 	//if !board.IsValid() {
 	//	return nil, errors.New("Board body is not valid")
 	//}
-	err := s.db.UpdateRecord(board, id)
+	err := s.db.UpdateRecord(board)
 	return board, err
 }
 
 func (s service) DeleteBoard(id customType.StringUUID) error {
-	board := &models.Board{}
-	return s.db.DeleteRecord(board, id)
+	board := &models.Board{
+		BaseInfo: dicts.BaseInfo{
+			ID: id,
+		},
+	}
+	return s.db.DeleteRecord(board)
 }
 
 func (s service) FetchBoards(limit, offset int) (boards []models.Board, err error) {

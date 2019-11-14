@@ -18,10 +18,9 @@ type IDataManager interface {
 	ExecuteQuery(sql string, args ...string) error
 	FindDictById(p interface{}) error
 	FindDictByColumn(p interface{}) (int, error)
-	FindCountDictByColumn(p interface{}) (int, error)
 	CreateRecord(p interface{}) error
-	UpdateRecord(p interface{}, id customType.StringUUID) error
-	DeleteRecord(p interface{}, id customType.StringUUID) error
+	UpdateRecord(p interface{}) error
+	DeleteRecord(p interface{}) error
 	FetchDict(data interface{}, table string, limit, offset int, where, whereArg []string) (int, error)
 }
 
@@ -67,23 +66,13 @@ func (d DataManager) FindDictById(p interface{}) error {
 func (d DataManager) FindDictByColumn(p interface{}) (int, error) {
 	count := 0
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
-	res := d.db.Table(obj.GetTableName()).Where(p).First(p)
+	res := d.db.Table(obj.GetTableName()).Where(p).First(p).Count(&count)
 	if res.Error != nil {
 		log.Println(res)
 		return 0, res.Error
 	}
 	if res.RecordNotFound() {
 		return 0, nil
-	}
-	return count, nil
-}
-
-func (d DataManager) FindCountDictByColumn(p interface{}) (int, error) {
-	count := 0
-	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
-	res := d.db.Table(obj.GetTableName()).Where(p).Count(&count)
-	if res.Error != nil {
-		return 0, res.Error
 	}
 	return count, nil
 }
@@ -118,9 +107,8 @@ func (d DataManager) CreateRecord(p interface{}) error {
 	return nil
 }
 
-func (d DataManager) UpdateRecord(p interface{}, id customType.StringUUID) error {
+func (d DataManager) UpdateRecord(p interface{}) error {
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
-	obj.SetId(id)
 	res := d.db.Model(obj).UpdateColumns(p)
 	if res.Error != nil {
 		return res.Error
@@ -128,9 +116,9 @@ func (d DataManager) UpdateRecord(p interface{}, id customType.StringUUID) error
 	return nil
 }
 
-func (d DataManager) DeleteRecord(p interface{}, id customType.StringUUID) error {
+func (d DataManager) DeleteRecord(p interface{}) error {
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
-	res := d.db.Table(obj.GetTableName()).Delete(p, "id = ?", id)
+	res := d.db.Table(obj.GetTableName()).Delete(p)
 	if res.Error != nil {
 		return res.Error
 	}

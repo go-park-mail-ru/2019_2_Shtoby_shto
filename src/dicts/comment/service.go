@@ -57,14 +57,19 @@ func (s service) UpdateComment(data []byte, id customType.StringUUID) (*models.C
 	if err := comment.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
+	comment.ID = id
 	comment.Text = s.sanitizer.Sanitize(comment.Text)
-	err := s.db.UpdateRecord(comment, id)
+	err := s.db.UpdateRecord(comment)
 	return comment, err
 }
 
 func (s service) DeleteComment(id customType.StringUUID) error {
-	comment := models.Comment{}
-	return s.db.DeleteRecord(&comment, id)
+	comment := &models.Comment{
+		BaseInfo: dicts.BaseInfo{
+			ID: id,
+		},
+	}
+	return s.db.DeleteRecord(comment)
 }
 
 func (s service) FetchComments(limit, offset int) (comments []models.Comment, err error) {

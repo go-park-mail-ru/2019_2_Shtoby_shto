@@ -57,14 +57,19 @@ func (s service) UpdateTag(data []byte, id customType.StringUUID) (*models.Tag, 
 	if err := tag.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
+	tag.ID = id
 	tag.Text = s.sanitizer.Sanitize(tag.Text)
-	err := s.db.UpdateRecord(tag, id)
+	err := s.db.UpdateRecord(tag)
 	return tag, err
 }
 
 func (s service) DeleteTag(id customType.StringUUID) error {
-	tag := models.Tag{}
-	return s.db.DeleteRecord(&tag, id)
+	tag := &models.Tag{
+		BaseInfo: dicts.BaseInfo{
+			ID: id,
+		},
+	}
+	return s.db.DeleteRecord(tag)
 }
 
 func (s service) FetchTags(limit, offset int) (tags []models.Tag, err error) {

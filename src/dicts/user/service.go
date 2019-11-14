@@ -109,6 +109,7 @@ func (s *service) UpdateUser(data []byte, id StringUUID) error {
 	if err := user.UnmarshalJSON(data); err != nil {
 		return err
 	}
+	user.ID = id
 	//if !user.IsValid() {
 	//	return errors.New("User not valid!")
 	//}
@@ -118,7 +119,7 @@ func (s *service) UpdateUser(data []byte, id StringUUID) error {
 			return err
 		}
 	}
-	if err := s.db.UpdateRecord(user, id); err != nil {
+	if err := s.db.UpdateRecord(user); err != nil {
 		return err
 	}
 	return nil

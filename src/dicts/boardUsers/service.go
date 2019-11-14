@@ -34,7 +34,7 @@ func (s service) FindBoardUsersByIDs(userID, boardID customType.StringUUID) (int
 		BoardID: boardID,
 		UserID:  userID,
 	}
-	count, err := s.db.FindCountDictByColumn(boardUsers)
+	count, err := s.db.FindDictByColumn(boardUsers)
 	if count == 0 {
 		return count, nil
 	}
@@ -58,19 +58,26 @@ func (s service) CreateBoardUsers(boardUsersID, userID, boardID customType.Strin
 
 func (s service) UpdateBoardUsers(userID, boardID customType.StringUUID, id customType.StringUUID) (*models.BoardUsers, error) {
 	boardUsers := &models.BoardUsers{
+		BaseInfo: dicts.BaseInfo{
+			ID: id,
+		},
 		UserID:  userID,
 		BoardID: boardID,
 	}
 	//if !boardUsers.IsValid() {
 	//	return nil, errors.New("Board body is not valid")
 	//}
-	err := s.db.UpdateRecord(boardUsers, id)
+	err := s.db.UpdateRecord(boardUsers)
 	return boardUsers, err
 }
 
 func (s service) DeleteBoardUsers(id customType.StringUUID) error {
-	boardUsers := models.BoardUsers{}
-	return s.db.DeleteRecord(boardUsers, id)
+	boardUsers := &models.BoardUsers{
+		BaseInfo: dicts.BaseInfo{
+			ID: id,
+		},
+	}
+	return s.db.DeleteRecord(boardUsers)
 }
 
 func (s service) FetchBoardUsersByUserID(userID customType.StringUUID) (boardUsers []models.BoardUsers, err error) {
