@@ -16,6 +16,7 @@ type Card struct {
 	CardGroupID customType.StringUUID `json:"card_group_id"`
 	Comments    []Comment             `json:"comments" sql:"-"`
 	Tags        []Tag                 `json:"tags" sql:"-"`
+	Users       []string              `json:"users" sql:"-"`
 }
 
 func (b Card) GetTableName() string {

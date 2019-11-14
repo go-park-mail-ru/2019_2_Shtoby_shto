@@ -155,7 +155,7 @@ func initService(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	securityService = security.CreateInstance(sessionService)
 	user.NewUserHandler(e, userService, boardUsersService, cardUsersService, securityService)
 	photo.NewPhotoHandler(e, photoService, userService, securityService)
-	board.NewBoardHandler(e, userService, boardService, boardUsersService, cardService, cardGroupService, tagService, cardTagsService, commentService, securityService)
+	board.NewBoardHandler(e, userService, boardService, boardUsersService, cardService, cardUsersService, cardGroupService, tagService, cardTagsService, commentService, securityService)
 	card.NewCardHandler(e, userService, cardService, cardUsersService, tagService, cardTagsService, commentService, securityService)
 	cardGroup.NewCardGroupHandler(e, cardGroupService, securityService)
 	comment.NewCommentHandler(e, userService, commentService, securityService)

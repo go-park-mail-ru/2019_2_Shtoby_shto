@@ -6,6 +6,7 @@ import (
 	"2019_2_Shtoby_shto/src/dicts/card"
 	"2019_2_Shtoby_shto/src/dicts/cardGroup"
 	"2019_2_Shtoby_shto/src/dicts/cardTags"
+	сardUsers "2019_2_Shtoby_shto/src/dicts/cardUsers"
 	"2019_2_Shtoby_shto/src/dicts/comment"
 	"2019_2_Shtoby_shto/src/dicts/tag"
 	"2019_2_Shtoby_shto/src/dicts/user"
@@ -22,6 +23,7 @@ type Handler struct {
 	userService       user.HandlerUserService
 	boardService      HandlerBoardService
 	cardService       card.HandlerCardService
+	cardUsersService  сardUsers.HandlerCardUsersService
 	cardGroupService  cardGroup.HandlerCardGroupService
 	tagService        tag.HandlerTagService
 	cardTagsService   cardTags.HandlerCardTagsService
@@ -35,6 +37,7 @@ func NewBoardHandler(e *echo.Echo, userService user.HandlerUserService,
 	boardService HandlerBoardService,
 	boardUsersService boardUsers.HandlerBoardUsersService,
 	cardService card.HandlerCardService,
+	cardUsersService сardUsers.HandlerCardUsersService,
 	cardGroupService cardGroup.HandlerCardGroupService,
 	tagService tag.HandlerTagService,
 	cardTagService cardTags.HandlerCardTagsService,
@@ -45,6 +48,7 @@ func NewBoardHandler(e *echo.Echo, userService user.HandlerUserService,
 		boardService:      boardService,
 		boardUsersService: boardUsersService,
 		cardService:       cardService,
+		cardUsersService:  cardUsersService,
 		cardGroupService:  cardGroupService,
 		tagService:        tagService,
 		cardTagsService:   cardTagService,
@@ -104,6 +108,12 @@ func (h Handler) Get(ctx echo.Context) error {
 				return err
 			}
 			cards[j].Tags = tags
+			cUsers, err := h.cardUsersService.FetchCardUsersByCardID(cards[j].ID)
+			usersResult := make([]string, 0)
+			for _, value := range cUsers {
+				usersResult = append(usersResult, value.UserID.String())
+			}
+			cards[j].Users = usersResult
 		}
 		cardGroups[i].Cards = cards
 	}

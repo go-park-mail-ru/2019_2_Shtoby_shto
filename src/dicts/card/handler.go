@@ -83,6 +83,12 @@ func (h Handler) Get(ctx echo.Context) error {
 		return err
 	}
 	card.Tags = tags
+	cUsers, err := h.cardUsersService.FetchCardUsersByCardID(card.ID)
+	usersResult := make([]string, 0)
+	for _, value := range cUsers {
+		usersResult = append(usersResult, value.UserID.String())
+	}
+	card.Users = usersResult
 	return ctx.JSON(http.StatusOK, card)
 }
 
@@ -119,6 +125,12 @@ func (h Handler) Fetch(ctx echo.Context) error {
 		}
 		cards[i].Comments = comments
 		cards[i].Tags = tags
+		cUsers, err := h.cardUsersService.FetchCardUsersByCardID(cards[i].ID)
+		usersResult := make([]string, 0)
+		for _, value := range cUsers {
+			usersResult = append(usersResult, value.UserID.String())
+		}
+		cards[i].Users = usersResult
 	}
 
 	return ctx.JSON(http.StatusOK, cards)

@@ -15,6 +15,7 @@ type HandlerCardUsersService interface {
 	CreateCardUsers(userID, сardID customType.StringUUID) (*models.CardUsers, error)
 	UpdateCardUsers(userID, сardID customType.StringUUID, id customType.StringUUID) (*models.CardUsers, error)
 	DeleteCardUsers(id customType.StringUUID) error
+	FetchCardUsersByCardID(cardID customType.StringUUID) (cardUsers []models.CardUsers, err error)
 }
 
 type service struct {
@@ -83,5 +84,12 @@ func (s service) DeleteCardUsers(id customType.StringUUID) error {
 
 func (s service) FetchCardUsers(limit, offset int) (cardUsers []models.CardUsers, err error) {
 	_, err = s.db.FetchDict(&cardUsers, "card_users", limit, offset, nil, nil)
+	return cardUsers, err
+}
+
+func (s service) FetchCardUsersByCardID(cardID customType.StringUUID) (cardUsers []models.CardUsers, err error) {
+	where := []string{"card_id = ?"}
+	whereArgs := []string{cardID.String()}
+	_, err = s.db.FetchDict(&cardUsers, "card_users", 10000, 0, where, whereArgs)
 	return cardUsers, err
 }

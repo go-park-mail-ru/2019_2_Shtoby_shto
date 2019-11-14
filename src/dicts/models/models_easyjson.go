@@ -1079,6 +1079,29 @@ func easyjsonD2b7633eDecode20192ShtobyShtoSrcDictsModels11(in *jlexer.Lexer, out
 				}
 				in.Delim(']')
 			}
+		case "users":
+			if in.IsNull() {
+				in.Skip()
+				out.Users = nil
+			} else {
+				in.Delim('[')
+				if out.Users == nil {
+					if !in.IsDelim(']') {
+						out.Users = make([]string, 0, 4)
+					} else {
+						out.Users = []string{}
+					}
+				} else {
+					out.Users = (out.Users)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v15 string
+					v15 = string(in.String())
+					out.Users = append(out.Users, v15)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
 		case "id":
 			out.ID = customType.StringUUID(in.String())
 		default:
@@ -1117,11 +1140,11 @@ func easyjsonD2b7633eEncode20192ShtobyShtoSrcDictsModels11(out *jwriter.Writer, 
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v15, v16 := range in.Comments {
-				if v15 > 0 {
+			for v16, v17 := range in.Comments {
+				if v16 > 0 {
 					out.RawByte(',')
 				}
-				(v16).MarshalEasyJSON(out)
+				(v17).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -1133,11 +1156,27 @@ func easyjsonD2b7633eEncode20192ShtobyShtoSrcDictsModels11(out *jwriter.Writer, 
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v17, v18 := range in.Tags {
-				if v17 > 0 {
+			for v18, v19 := range in.Tags {
+				if v18 > 0 {
 					out.RawByte(',')
 				}
-				(v18).MarshalEasyJSON(out)
+				(v19).MarshalEasyJSON(out)
+			}
+			out.RawByte(']')
+		}
+	}
+	{
+		const prefix string = ",\"users\":"
+		out.RawString(prefix)
+		if in.Users == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+			out.RawString("null")
+		} else {
+			out.RawByte('[')
+			for v20, v21 := range in.Users {
+				if v20 > 0 {
+					out.RawByte(',')
+				}
+				out.String(string(v21))
 			}
 			out.RawByte(']')
 		}
@@ -1290,9 +1329,9 @@ func easyjsonD2b7633eDecode20192ShtobyShtoSrcDictsModels13(in *jlexer.Lexer, out
 					out.Users = (out.Users)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v19 string
-					v19 = string(in.String())
-					out.Users = append(out.Users, v19)
+					var v22 string
+					v22 = string(in.String())
+					out.Users = append(out.Users, v22)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -1313,9 +1352,9 @@ func easyjsonD2b7633eDecode20192ShtobyShtoSrcDictsModels13(in *jlexer.Lexer, out
 					out.CardGroups = (out.CardGroups)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v20 CardGroup
-					(v20).UnmarshalEasyJSON(in)
-					out.CardGroups = append(out.CardGroups, v20)
+					var v23 CardGroup
+					(v23).UnmarshalEasyJSON(in)
+					out.CardGroups = append(out.CardGroups, v23)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -1348,11 +1387,11 @@ func easyjsonD2b7633eEncode20192ShtobyShtoSrcDictsModels13(out *jwriter.Writer, 
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v21, v22 := range in.Users {
-				if v21 > 0 {
+			for v24, v25 := range in.Users {
+				if v24 > 0 {
 					out.RawByte(',')
 				}
-				out.String(string(v22))
+				out.String(string(v25))
 			}
 			out.RawByte(']')
 		}
@@ -1364,11 +1403,11 @@ func easyjsonD2b7633eEncode20192ShtobyShtoSrcDictsModels13(out *jwriter.Writer, 
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v23, v24 := range in.CardGroups {
-				if v23 > 0 {
+			for v26, v27 := range in.CardGroups {
+				if v26 > 0 {
 					out.RawByte(',')
 				}
-				(v24).MarshalEasyJSON(out)
+				(v27).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
