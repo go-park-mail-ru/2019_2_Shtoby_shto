@@ -1031,8 +1031,6 @@ func easyjsonD2b7633eDecode20192ShtobyShtoSrcDictsModels11(in *jlexer.Lexer, out
 			out.Caption = string(in.String())
 		case "priority":
 			out.Priority = int(in.Int())
-		case "card_user_id":
-			out.CardUserID = customType.StringUUID(in.String())
 		case "card_group_id":
 			out.CardGroupID = customType.StringUUID(in.String())
 		case "comments":
@@ -1106,11 +1104,6 @@ func easyjsonD2b7633eEncode20192ShtobyShtoSrcDictsModels11(out *jwriter.Writer, 
 		const prefix string = ",\"priority\":"
 		out.RawString(prefix)
 		out.Int(int(in.Priority))
-	}
-	{
-		const prefix string = ",\"card_user_id\":"
-		out.RawString(prefix)
-		out.String(string(in.CardUserID))
 	}
 	{
 		const prefix string = ",\"card_group_id\":"
@@ -1281,8 +1274,6 @@ func easyjsonD2b7633eDecode20192ShtobyShtoSrcDictsModels13(in *jlexer.Lexer, out
 		switch key {
 		case "name":
 			out.Name = string(in.String())
-		case "board_users_id":
-			out.BoardUsersID = customType.StringUUID(in.String())
 		case "card_groups":
 			if in.IsNull() {
 				in.Skip()
@@ -1326,11 +1317,6 @@ func easyjsonD2b7633eEncode20192ShtobyShtoSrcDictsModels13(out *jwriter.Writer, 
 		const prefix string = ",\"name\":"
 		out.RawString(prefix[1:])
 		out.String(string(in.Name))
-	}
-	{
-		const prefix string = ",\"board_users_id\":"
-		out.RawString(prefix)
-		out.String(string(in.BoardUsersID))
 	}
 	{
 		const prefix string = ",\"card_groups\":"

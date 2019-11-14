@@ -12,7 +12,7 @@ type Card struct {
 	dicts.BaseInfo
 	Caption     string                `json:"caption"`
 	Priority    int                   `json:"priority"`
-	CardUserID  customType.StringUUID `json:"card_user_id"`
+	CardUserID  customType.StringUUID `json:"-"`
 	CardGroupID customType.StringUUID `json:"card_group_id"`
 	Comments    []Comment             `json:"comments" sql:"-"`
 	Tags        []Tag                 `json:"tags" sql:"-"`
