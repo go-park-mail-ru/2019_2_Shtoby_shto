@@ -122,6 +122,11 @@ func (h Handler) Get(ctx echo.Context) error {
 	}
 	board.CardGroups = cardGroups
 	bUsers, err := h.boardUsersService.FetchBoardUsersByBoardID(board.ID)
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "FetchBoardUsersByBoardID error", http.StatusInternalServerError, err)
+		return err
+	}
 	usersResult := make([]string, 0)
 	for _, value := range bUsers {
 		usersResult = append(usersResult, value.UserID.String())
@@ -138,6 +143,11 @@ func (h Handler) Fetch(ctx echo.Context) error {
 		ctx.Logger().Error(err)
 		return err
 	}
+	if err := h.setBoardUsers(boards); err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "setBoardUsers error", http.StatusInternalServerError, err)
+		return err
+	}
 	return ctx.JSON(http.StatusOK, boards)
 }
 
@@ -150,7 +160,7 @@ func (h Handler) FetchUserBoards(ctx echo.Context) error {
 		return errors.New("get user_id failed")
 	}
 	if curUserID != userID {
-		return errors.New("It is not your data, man")
+		return ctx.String(http.StatusUnauthorized, "It is not your data, man")
 	}
 	if !userID.IsUUID() {
 		return ctx.JSON(http.StatusBadRequest, errors.New("Not valid userID"))
@@ -171,7 +181,27 @@ func (h Handler) FetchUserBoards(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "FetchBoardUsersByUserID error", http.StatusInternalServerError, err)
 		return err
 	}
+	if err := h.setBoardUsers(boards); err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "setBoardUsers error", http.StatusInternalServerError, err)
+		return err
+	}
 	return ctx.JSON(http.StatusOK, boards)
+}
+
+func (h Handler) setBoardUsers(boards []models.Board) error {
+	for i, board := range boards {
+		bUsers, err := h.boardUsersService.FetchBoardUsersByBoardID(board.ID)
+		if err != nil {
+			return err
+		}
+		usersResult := make([]string, 0)
+		for _, value := range bUsers {
+			usersResult = append(usersResult, value.UserID.String())
+		}
+		boards[i].Users = usersResult
+	}
+	return nil
 }
 
 func (h Handler) AttachUserToBoard(ctx echo.Context) error {
