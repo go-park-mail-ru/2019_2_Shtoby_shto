@@ -61,36 +61,11 @@ func (h Handler) Get(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "FindCardByID error", http.StatusBadRequest, err)
 		return err
 	}
-	comments, err := h.commentService.FetchCommentsByCardID(card.ID.String())
-	if err != nil {
+	if err := h.fillCardFields(card); err != nil {
 		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "FetchCommentsByCardID error", http.StatusBadRequest, err)
+		errorsLib.ErrorHandler(ctx.Response(), "fillCardFields error", http.StatusBadRequest, err)
 		return err
 	}
-	card.Comments = comments
-	cardTags, err := h.cardTagsService.FindCardTagsByCardID(card.ID)
-	if err != nil {
-		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "FindCardTagsByCardID error", http.StatusBadRequest, err)
-		return err
-	}
-	resultTagIDs := make([]string, 0)
-	for _, ct := range cardTags {
-		resultTagIDs = append(resultTagIDs, ct.TagID.String())
-	}
-	tags, err := h.tagService.FetchTagsByIDs(resultTagIDs)
-	if err != nil {
-		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "FetchTagsByIDs error", http.StatusBadRequest, err)
-		return err
-	}
-	card.Tags = tags
-	cUsers, err := h.cardUsersService.FetchCardUsersByCardID(card.ID)
-	usersResult := make([]string, 0)
-	for _, value := range cUsers {
-		usersResult = append(usersResult, value.UserID.String())
-	}
-	card.Users = usersResult
 	return ctx.JSON(http.StatusOK, card)
 }
 
@@ -102,10 +77,12 @@ func (h Handler) Fetch(ctx echo.Context) error {
 		ctx.Logger().Error(err)
 		return err
 	}
-	if err := h.fillCardFields(cards); err != nil {
-		errorsLib.ErrorHandler(ctx.Response(), "fillCardFields error ", http.StatusBadRequest, err)
-		ctx.Logger().Error(err)
-		return err
+	for i := range cards {
+		if err := h.fillCardFields(&cards[i]); err != nil {
+			errorsLib.ErrorHandler(ctx.Response(), "fillBoardFields error ", http.StatusBadRequest, err)
+			ctx.Logger().Error(err)
+			return err
+		}
 	}
 	return ctx.JSON(http.StatusOK, cards)
 }
@@ -133,10 +110,12 @@ func (h Handler) FetchUserCards(ctx echo.Context) error {
 		ctx.Logger().Error(err)
 		return err
 	}
-	if err := h.fillCardFields(cards); err != nil {
-		errorsLib.ErrorHandler(ctx.Response(), "fillCardFields error ", http.StatusBadRequest, err)
-		ctx.Logger().Error(err)
-		return err
+	for i := range cards {
+		if err := h.fillCardFields(&cards[i]); err != nil {
+			errorsLib.ErrorHandler(ctx.Response(), "fillBoardFields error ", http.StatusBadRequest, err)
+			ctx.Logger().Error(err)
+			return err
+		}
 	}
 	return ctx.JSON(http.StatusOK, cards)
 }
@@ -247,32 +226,30 @@ func (h Handler) Delete(ctx echo.Context) error {
 	return nil
 }
 
-func (h Handler) fillCardFields(cards []models.Card) error {
-	for i, card := range cards {
-		comments, err := h.commentService.FetchCommentsByCardID(card.ID.String())
-		if err != nil {
-			return err
-		}
-		cardTags, err := h.cardTagsService.FindCardTagsByCardID(card.ID)
-		if err != nil {
-			return err
-		}
-		resultTagIDs := make([]string, 0)
-		for _, ct := range cardTags {
-			resultTagIDs = append(resultTagIDs, ct.TagID.String())
-		}
-		tags, err := h.tagService.FetchTagsByIDs(resultTagIDs)
-		if err != nil {
-			return err
-		}
-		cards[i].Comments = comments
-		cards[i].Tags = tags
-		cUsers, err := h.cardUsersService.FetchCardUsersByCardID(cards[i].ID)
-		usersResult := make([]string, 0)
-		for _, value := range cUsers {
-			usersResult = append(usersResult, value.UserID.String())
-		}
-		cards[i].Users = usersResult
+func (h Handler) fillCardFields(card *models.Card) error {
+	comments, err := h.commentService.FetchCommentsByCardID(card.ID.String())
+	if err != nil {
+		return err
 	}
+	card.Comments = comments
+	cardTags, err := h.cardTagsService.FindCardTagsByCardID(card.ID)
+	if err != nil {
+		return err
+	}
+	resultTagIDs := make([]string, 0)
+	for _, ct := range cardTags {
+		resultTagIDs = append(resultTagIDs, ct.TagID.String())
+	}
+	tags, err := h.tagService.FetchTagsByIDs(resultTagIDs)
+	if err != nil {
+		return err
+	}
+	card.Tags = tags
+	cUsers, err := h.cardUsersService.FetchCardUsersByCardID(card.ID)
+	usersResult := make([]string, 0)
+	for _, value := range cUsers {
+		usersResult = append(usersResult, value.UserID.String())
+	}
+	card.Users = usersResult
 	return nil
 }
