@@ -1274,6 +1274,29 @@ func easyjsonD2b7633eDecode20192ShtobyShtoSrcDictsModels13(in *jlexer.Lexer, out
 		switch key {
 		case "name":
 			out.Name = string(in.String())
+		case "users":
+			if in.IsNull() {
+				in.Skip()
+				out.Users = nil
+			} else {
+				in.Delim('[')
+				if out.Users == nil {
+					if !in.IsDelim(']') {
+						out.Users = make([]string, 0, 4)
+					} else {
+						out.Users = []string{}
+					}
+				} else {
+					out.Users = (out.Users)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v19 string
+					v19 = string(in.String())
+					out.Users = append(out.Users, v19)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
 		case "card_groups":
 			if in.IsNull() {
 				in.Skip()
@@ -1290,9 +1313,9 @@ func easyjsonD2b7633eDecode20192ShtobyShtoSrcDictsModels13(in *jlexer.Lexer, out
 					out.CardGroups = (out.CardGroups)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v19 CardGroup
-					(v19).UnmarshalEasyJSON(in)
-					out.CardGroups = append(out.CardGroups, v19)
+					var v20 CardGroup
+					(v20).UnmarshalEasyJSON(in)
+					out.CardGroups = append(out.CardGroups, v20)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -1319,17 +1342,33 @@ func easyjsonD2b7633eEncode20192ShtobyShtoSrcDictsModels13(out *jwriter.Writer, 
 		out.String(string(in.Name))
 	}
 	{
+		const prefix string = ",\"users\":"
+		out.RawString(prefix)
+		if in.Users == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+			out.RawString("null")
+		} else {
+			out.RawByte('[')
+			for v21, v22 := range in.Users {
+				if v21 > 0 {
+					out.RawByte(',')
+				}
+				out.String(string(v22))
+			}
+			out.RawByte(']')
+		}
+	}
+	{
 		const prefix string = ",\"card_groups\":"
 		out.RawString(prefix)
 		if in.CardGroups == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v20, v21 := range in.CardGroups {
-				if v20 > 0 {
+			for v23, v24 := range in.CardGroups {
+				if v23 > 0 {
 					out.RawByte(',')
 				}
-				(v21).MarshalEasyJSON(out)
+				(v24).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}

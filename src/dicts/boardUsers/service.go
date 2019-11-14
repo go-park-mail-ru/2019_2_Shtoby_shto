@@ -15,6 +15,7 @@ type HandlerBoardUsersService interface {
 	UpdateBoardUsers(userID, boardID customType.StringUUID, id customType.StringUUID) (*models.BoardUsers, error)
 	DeleteBoardUsers(id customType.StringUUID) error
 	FetchBoardUsersByUserID(userID customType.StringUUID) (boardUsers []models.BoardUsers, err error)
+	FetchBoardUsersByBoardID(boardID customType.StringUUID) (boardUsers []models.BoardUsers, err error)
 }
 
 type service struct {
@@ -71,6 +72,13 @@ func (s service) DeleteBoardUsers(id customType.StringUUID) error {
 func (s service) FetchBoardUsersByUserID(userID customType.StringUUID) (boardUsers []models.BoardUsers, err error) {
 	where := []string{"user_id = ?"}
 	whereArgs := []string{userID.String()}
+	_, err = s.db.FetchDict(&boardUsers, "board_users", 10000, 0, where, whereArgs)
+	return boardUsers, err
+}
+
+func (s service) FetchBoardUsersByBoardID(boardID customType.StringUUID) (boardUsers []models.BoardUsers, err error) {
+	where := []string{"board_id = ?"}
+	whereArgs := []string{boardID.String()}
 	_, err = s.db.FetchDict(&boardUsers, "board_users", 10000, 0, where, whereArgs)
 	return boardUsers, err
 }

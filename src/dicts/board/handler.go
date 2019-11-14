@@ -108,18 +108,24 @@ func (h Handler) Get(ctx echo.Context) error {
 		cardGroups[i].Cards = cards
 	}
 	board.CardGroups = cardGroups
+	bUsers, err := h.boardUsersService.FetchBoardUsersByBoardID(board.ID)
+	usersResult := make([]string, 0)
+	for _, value := range bUsers {
+		usersResult = append(usersResult, value.UserID.String())
+	}
+	board.Users = usersResult
 	return ctx.JSON(http.StatusOK, board)
 }
 
 func (h Handler) Fetch(ctx echo.Context) error {
 	params := utils.ParseRequestParams(*ctx.Request().URL)
-	users, err := h.boardService.FetchBoards(params.Limit, params.Offset)
+	boards, err := h.boardService.FetchBoards(params.Limit, params.Offset)
 	if err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "Fetch error ", http.StatusBadRequest, err)
 		ctx.Logger().Error(err)
 		return err
 	}
-	return ctx.JSON(http.StatusOK, users)
+	return ctx.JSON(http.StatusOK, boards)
 }
 
 func (h Handler) FetchUserBoards(ctx echo.Context) error {

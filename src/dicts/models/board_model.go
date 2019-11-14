@@ -11,6 +11,7 @@ const boardTableName = "boards"
 type Board struct {
 	dicts.BaseInfo
 	Name         string                `json:"name"`
+	Users        []string              `json:"users"`
 	BoardUsersID customType.StringUUID `json:"-"`
 	CardGroups   []CardGroup           `json:"card_groups" sql:"-"`
 }
