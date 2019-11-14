@@ -78,6 +78,11 @@ func (h Handler) Get(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "fillBoardFields error", http.StatusInternalServerError, err)
 		return err
 	}
+	if err := h.fillBoardUsers(board); err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "fillBoardUsers error", http.StatusInternalServerError, err)
+		return err
+	}
 	return ctx.JSON(http.StatusOK, board)
 }
 
@@ -90,8 +95,8 @@ func (h Handler) Fetch(ctx echo.Context) error {
 		return err
 	}
 	for i := range boards {
-		if err := h.fillBoardFields(&boards[i]); err != nil {
-			errorsLib.ErrorHandler(ctx.Response(), "fillBoardFields error ", http.StatusBadRequest, err)
+		if err := h.fillBoardUsers(&boards[i]); err != nil {
+			errorsLib.ErrorHandler(ctx.Response(), "fillBoardUsers error ", http.StatusBadRequest, err)
 			ctx.Logger().Error(err)
 			return err
 		}
@@ -130,8 +135,8 @@ func (h Handler) FetchUserBoards(ctx echo.Context) error {
 		return err
 	}
 	for i := range boards {
-		if err := h.fillBoardFields(&boards[i]); err != nil {
-			errorsLib.ErrorHandler(ctx.Response(), "fillBoardFields error ", http.StatusBadRequest, err)
+		if err := h.fillBoardUsers(&boards[i]); err != nil {
+			errorsLib.ErrorHandler(ctx.Response(), "fillBoardUsers error ", http.StatusBadRequest, err)
 			ctx.Logger().Error(err)
 			return err
 		}
@@ -291,6 +296,10 @@ func (h Handler) fillBoardFields(board *models.Board) error {
 		cardGroups[i].Cards = cards
 	}
 	board.CardGroups = cardGroups
+	return nil
+}
+
+func (h Handler) fillBoardUsers(board *models.Board) error {
 	bUsers, err := h.boardUsersService.FetchBoardUsersByBoardID(board.ID)
 	if err != nil {
 		return err
