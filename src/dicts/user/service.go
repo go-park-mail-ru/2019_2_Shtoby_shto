@@ -3,6 +3,7 @@ package user
 import (
 	. "2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
+	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/dicts/models"
 	"bytes"
 	"github.com/gyepisam/mcf/pbkdf2"
@@ -13,6 +14,7 @@ type HandlerUserService interface {
 	CreateUser(data []byte) (*models.User, error)
 	UpdateUser(data []byte, id StringUUID) error
 	GetUserById(id StringUUID) (models.User, error)
+	DeleteUser(id StringUUID) error
 	GetUserByLogin(data []byte) (*models.User, error)
 	FetchUsers(limit, offset int) (users []models.User, err error)
 }
@@ -129,4 +131,13 @@ func (s service) FetchUsers(limit, offset int) (users []models.User, err error) 
 	userModel := &models.User{}
 	_, err = s.db.FetchDict(&users, userModel, limit, offset)
 	return users, err
+}
+
+func (s service) DeleteUser(id StringUUID) error {
+	userModel := &models.User{
+		BaseInfo: dicts.BaseInfo{
+			ID: id,
+		},
+	}
+	return s.db.DeleteRecord(userModel)
 }

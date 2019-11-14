@@ -38,7 +38,7 @@ func NewUserHandler(e *echo.Echo, userService HandlerUserService,
 	e.GET("/users/:id", handler.Get)
 	e.POST("/users/registration", handler.Post)
 	e.PUT("/users", handler.Put)
-	e.DELETE("/users/:id", handler.Delete)
+	e.DELETE("/users", handler.Delete)
 }
 
 func (h Handler) Get(ctx echo.Context) error {
@@ -134,4 +134,19 @@ func (h Handler) Logout(ctx echo.Context) (err error) {
 	ctx.Response().Header().Del("session_id")
 	h.SecurityResponse(ctx.Response(), http.StatusOK, "Logout", err)
 	return err
+}
+
+func (h Handler) Delete(ctx echo.Context) error {
+	userID, ok := ctx.Get("user_id").(customType.StringUUID)
+	if !ok {
+		ctx.Logger().Error("get user_id failed")
+		errorsLib.ErrorHandler(ctx.Response(), "get user_id failed", http.StatusInternalServerError, errors.New("get user_id failed"))
+		return errors.New("get user_id failed")
+	}
+	if err := h.userService.DeleteUser(userID); err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "DeleteUser failed", http.StatusInternalServerError, errors.New("DeleteUser failed"))
+		return err
+	}
+	return ctx.JSON(http.StatusOK, userID)
 }
