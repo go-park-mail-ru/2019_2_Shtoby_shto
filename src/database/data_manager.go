@@ -17,7 +17,8 @@ type IDataManager interface {
 	CloseConnection() error
 	ExecuteQuery(sql string, args ...string) error
 	FindDictById(p interface{}) error
-	FindDictByColumn(p interface{}, where, whereArg []string) error
+	FindDictByColumn(p interface{}) (int, error)
+	FindCountDictByColumn(p interface{}) (int, error)
 	CreateRecord(p interface{}) error
 	UpdateRecord(p interface{}, id customType.StringUUID) error
 	DeleteRecord(p interface{}, id customType.StringUUID) error
@@ -63,18 +64,28 @@ func (d DataManager) FindDictById(p interface{}) error {
 	return nil
 }
 
-func (d DataManager) FindDictByColumn(p interface{}, where, whereArg []string) error {
+func (d DataManager) FindDictByColumn(p interface{}) (int, error) {
+	count := 0
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
-	if len(where) != len(whereArg) {
-		return errors.New("Not valid where ")
-	}
-	whereResult := strings.Join(where, " and ")
-	res := d.db.Table(obj.GetTableName()).Where(whereResult, whereArg).First(p)
-	if res.RecordNotFound() || res.Error != nil {
+	res := d.db.Table(obj.GetTableName()).Where(p).First(p)
+	if res.Error != nil {
 		log.Println(res)
-		return res.Error
+		return 0, res.Error
 	}
-	return nil
+	if res.RecordNotFound() {
+		return 0, nil
+	}
+	return count, nil
+}
+
+func (d DataManager) FindCountDictByColumn(p interface{}) (int, error) {
+	count := 0
+	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
+	res := d.db.Table(obj.GetTableName()).Where(p).Count(&count)
+	if res.Error != nil {
+		return 0, res.Error
+	}
+	return count, nil
 }
 
 func (d DataManager) FetchDict(data interface{}, table string, limit, offset int, where, whereArg []string) (int, error) {

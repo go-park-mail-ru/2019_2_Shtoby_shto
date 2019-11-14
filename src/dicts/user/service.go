@@ -84,12 +84,15 @@ func (s *service) GetUserByLogin(data []byte) (*models.User, error) {
 	if err := curUser.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
-	user := &models.User{}
-	where := []string{"login = ?"}
-	whereArgs := []string{curUser.Login}
-	err := s.db.FindDictByColumn(user, where, whereArgs)
+	user := &models.User{
+		Login: curUser.Login,
+	}
+	count, err := s.db.FindDictByColumn(user)
 	if err != nil {
 		return nil, err
+	}
+	if count == 0 {
+		return nil, errors.New("User not found")
 	}
 	pass, err := s.getCryptPass(curUser.Password, user.Salt)
 	if err != nil {

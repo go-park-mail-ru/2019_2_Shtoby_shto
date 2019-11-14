@@ -176,8 +176,21 @@ func (h Handler) AttachUserToCard(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "UnmarshalJSON body error", http.StatusInternalServerError, err)
 		return err
 	}
-	_, err = h.cardUsersService.CreateCardUsers(attachRequest.UserID, attachRequest.CardID)
-	return ctx.JSON(http.StatusOK, nil)
+	count, err := h.cardUsersService.FindCardUsersByIDs(attachRequest.UserID, attachRequest.CardID)
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "FindBoardUsersByIDs error", http.StatusInternalServerError, err)
+		return err
+	}
+	if count == 0 {
+		_, err = h.cardUsersService.CreateCardUsers(attachRequest.UserID, attachRequest.CardID)
+		if err != nil {
+			ctx.Logger().Error(err)
+			errorsLib.ErrorHandler(ctx.Response(), "CreateCardUsers error", http.StatusInternalServerError, err)
+			return err
+		}
+	}
+	return ctx.JSON(http.StatusOK, attachRequest)
 }
 
 func (h Handler) Post(ctx echo.Context) error {

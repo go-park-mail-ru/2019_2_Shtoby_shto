@@ -73,7 +73,7 @@ func main() {
 	dm := database.NewDataManager(db)
 	defer dm.CloseConnection()
 
-	e.Logger.SetLevel(echoLog.INFO)
+	e.Logger.SetLevel(echoLog.DEBUG)
 	initService(e, dm, conf)
 	newServer(e, httpAddr)
 

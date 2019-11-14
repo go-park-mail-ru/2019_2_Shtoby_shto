@@ -186,8 +186,21 @@ func (h Handler) AttachUserToBoard(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "UnmarshalJSON body error", http.StatusInternalServerError, err)
 		return err
 	}
-	_, err = h.boardUsersService.CreateBoardUsers("", attachRequest.UserID, attachRequest.BoardID)
-	return ctx.JSON(http.StatusOK, nil)
+	count, err := h.boardUsersService.FindBoardUsersByIDs(attachRequest.UserID, attachRequest.BoardID)
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "FindBoardUsersByIDs error", http.StatusInternalServerError, err)
+		return err
+	}
+	if count == 0 {
+		_, err = h.boardUsersService.CreateBoardUsers("", attachRequest.UserID, attachRequest.BoardID)
+		if err != nil {
+			ctx.Logger().Error(err)
+			errorsLib.ErrorHandler(ctx.Response(), "CreateBoardUsers error", http.StatusInternalServerError, err)
+			return err
+		}
+	}
+	return ctx.JSON(http.StatusOK, attachRequest)
 }
 
 func (h Handler) Post(ctx echo.Context) error {

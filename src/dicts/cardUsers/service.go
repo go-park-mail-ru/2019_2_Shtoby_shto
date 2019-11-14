@@ -12,6 +12,7 @@ import (
 type HandlerCardUsersService interface {
 	FindCardUsersByID(id customType.StringUUID) (*models.CardUsers, error)
 	FindCardUsersByUserID(userData []byte) ([]models.CardUsers, error)
+	FindCardUsersByIDs(userID, cardID customType.StringUUID) (int, error)
 	CreateCardUsers(userID, сardID customType.StringUUID) (*models.CardUsers, error)
 	UpdateCardUsers(userID, сardID customType.StringUUID, id customType.StringUUID) (*models.CardUsers, error)
 	DeleteCardUsers(id customType.StringUUID) error
@@ -51,6 +52,18 @@ func (s service) FindCardUsersByID(id customType.StringUUID) (*models.CardUsers,
 	}
 	err := s.db.FindDictById(сardUsers)
 	return сardUsers, err
+}
+
+func (s service) FindCardUsersByIDs(userID, cardID customType.StringUUID) (int, error) {
+	cardUsers := &models.CardUsers{
+		CardID: cardID,
+		UserID: userID,
+	}
+	count, err := s.db.FindCountDictByColumn(cardUsers)
+	if count == 0 {
+		return count, nil
+	}
+	return count, err
 }
 
 func (s service) CreateCardUsers(userID, сardID customType.StringUUID) (*models.CardUsers, error) {

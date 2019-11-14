@@ -10,8 +10,8 @@ import (
 )
 
 type HandlerBoardUsersService interface {
-	FindBoardUsersByIDs(userID, boardID customType.StringUUID) (*models.BoardUsers, error)
 	CreateBoardUsers(boardUsersID, userID, boardID customType.StringUUID) (*models.BoardUsers, error)
+	FindBoardUsersByIDs(userID, boardID customType.StringUUID) (int, error)
 	UpdateBoardUsers(userID, boardID customType.StringUUID, id customType.StringUUID) (*models.BoardUsers, error)
 	DeleteBoardUsers(id customType.StringUUID) error
 	FetchBoardUsersByUserID(userID customType.StringUUID) (boardUsers []models.BoardUsers, err error)
@@ -29,12 +29,16 @@ func CreateInstance(db database.IDataManager) HandlerBoardUsersService {
 	}
 }
 
-func (s service) FindBoardUsersByIDs(userID, boardID customType.StringUUID) (*models.BoardUsers, error) {
-	boardUsers := &models.BoardUsers{}
-	where := []string{"user_id = ?", "board_id = ?"}
-	whereArgs := []string{userID.String(), boardID.String()}
-	err := s.db.FindDictByColumn(boardUsers, where, whereArgs)
-	return boardUsers, err
+func (s service) FindBoardUsersByIDs(userID, boardID customType.StringUUID) (int, error) {
+	boardUsers := &models.BoardUsers{
+		BoardID: boardID,
+		UserID:  userID,
+	}
+	count, err := s.db.FindCountDictByColumn(boardUsers)
+	if count == 0 {
+		return count, nil
+	}
+	return count, err
 }
 
 func (s service) CreateBoardUsers(boardUsersID, userID, boardID customType.StringUUID) (*models.BoardUsers, error) {
