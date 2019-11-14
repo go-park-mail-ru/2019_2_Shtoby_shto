@@ -177,7 +177,12 @@ func (h Handler) DetachUserToCard(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "UnmarshalJSON body error", http.StatusInternalServerError, err)
 		return err
 	}
-
+	err = h.cardUsersService.DeleteCardUsersByIDs(attachRequest.UserID, attachRequest.CardID)
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "DeleteCardUsersByIDs error", http.StatusInternalServerError, err)
+		return err
+	}
 	return ctx.JSON(http.StatusOK, attachRequest)
 }
 

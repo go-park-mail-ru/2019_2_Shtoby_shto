@@ -131,7 +131,7 @@ func (d DataManager) UpdateRecord(p interface{}) error {
 
 func (d DataManager) DeleteRecord(p interface{}) error {
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
-	res := d.db.Table(obj.GetTableName()).Delete(p)
+	res := d.db.Table(obj.GetTableName()).Where(p).Delete(p)
 	if res.Error != nil {
 		return res.Error
 	}

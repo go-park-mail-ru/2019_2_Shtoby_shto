@@ -61,6 +61,7 @@ func NewBoardHandler(e *echo.Echo, userService user.HandlerUserService,
 	e.GET("/board/user/:id", handler.FetchUserBoards)
 	e.POST("/board", handler.Post)
 	e.POST("/board/user/attach", handler.AttachUserToBoard)
+	e.POST("/board/user/detach", handler.DetachUserToBoard)
 	e.PUT("/board/:id", handler.Put)
 	e.DELETE("/board/:id", handler.Delete)
 }
@@ -199,6 +200,28 @@ func (h Handler) AttachUserToBoard(ctx echo.Context) error {
 			errorsLib.ErrorHandler(ctx.Response(), "CreateBoardUsers error", http.StatusInternalServerError, err)
 			return err
 		}
+	}
+	return ctx.JSON(http.StatusOK, attachRequest)
+}
+
+func (h Handler) DetachUserToBoard(ctx echo.Context) error {
+	body, err := h.ReadBody(ctx.Request().Body)
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
+		return err
+	}
+	attachRequest := &models.BoardsUserAttachRequest{}
+	if err := attachRequest.UnmarshalJSON(body); err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "UnmarshalJSON body error", http.StatusInternalServerError, err)
+		return err
+	}
+	err = h.boardUsersService.DeleteBoardUsersByIDs(attachRequest.UserID, attachRequest.BoardID)
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "DeleteCardUsersByIDs error", http.StatusInternalServerError, err)
+		return err
 	}
 	return ctx.JSON(http.StatusOK, attachRequest)
 }

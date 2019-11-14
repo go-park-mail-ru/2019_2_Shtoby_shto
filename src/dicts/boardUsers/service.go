@@ -14,6 +14,7 @@ type HandlerBoardUsersService interface {
 	FindBoardUsersByIDs(userID, boardID customType.StringUUID) (int, error)
 	UpdateBoardUsers(userID, boardID customType.StringUUID, id customType.StringUUID) (*models.BoardUsers, error)
 	DeleteBoardUsers(id customType.StringUUID) error
+	DeleteBoardUsersByIDs(userID, boardID customType.StringUUID) error
 	FetchBoardUsersByUserID(userID customType.StringUUID) (boardUsers []models.BoardUsers, err error)
 	FetchBoardUsersByBoardID(boardID customType.StringUUID) (boardUsers []models.BoardUsers, err error)
 }
@@ -78,6 +79,18 @@ func (s service) DeleteBoardUsers(id customType.StringUUID) error {
 		},
 	}
 	return s.db.DeleteRecord(boardUsers)
+}
+
+func (s service) DeleteBoardUsersByIDs(userID, boardID customType.StringUUID) error {
+	boardUsers := &models.BoardUsers{
+		UserID:  userID,
+		BoardID: boardID,
+	}
+	err := s.db.DeleteRecord(boardUsers)
+	if err != nil {
+
+	}
+	return nil
 }
 
 func (s service) FetchBoardUsersByUserID(userID customType.StringUUID) (boardUsers []models.BoardUsers, err error) {
