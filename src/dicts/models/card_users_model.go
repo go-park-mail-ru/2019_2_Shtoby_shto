@@ -26,3 +26,9 @@ func (c CardUsers) IsValid() bool {
 type CardsUserRequest struct {
 	Users []string `json:"users"`
 }
+
+//easyjson:json
+type CardsUserAttachRequest struct {
+	UserID customType.StringUUID `json:"user_id"`
+	CardID customType.StringUUID `json:"card_id"`
+}

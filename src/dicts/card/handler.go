@@ -47,6 +47,7 @@ func NewCardHandler(e *echo.Echo, userService user.HandlerUserService,
 	e.GET("/cards", handler.Fetch)
 	//e.POST( "/cards/board", handler.PostCardsBoard)
 	e.POST("/cards/user", handler.FetchUserCards)
+	e.POST("/cards/user/attach", handler.AttachUserToCard)
 	e.POST("/cards", handler.Post)
 	e.PUT("/cards/:id", handler.Put)
 	e.DELETE("/cards/:id", handler.Delete)
@@ -160,6 +161,23 @@ func (h Handler) FetchUserCards(ctx echo.Context) error {
 	}
 	cards, err := h.cardService.FetchCardsByIDs(resultCardUsersIDs)
 	return ctx.JSON(http.StatusOK, cards)
+}
+
+func (h Handler) AttachUserToCard(ctx echo.Context) error {
+	body, err := h.ReadBody(ctx.Request().Body)
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
+		return err
+	}
+	attachRequest := &models.CardsUserAttachRequest{}
+	if err := attachRequest.UnmarshalJSON(body); err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "UnmarshalJSON body error", http.StatusInternalServerError, err)
+		return err
+	}
+	_, err = h.cardUsersService.CreateCardUsers(attachRequest.UserID, attachRequest.CardID)
+	return ctx.JSON(http.StatusOK, nil)
 }
 
 func (h Handler) Post(ctx echo.Context) error {
