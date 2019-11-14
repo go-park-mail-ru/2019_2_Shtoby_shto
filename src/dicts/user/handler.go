@@ -121,8 +121,7 @@ func (h Handler) Login(ctx echo.Context) error {
 		return err
 	}
 	ctx.Set("user_id", user.ID)
-	h.SecurityResponse(ctx.Response(), http.StatusOK, "Login", err)
-	return nil
+	return ctx.JSON(http.StatusOK, user)
 }
 
 func (h Handler) Logout(ctx echo.Context) (err error) {
