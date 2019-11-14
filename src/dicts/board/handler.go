@@ -73,65 +73,11 @@ func (h Handler) Get(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "GetUserById error", http.StatusBadRequest, err)
 		return err
 	}
-	cardGroups, err := h.cardGroupService.FetchCardGroupsByBoardIDs([]string{board.ID.String()})
-	if err != nil {
+	if err := h.fillBoardFields(board); err != nil {
 		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "FetchCardGroupsByBoardIDs error", http.StatusBadRequest, err)
+		errorsLib.ErrorHandler(ctx.Response(), "fillBoardFields error", http.StatusInternalServerError, err)
 		return err
 	}
-	for i, group := range cardGroups {
-		cards, err := h.cardService.FetchCardsByCardGroupIDs([]string{group.ID.String()})
-		if err != nil {
-			ctx.Logger().Error(err)
-			errorsLib.ErrorHandler(ctx.Response(), "FetchCardsByCardGroupIDs error", http.StatusBadRequest, err)
-			return err
-		}
-		for j, card := range cards {
-			comments, err := h.commentService.FetchCommentsByCardID(card.ID.String())
-			if err != nil {
-				ctx.Logger().Error(err)
-				errorsLib.ErrorHandler(ctx.Response(), "FetchCardsByCardGroupIDs error", http.StatusBadRequest, err)
-				return err
-			}
-			cards[j].Comments = comments
-			cardTags, err := h.cardTagsService.FindCardTagsByCardID(card.ID)
-			if err != nil {
-				ctx.Logger().Error(err)
-				errorsLib.ErrorHandler(ctx.Response(), "FindCardTagsByCardID error", http.StatusBadRequest, err)
-				return err
-			}
-			resultTagIDs := make([]string, 0)
-			for _, ct := range cardTags {
-				resultTagIDs = append(resultTagIDs, ct.TagID.String())
-			}
-			tags, err := h.tagService.FetchTagsByIDs(resultTagIDs)
-			if err != nil {
-				ctx.Logger().Error(err)
-				errorsLib.ErrorHandler(ctx.Response(), "FetchTagsByIDs error", http.StatusBadRequest, err)
-				return err
-			}
-			cards[j].Tags = tags
-			cUsers, err := h.cardUsersService.FetchCardUsersByCardID(cards[j].ID)
-			usersResult := make([]string, 0)
-			for _, value := range cUsers {
-				usersResult = append(usersResult, value.UserID.String())
-			}
-			cards[j].Users = usersResult
-		}
-		cardGroups[i].Cards = cards
-	}
-	board.CardGroups = cardGroups
-	bUsers, err := h.boardUsersService.FetchBoardUsersByBoardID(board.ID)
-	if err != nil {
-		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "FetchBoardUsersByBoardID error", http.StatusInternalServerError, err)
-		return err
-	}
-	usersResult := make([]string, 0)
-	for _, value := range bUsers {
-		usersResult = append(usersResult, value.UserID.String())
-	}
-	board.Users = usersResult
 	return ctx.JSON(http.StatusOK, board)
 }
 
@@ -143,10 +89,12 @@ func (h Handler) Fetch(ctx echo.Context) error {
 		ctx.Logger().Error(err)
 		return err
 	}
-	if err := h.setBoardUsers(boards); err != nil {
-		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "setBoardUsers error", http.StatusInternalServerError, err)
-		return err
+	for i := range boards {
+		if err := h.fillBoardFields(&boards[i]); err != nil {
+			errorsLib.ErrorHandler(ctx.Response(), "fillBoardFields error ", http.StatusBadRequest, err)
+			ctx.Logger().Error(err)
+			return err
+		}
 	}
 	return ctx.JSON(http.StatusOK, boards)
 }
@@ -181,27 +129,14 @@ func (h Handler) FetchUserBoards(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "FetchBoardUsersByUserID error", http.StatusInternalServerError, err)
 		return err
 	}
-	if err := h.setBoardUsers(boards); err != nil {
-		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "setBoardUsers error", http.StatusInternalServerError, err)
-		return err
-	}
-	return ctx.JSON(http.StatusOK, boards)
-}
-
-func (h Handler) setBoardUsers(boards []models.Board) error {
-	for i, board := range boards {
-		bUsers, err := h.boardUsersService.FetchBoardUsersByBoardID(board.ID)
-		if err != nil {
+	for i := range boards {
+		if err := h.fillBoardFields(&boards[i]); err != nil {
+			errorsLib.ErrorHandler(ctx.Response(), "fillBoardFields error ", http.StatusBadRequest, err)
+			ctx.Logger().Error(err)
 			return err
 		}
-		usersResult := make([]string, 0)
-		for _, value := range bUsers {
-			usersResult = append(usersResult, value.UserID.String())
-		}
-		boards[i].Users = usersResult
 	}
-	return nil
+	return ctx.JSON(http.StatusOK, boards)
 }
 
 func (h Handler) AttachUserToBoard(ctx echo.Context) error {
@@ -314,5 +249,56 @@ func (h Handler) Delete(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "UpdateBoard error", http.StatusInternalServerError, err)
 		return err
 	}
+	return nil
+}
+
+func (h Handler) fillBoardFields(board *models.Board) error {
+	cardGroups, err := h.cardGroupService.FetchCardGroupsByBoardIDs([]string{board.ID.String()})
+	if err != nil {
+		return err
+	}
+	for i, group := range cardGroups {
+		cards, err := h.cardService.FetchCardsByCardGroupIDs([]string{group.ID.String()})
+		if err != nil {
+			return err
+		}
+		for j, card := range cards {
+			comments, err := h.commentService.FetchCommentsByCardID(card.ID.String())
+			if err != nil {
+				return err
+			}
+			cards[j].Comments = comments
+			cardTags, err := h.cardTagsService.FindCardTagsByCardID(card.ID)
+			if err != nil {
+				return err
+			}
+			resultTagIDs := make([]string, 0)
+			for _, ct := range cardTags {
+				resultTagIDs = append(resultTagIDs, ct.TagID.String())
+			}
+			tags, err := h.tagService.FetchTagsByIDs(resultTagIDs)
+			if err != nil {
+				return err
+			}
+			cards[j].Tags = tags
+			cUsers, err := h.cardUsersService.FetchCardUsersByCardID(cards[j].ID)
+			usersResult := make([]string, 0)
+			for _, value := range cUsers {
+				usersResult = append(usersResult, value.UserID.String())
+			}
+			cards[j].Users = usersResult
+		}
+		cardGroups[i].Cards = cards
+	}
+	board.CardGroups = cardGroups
+	bUsers, err := h.boardUsersService.FetchBoardUsersByBoardID(board.ID)
+	if err != nil {
+		return err
+	}
+	usersResult := make([]string, 0)
+	for _, value := range bUsers {
+		usersResult = append(usersResult, value.UserID.String())
+	}
+	board.Users = usersResult
 	return nil
 }

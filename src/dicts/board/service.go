@@ -59,9 +59,6 @@ func (s service) UpdateBoard(data []byte, id customType.StringUUID) (*models.Boa
 		return nil, err
 	}
 	board.ID = id
-	//if !board.IsValid() {
-	//	return nil, errors.New("Board body is not valid")
-	//}
 	err := s.db.UpdateRecord(board)
 	return board, err
 }
