@@ -21,3 +21,9 @@ func (b BoardUsers) GetTableName() string {
 func (b BoardUsers) IsValid() bool {
 	return b.BoardID != "" && b.UserID != ""
 }
+
+//easyjson:json
+type BoardsUserAttachRequest struct {
+	UserID  customType.StringUUID `json:"user_id"`
+	BoardID customType.StringUUID `json:"board_id"`
+}

@@ -8,6 +8,7 @@ import (
 	"2019_2_Shtoby_shto/src/dicts/cardTags"
 	сardUsers "2019_2_Shtoby_shto/src/dicts/cardUsers"
 	"2019_2_Shtoby_shto/src/dicts/comment"
+	"2019_2_Shtoby_shto/src/dicts/models"
 	"2019_2_Shtoby_shto/src/dicts/tag"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	errorsLib "2019_2_Shtoby_shto/src/errors"
@@ -59,6 +60,7 @@ func NewBoardHandler(e *echo.Echo, userService user.HandlerUserService,
 	e.GET("/board", handler.Fetch)
 	e.GET("/board/user/:id", handler.FetchUserBoards)
 	e.POST("/board", handler.Post)
+	e.POST("/board/user/attach", handler.AttachUserToBoard)
 	e.PUT("/board/:id", handler.Put)
 	e.DELETE("/board/:id", handler.Delete)
 }
@@ -169,6 +171,23 @@ func (h Handler) FetchUserBoards(ctx echo.Context) error {
 		return err
 	}
 	return ctx.JSON(http.StatusOK, boards)
+}
+
+func (h Handler) AttachUserToBoard(ctx echo.Context) error {
+	body, err := h.ReadBody(ctx.Request().Body)
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
+		return err
+	}
+	attachRequest := &models.BoardsUserAttachRequest{}
+	if err := attachRequest.UnmarshalJSON(body); err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "UnmarshalJSON body error", http.StatusInternalServerError, err)
+		return err
+	}
+	_, err = h.boardUsersService.CreateBoardUsers("", attachRequest.UserID, attachRequest.BoardID)
+	return ctx.JSON(http.StatusOK, nil)
 }
 
 func (h Handler) Post(ctx echo.Context) error {
