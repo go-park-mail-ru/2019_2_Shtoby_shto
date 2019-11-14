@@ -228,6 +228,7 @@ func (h Handler) Post(ctx echo.Context) error {
 		return err
 	}
 	newBoard.BoardUsersID = boardUser.ID
+	newBoard.Users = append(newBoard.Users, userID.String())
 	return ctx.JSON(http.StatusOK, newBoard)
 }
 
