@@ -35,20 +35,14 @@ func NewUserHandler(e *echo.Echo, userService HandlerUserService,
 	e.POST("/login", handler.Login)
 	e.GET("/logout", handler.Logout)
 	e.GET("/users/all", handler.Fetch)
-	e.GET("/users", handler.Get)
+	e.GET("/users/:id", handler.Get)
 	e.POST("/users/registration", handler.Post)
 	e.PUT("/users", handler.Put)
 	e.DELETE("/users/:id", handler.Delete)
 }
 
 func (h Handler) Get(ctx echo.Context) error {
-	userID, ok := ctx.Get("user_id").(customType.StringUUID)
-	if !ok {
-		ctx.Logger().Error("get user_id failed")
-		errorsLib.ErrorHandler(ctx.Response(), "get user_id failed", http.StatusInternalServerError, errors.New("download fail"))
-		return errors.New("get user_id failed")
-	}
-
+	userID := customType.StringUUID(ctx.Param("id"))
 	user, err := h.userService.GetUserById(userID)
 	if err != nil {
 		ctx.Logger().Error(err)
