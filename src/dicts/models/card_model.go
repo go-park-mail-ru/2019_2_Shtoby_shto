@@ -11,6 +11,7 @@ const cardTableName = "cards"
 type Card struct {
 	dicts.BaseInfo
 	Caption     string                `json:"caption"`
+	Text        string                `json:"text"`
 	Priority    int                   `json:"priority"`
 	CardUserID  customType.StringUUID `json:"-"`
 	CardGroupID customType.StringUUID `json:"card_group_id"`

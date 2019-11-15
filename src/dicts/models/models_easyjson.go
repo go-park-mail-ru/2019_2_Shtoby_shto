@@ -1102,6 +1102,8 @@ func easyjsonD2b7633eDecode20192ShtobyShtoSrcDictsModels12(in *jlexer.Lexer, out
 		switch key {
 		case "caption":
 			out.Caption = string(in.String())
+		case "text":
+			out.Text = string(in.String())
 		case "priority":
 			out.Priority = int(in.Int())
 		case "card_group_id":
@@ -1195,6 +1197,11 @@ func easyjsonD2b7633eEncode20192ShtobyShtoSrcDictsModels12(out *jwriter.Writer, 
 		const prefix string = ",\"caption\":"
 		out.RawString(prefix[1:])
 		out.String(string(in.Caption))
+	}
+	{
+		const prefix string = ",\"text\":"
+		out.RawString(prefix)
+		out.String(string(in.Text))
 	}
 	{
 		const prefix string = ",\"priority\":"
