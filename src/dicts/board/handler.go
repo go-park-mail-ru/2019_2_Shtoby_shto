@@ -245,6 +245,12 @@ func (h Handler) Put(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "UpdateBoard error", http.StatusInternalServerError, err)
 		return err
 	}
+	err = h.fillBoardFields(board)
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "fillBoardFields error", http.StatusInternalServerError, err)
+		return err
+	}
 	return ctx.JSON(http.StatusOK, board)
 }
 

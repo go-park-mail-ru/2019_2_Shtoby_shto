@@ -208,13 +208,19 @@ func (h Handler) Put(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
 		return err
 	}
-	board, err := h.cardService.UpdateCard(body, customType.StringUUID(ctx.Param("id")))
+	card, err := h.cardService.UpdateCard(body, customType.StringUUID(ctx.Param("id")))
 	if err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "Update card error", http.StatusInternalServerError, err)
 		return err
 	}
-	return ctx.JSON(http.StatusOK, board)
+	err = h.fillCardFields(card)
+	if err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "fillCardFields card error", http.StatusInternalServerError, err)
+		return err
+	}
+	return ctx.JSON(http.StatusOK, card)
 }
 
 func (h Handler) Delete(ctx echo.Context) error {
@@ -245,7 +251,18 @@ func (h Handler) fillCardFields(card *models.Card) error {
 		return err
 	}
 	card.Tags = tags
+	err = h.fillCardUsers(card)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h Handler) fillCardUsers(card *models.Card) error {
 	cUsers, err := h.cardUsersService.FetchCardUsersByCardID(card.ID)
+	if err != nil {
+		return err
+	}
 	usersResult := make([]string, 0)
 	for _, value := range cUsers {
 		usersResult = append(usersResult, value.UserID.String())
