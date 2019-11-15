@@ -8,6 +8,9 @@ import (
 	transport "2019_2_Shtoby_shto/src/handle"
 	"bufio"
 	"bytes"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"io/ioutil"
 	"os"
 	"path"
@@ -21,16 +24,27 @@ type HandlerPhotoService interface {
 
 type service struct {
 	transport.HandlerImpl
-	db database.IDataManager
+	svc *s3.S3
+	db  database.IDataManager
 }
 
 func CreateInstance(db database.IDataManager) HandlerPhotoService {
+	sess := session.Must(session.NewSession(&aws.Config{
+		Region:   aws.String("ru-msk"),
+		Endpoint: aws.String("http://hb.bizmrg.com"),
+	}))
+	svc := s3.New(sess)
 	return &service{
-		db: db,
+		svc: svc,
+		db:  db,
 	}
 }
 
 func (s service) DownloadPhoto(photo *bufio.Reader) (*models.Photo, error) {
+	//out, err := s.svc.GetObject(&s3.GetObjectInput{
+	//	Bucket: aws.String("photo_storage"),
+	//	Key:    aws.String("1.jpg"),
+	//})
 	photoPath := config.GetInstance().ImagePath
 	if err := os.MkdirAll(photoPath, os.ModePerm); err != nil {
 		return nil, err
@@ -53,10 +67,26 @@ func (s service) DownloadPhoto(photo *bufio.Reader) (*models.Photo, error) {
 	if _, err := bufio.NewWriter(file).Write(buf.Bytes()); err != nil {
 		return nil, err
 	}
+
+	r := bytes.NewReader(buf.Bytes())
+	_, err = s.svc.PutObject(&s3.PutObjectInput{
+		Bucket: aws.String("photo_storage"),
+		Key:    aws.String(newPhoto.ID.String() + ".jpg"),
+		Body:   r,
+	})
+	if err != nil {
+		return nil, err
+	}
 	return newPhoto, nil
 }
 
 func (s service) GetPhotoByUser(photoID customType.StringUUID) ([]byte, error) {
-	photoPath := config.GetInstance().ImagePath
-	return ioutil.ReadFile(path.Join(photoPath, photoID.String()+".jpg"))
+	out, err := s.svc.GetObject(&s3.GetObjectInput{
+		Bucket: aws.String("photo_storage"),
+		Key:    aws.String(photoID.String() + ".jpg"),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return ioutil.ReadAll(out.Body)
 }

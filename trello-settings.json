@@ -2,6 +2,8 @@
   "trello.service.port": 443,
   "trello.service.frontend.url": "https://front.aleshka2012.now.sh",
   "trello.service.image.path": "./image",
+  "trello.service.storage.access.key": "ikWLxqGuW1kivBRAv2agu3",
+  "trello.service.storage.secret.key": "f2oKA3BZKQ7vYjNtA1CmDPV9DeY7KLovBJdH4rwsqVn2",
   "trello.service.db.config":"host='postgres' port=5432 user=postgres dbname='trello' sslmode=disable password='1111'",
   "trello.service.redis.config":"redis:6379",
   "trello.service.redis.password":"",
