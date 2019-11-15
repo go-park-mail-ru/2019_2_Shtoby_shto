@@ -23,6 +23,9 @@ type Config struct {
 	ImagePath        string `json:"trello.service.image.path"`
 	StorageAccessKey string `json:"trello.service.storage.access.key"`
 	StorageSecretKey string `json:"trello.service.storage.secret.key"`
+	StorageRegion    string `json:"trello.service.storage.region"`
+	StorageEndpoint  string `json:"trello.service.storage.endpoint"`
+	StorageBucket    string `json:"trello.service.storage.bucket"`
 	DbConfig         string `json:"trello.service.db.config"`
 	RedisConfig      string `json:"trello.service.redis.config"`
 	RedisPass        string `json:"trello.service.redis.password"`

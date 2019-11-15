@@ -46,6 +46,12 @@ func easyjsonCd93bc43Decode20192ShtobyShtoSrcConfig(in *jlexer.Lexer, out *Confi
 			out.StorageAccessKey = string(in.String())
 		case "trello.service.storage.secret.key":
 			out.StorageSecretKey = string(in.String())
+		case "trello.service.storage.region":
+			out.StorageRegion = string(in.String())
+		case "trello.service.storage.endpoint":
+			out.StorageEndpoint = string(in.String())
+		case "trello.service.storage.bucket":
+			out.StorageBucket = string(in.String())
 		case "trello.service.db.config":
 			out.DbConfig = string(in.String())
 		case "trello.service.redis.config":
@@ -92,6 +98,21 @@ func easyjsonCd93bc43Encode20192ShtobyShtoSrcConfig(out *jwriter.Writer, in Conf
 		const prefix string = ",\"trello.service.storage.secret.key\":"
 		out.RawString(prefix)
 		out.String(string(in.StorageSecretKey))
+	}
+	{
+		const prefix string = ",\"trello.service.storage.region\":"
+		out.RawString(prefix)
+		out.String(string(in.StorageRegion))
+	}
+	{
+		const prefix string = ",\"trello.service.storage.endpoint\":"
+		out.RawString(prefix)
+		out.String(string(in.StorageEndpoint))
+	}
+	{
+		const prefix string = ",\"trello.service.storage.bucket\":"
+		out.RawString(prefix)
+		out.String(string(in.StorageBucket))
 	}
 	{
 		const prefix string = ",\"trello.service.db.config\":"
