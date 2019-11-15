@@ -76,12 +76,15 @@ func (s *service) CheckSession(h echo.HandlerFunc) echo.HandlerFunc {
 			errors.ErrorHandler(ctx.Response(), "Error cookie", http.StatusUnauthorized, err)
 			return err
 		}
-		ctx.Set("session_id", cookieSessionID.Value)
 		ctx.Logger().Info(ctx.Request().Host, ctx.Request().RequestURI)
-		if err := s.Sm.Check(&ctx); err != nil {
+		session, err := s.Sm.Check(cookieSessionID.Value)
+		if err != nil {
 			errors.ErrorHandler(ctx.Response(), "Error check session", http.StatusUnauthorized, err)
 			return err
 		}
+		ctx.Set("session_id", cookieSessionID.Value)
+		ctx.Set("user_id", session.UserID)
+		ctx.Set("csrf_token", session.CsrfToken)
 		return h(ctx)
 	}
 }

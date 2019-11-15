@@ -39,6 +39,9 @@ func NewSessionManager(addr, password string, dbNumber int) *SessionManager {
 }
 
 func (sm SessionManager) Create(userID StringUUID) (*Session, error) {
+	if !userID.IsUUID() {
+		return nil, errors.New("userID is not uuid")
+	}
 	id, err := utils.GenerateUUID()
 	if err != nil {
 		return nil, err
@@ -89,31 +92,25 @@ func (sm *SessionManager) Delete(ctx echo.Context) error {
 	return sm.cache.Del(s.(string)).Err()
 }
 
-func (sm *SessionManager) Check(ctx *echo.Context) error {
+func (sm *SessionManager) Check(sessionID string) (*Session, error) {
 	s := &Session{}
-	sessionID := (*ctx).Get("session_id").(string)
 	sessionInfo, err := sm.getSession(sessionID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if sessionInfo == "" {
-		return errors.New("Missing session info")
+		return nil, errors.New("Missing session info")
 	}
 	if err := s.UnmarshalJSON([]byte(sessionInfo)); err != nil {
-		return err
+		return nil, err
 	}
-	(*ctx).Set("user_id", s.UserID)
 	HMACHashToken, err := utils.NewHMACHashToken("1111")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	_, err = HMACHashToken.Check(sessionID, s.UserID.String(), s.CsrfToken)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	//if !isValid {
-	//	return errors.New("invalid csrf token")
-	//}
-	(*ctx).Set("csrf_token", s.CsrfToken)
-	return nil
+	return s, nil
 }

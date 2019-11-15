@@ -21,6 +21,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoLog "github.com/labstack/gommon/log"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 	"os"
 	"os/signal"
@@ -53,6 +54,8 @@ func main() {
 	e.GET("/swagger/*", func(ctx echo.Context) error {
 		return ctx.Redirect(http.StatusPermanentRedirect, "https://app.swaggerhub.com/apis/aleksandrkhoroshenin/trello-api/4.0")
 	})
+
+	e.POST("/api/v1/query", echo.WrapHandler(promhttp.Handler()))
 
 	if err := config.InitConfig(); err != nil {
 		e.Logger.Error(err)
@@ -109,7 +112,7 @@ func newServer(e *echo.Echo, httpAddr string) {
 	e.Use(
 		middleware.Logger(),
 		middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins:     []string{apiURL},
+			AllowOrigins:     []string{apiURL, "https://aleksandrkhoroshenin.grafana.net/"},
 			AllowCredentials: true,
 			AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete, http.MethodOptions},
 			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderXCSRFToken},
