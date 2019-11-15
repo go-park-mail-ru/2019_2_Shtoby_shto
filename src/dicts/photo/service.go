@@ -25,11 +25,11 @@ type HandlerPhotoService interface {
 type service struct {
 	transport.HandlerImpl
 	svc *s3.S3
+	cfg *config.Config
 	db  database.IDataManager
 }
 
-func CreateInstance(db database.IDataManager) HandlerPhotoService {
-	cfg := config.GetInstance()
+func CreateInstance(db database.IDataManager, cfg *config.Config) HandlerPhotoService {
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region:   aws.String(cfg.StorageRegion),
 		Endpoint: aws.String(cfg.StorageEndpoint),
@@ -37,13 +37,13 @@ func CreateInstance(db database.IDataManager) HandlerPhotoService {
 	svc := s3.New(sess)
 	return &service{
 		svc: svc,
+		cfg: cfg,
 		db:  db,
 	}
 }
 
 func (s service) DownloadPhoto(photo *bufio.Reader) (*models.Photo, error) {
-	cfg := config.GetInstance()
-	photoPath := cfg.ImagePath
+	photoPath := s.cfg.ImagePath
 	if err := os.MkdirAll(photoPath, os.ModePerm); err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (s service) DownloadPhoto(photo *bufio.Reader) (*models.Photo, error) {
 
 	r := bytes.NewReader(buf.Bytes())
 	_, err = s.svc.PutObject(&s3.PutObjectInput{
-		Bucket: aws.String(cfg.StorageBucket),
+		Bucket: aws.String(s.cfg.StorageBucket),
 		Key:    aws.String(newPhoto.ID.String() + ".jpg"),
 		Body:   r,
 	})
@@ -79,9 +79,8 @@ func (s service) DownloadPhoto(photo *bufio.Reader) (*models.Photo, error) {
 }
 
 func (s service) GetPhotoByUser(photoID customType.StringUUID) ([]byte, error) {
-	cfg := config.GetInstance()
 	out, err := s.svc.GetObject(&s3.GetObjectInput{
-		Bucket: aws.String(cfg.StorageBucket),
+		Bucket: aws.String(s.cfg.StorageBucket),
 		Key:    aws.String(photoID.String() + ".jpg"),
 	})
 	if err != nil {

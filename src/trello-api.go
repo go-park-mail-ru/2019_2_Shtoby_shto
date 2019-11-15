@@ -143,7 +143,7 @@ func checkCSRF(h echo.HandlerFunc) echo.HandlerFunc {
 func initService(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	sessionService := security.NewSessionManager(conf.RedisConfig, conf.RedisPass, conf.RedisDbNumber)
 	userService = user.CreateInstance(db)
-	photoService = photo.CreateInstance(db)
+	photoService = photo.CreateInstance(db, conf)
 	boardService = board.CreateInstance(db)
 	boardUsersService = boardUsers.CreateInstance(db)
 	cardUsersService = сardUsers.CreateInstance(db)
