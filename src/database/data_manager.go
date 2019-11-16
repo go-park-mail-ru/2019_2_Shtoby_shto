@@ -122,7 +122,7 @@ func (d DataManager) CreateRecord(p interface{}) error {
 
 func (d DataManager) UpdateRecord(p interface{}) error {
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
-	res := d.db.Table(obj.GetTableName()).Where(p).Update(p)
+	res := d.db.Model(obj).UpdateColumns(p)
 	if res.Error != nil {
 		return res.Error
 	}
