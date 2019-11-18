@@ -54,6 +54,7 @@ func (s service) DownloadPhoto(photo *bufio.Reader) (*models.Photo, error) {
 	if err := s.db.CreateRecord(newPhoto); err != nil {
 		return nil, err
 	}
+	// внутрисервисное хранение - в последствии выпилится
 	file, err := os.Create(path.Join(photoPath, newPhoto.ID.String()+".jpg"))
 	if err != nil {
 		return nil, err
@@ -65,11 +66,12 @@ func (s service) DownloadPhoto(photo *bufio.Reader) (*models.Photo, error) {
 	if _, err := bufio.NewWriter(file).Write(buf.Bytes()); err != nil {
 		return nil, err
 	}
-
+	var acl = s3.ObjectCannedACLPublicRead
 	r := bytes.NewReader(buf.Bytes())
 	_, err = s.svc.PutObject(&s3.PutObjectInput{
 		Bucket: aws.String(s.cfg.StorageBucket),
-		Key:    aws.String(newPhoto.ID.String() + ".jpg"),
+		Key:    aws.String(newPhoto.ID.String()),
+		ACL:    &acl,
 		Body:   r,
 	})
 	if err != nil {
@@ -81,7 +83,7 @@ func (s service) DownloadPhoto(photo *bufio.Reader) (*models.Photo, error) {
 func (s service) GetPhotoByUser(photoID customType.StringUUID) ([]byte, error) {
 	out, err := s.svc.GetObject(&s3.GetObjectInput{
 		Bucket: aws.String(s.cfg.StorageBucket),
-		Key:    aws.String(photoID.String() + ".jpg"),
+		Key:    aws.String(photoID.String()),
 	})
 	if err != nil {
 		return nil, err
