@@ -13,6 +13,7 @@ import (
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/tag"
 	"2019_2_Shtoby_shto/src/dicts/user"
+	"2019_2_Shtoby_shto/src/fileLoader"
 	"2019_2_Shtoby_shto/src/initDB"
 	"2019_2_Shtoby_shto/src/security"
 	"context"
@@ -145,8 +146,9 @@ func checkCSRF(h echo.HandlerFunc) echo.HandlerFunc {
 
 func initService(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	sessionService := security.NewSessionManager(conf.RedisConfig, conf.RedisPass, conf.RedisDbNumber)
+	fl := fileLoader.CreateFileLoaderInstance(conf.StorageRegion, conf.StorageEndpoint, conf.StorageBucket)
 	userService = user.CreateInstance(db)
-	photoService = photo.CreateInstance(db, conf)
+	photoService = photo.CreateInstance(db, conf, fl)
 	boardService = board.CreateInstance(db)
 	boardUsersService = boardUsers.CreateInstance(db)
 	cardUsersService = сardUsers.CreateInstance(db)

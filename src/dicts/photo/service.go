@@ -5,12 +5,10 @@ import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts/models"
+	"2019_2_Shtoby_shto/src/fileLoader"
 	transport "2019_2_Shtoby_shto/src/handle"
 	"bufio"
 	"bytes"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
 	"io/ioutil"
 	"os"
 	"path"
@@ -24,21 +22,16 @@ type HandlerPhotoService interface {
 
 type service struct {
 	transport.HandlerImpl
-	svc *s3.S3
 	cfg *config.Config
 	db  database.IDataManager
+	fl  fileLoader.IFileLoaderManager
 }
 
-func CreateInstance(db database.IDataManager, cfg *config.Config) HandlerPhotoService {
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region:   aws.String(cfg.StorageRegion),
-		Endpoint: aws.String(cfg.StorageEndpoint),
-	}))
-	svc := s3.New(sess)
+func CreateInstance(db database.IDataManager, cfg *config.Config, fileLoader fileLoader.IFileLoaderManager) HandlerPhotoService {
 	return &service{
-		svc: svc,
 		cfg: cfg,
 		db:  db,
+		fl:  fileLoader,
 	}
 }
 
@@ -66,14 +59,7 @@ func (s service) DownloadPhoto(photo *bufio.Reader) (*models.Photo, error) {
 	if _, err := bufio.NewWriter(file).Write(buf.Bytes()); err != nil {
 		return nil, err
 	}
-	var acl = s3.ObjectCannedACLPublicRead
-	r := bytes.NewReader(buf.Bytes())
-	_, err = s.svc.PutObject(&s3.PutObjectInput{
-		Bucket: aws.String(s.cfg.StorageBucket),
-		Key:    aws.String(newPhoto.ID.String()),
-		ACL:    &acl,
-		Body:   r,
-	})
+	err = s.fl.DownloadFile(newPhoto.ID.String(), buf.Bytes())
 	if err != nil {
 		return nil, err
 	}
@@ -81,12 +67,9 @@ func (s service) DownloadPhoto(photo *bufio.Reader) (*models.Photo, error) {
 }
 
 func (s service) GetPhotoByUser(photoID customType.StringUUID) ([]byte, error) {
-	out, err := s.svc.GetObject(&s3.GetObjectInput{
-		Bucket: aws.String(s.cfg.StorageBucket),
-		Key:    aws.String(photoID.String()),
-	})
+	file, err := s.fl.UploadFile(photoID.String())
 	if err != nil {
 		return nil, err
 	}
-	return ioutil.ReadAll(out.Body)
+	return ioutil.ReadAll(file)
 }
