@@ -33,21 +33,6 @@ import (
 	//"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-var (
-	securityService   security.HandlerSecurity
-	userService       user.HandlerUserService
-	photoService      photo.HandlerPhotoService
-	boardService      board.HandlerBoardService
-	boardUsersService boardUsers.HandlerBoardUsersService
-	cardUsersService  сardUsers.HandlerCardUsersService
-	cardService       card.HandlerCardService
-	cardGroupService  cardGroup.HandlerCardGroupService
-	commentService    comment.HandlerCommentService
-	tagService        tag.HandlerTagService
-	cardTagsService   cardTags.HandlerCardTagsService
-	dbService         initDB.InitDBManager
-)
-
 func main() {
 	flag.Parse()
 	e := echo.New()
@@ -68,7 +53,7 @@ func main() {
 	httpAddr := ":" + strconv.Itoa(conf.Port)
 	e.Logger.Info("API Url:", httpAddr)
 
-	dbService = initDB.Init()
+	dbService := initDB.Init()
 	db, err := dbService.DbConnect("postgres", conf.DbConfig)
 	if err != nil {
 		e.Logger.Error(err)
@@ -78,7 +63,7 @@ func main() {
 	defer dm.CloseConnection()
 
 	e.Logger.SetLevel(echoLog.DEBUG)
-	initService(e, dm, conf)
+	InitServices(e, dm, conf)
 	newServer(e, httpAddr)
 
 	// great shutdown
@@ -119,7 +104,6 @@ func newServer(e *echo.Echo, httpAddr string) {
 			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderXCSRFToken},
 			ExposeHeaders:    []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderXCSRFToken},
 		}),
-		securityService.CheckSession,
 		checkCSRF)
 
 	e.Server = &http.Server{
@@ -144,20 +128,21 @@ func checkCSRF(h echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func initService(e *echo.Echo, db database.IDataManager, conf *config.Config) {
+func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	sessionService := security.NewSessionManager(conf.RedisConfig, conf.RedisPass, conf.RedisDbNumber)
 	fl := fileLoader.CreateFileLoaderInstance(conf.StorageRegion, conf.StorageEndpoint, conf.StorageBucket)
-	userService = user.CreateInstance(db)
-	photoService = photo.CreateInstance(db, conf, fl)
-	boardService = board.CreateInstance(db)
-	boardUsersService = boardUsers.CreateInstance(db)
-	cardUsersService = сardUsers.CreateInstance(db)
-	cardService = card.CreateInstance(db)
-	cardGroupService = cardGroup.CreateInstance(db)
-	commentService = comment.CreateInstance(db)
-	tagService = tag.CreateInstance(db)
-	cardTagsService = cardTags.CreateInstance(db)
-	securityService = security.CreateInstance(sessionService)
+	userService := user.CreateInstance(db)
+	photoService := photo.CreateInstance(db, conf, fl)
+	boardService := board.CreateInstance(db)
+	boardUsersService := boardUsers.CreateInstance(db)
+	cardUsersService := сardUsers.CreateInstance(db)
+	cardService := card.CreateInstance(db)
+	cardGroupService := cardGroup.CreateInstance(db)
+	commentService := comment.CreateInstance(db)
+	tagService := tag.CreateInstance(db)
+	cardTagsService := cardTags.CreateInstance(db)
+	securityService := security.CreateInstance(sessionService)
+	e.Use(securityService.CheckSession)
 	user.NewUserHandler(e, userService, boardUsersService, cardUsersService, securityService)
 	photo.NewPhotoHandler(e, photoService, userService, securityService)
 	board.NewBoardHandler(e, userService, boardService, boardUsersService, cardService, cardUsersService, cardGroupService, tagService, cardTagsService, commentService, securityService)
