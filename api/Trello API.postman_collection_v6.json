@@ -1,0 +1,3940 @@
+{
+	"info": {
+		"_postman_id": "7db4783e-c642-4ee2-8d8a-b39765a0398b",
+		"name": "Trello API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Card",
+			"item": [
+				{
+					"name": "Card | POST",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"caption\":\"В работе\",\n\t\"card_group_id\":\"0b0dae61-de69-4ad0-9b9f-d8ecf7106b6e\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/cards",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"cards"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Card | POST",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"caption\":\"В работе\",\n\t\"card_group_id\":\"b99b8741-4d72-4531-947a-c965c2f9642d\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/cards",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"cards"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:37:52 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "209"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"caption\": \"В работе\",\n    \"priority\": 0,\n    \"card_user_id\": \"4af32966-7d93-4df8-9b4e-782a050684cf\",\n    \"card_group_id\": \"b99b8741-4d72-4531-947a-c965c2f9642d\",\n    \"tasks\": null,\n    \"id\": \"b37e44cd-cd6d-4ea2-a02d-fce1ffcfba38\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Card Attach user | POST",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"user_id\":\"1111c4cf-9421-4762-abbd-d53a7829ac2c\",\n\t\"card_id\":\"422262ef-71d8-49f2-b3e4-3c5d2ddfbaff\"\n}"
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/cards/user/attach",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"cards",
+								"user",
+								"attach"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Card | POST",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"caption\":\"В работе\",\n\t\"card_group_id\":\"b99b8741-4d72-4531-947a-c965c2f9642d\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/cards",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"cards"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:37:52 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "209"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"caption\": \"В работе\",\n    \"priority\": 0,\n    \"card_user_id\": \"4af32966-7d93-4df8-9b4e-782a050684cf\",\n    \"card_group_id\": \"b99b8741-4d72-4531-947a-c965c2f9642d\",\n    \"tasks\": null,\n    \"id\": \"b37e44cd-cd6d-4ea2-a02d-fce1ffcfba38\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Card Detach user | POST",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"user_id\":\"1111c4cf-9421-4762-abbd-d53a7829ac2c\",\n\t\"card_id\":\"422262ef-71d8-49f2-b3e4-3c5d2ddfbaff\"\n}"
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/cards/user/detach",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"cards",
+								"user",
+								"detach"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Card | POST",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"caption\":\"В работе\",\n\t\"card_group_id\":\"b99b8741-4d72-4531-947a-c965c2f9642d\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/cards",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"cards"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:37:52 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "209"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"caption\": \"В работе\",\n    \"priority\": 0,\n    \"card_user_id\": \"4af32966-7d93-4df8-9b4e-782a050684cf\",\n    \"card_group_id\": \"b99b8741-4d72-4531-947a-c965c2f9642d\",\n    \"tasks\": null,\n    \"id\": \"b37e44cd-cd6d-4ea2-a02d-fce1ffcfba38\"\n}"
+						},
+						{
+							"name": "Card Detach user | POST",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"user_id\":\"1111c4cf-9421-4762-abbd-d53a7829ac2c\",\n\t\"card_id\":\"422262ef-71d8-49f2-b3e4-3c5d2ddfbaff\"\n}"
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/cards/user/detach",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"cards",
+										"user",
+										"detach"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Access-Control-Expose-Headers",
+									"value": "Origin,Content-Type,Accept,X-CSRF-Token"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 14 Nov 2019 21:03:50 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "100"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"user_id\": \"1111c4cf-9421-4762-abbd-d53a7829ac2c\",\n    \"card_id\": \"422262ef-71d8-49f2-b3e4-3c5d2ddfbaff\"\n}"
+						}
+					]
+				},
+				{
+					"name": "User cards | POST",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"users\":[\"9ba3c360-501a-4c6e-a180-91ec0f059d55\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/cards/user",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"cards",
+								"user"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "User cards | POST",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"users\":[\"9ba3c360-501a-4c6e-a180-91ec0f059d55\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/cards/user",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"cards",
+										"user"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 27 Oct 2019 20:25:47 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "176"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"caption\": \"В работе\",\n        \"priority\": 0,\n        \"board_id\": \"\",\n        \"card_user_id\": \"\",\n        \"card_group_id\": \"503510af-c577-46d7-b33d-598f41c0fba4\",\n        \"id\": \"da2303a7-5123-4f6b-98a8-2abaa72cc8b0\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Card | PUT",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"caption\": \"В работе\",\r\n    \"priority\": 0,\r\n    \"board_id\": \"0eeee470-0cd9-442c-b302-e04ddd69233f\",\r\n    \"card_user_id\": \"\",\r\n    \"card_group_id\": \"503510af-c577-46d7-b33d-598f41c0fba4\",\r\n    \"id\": \"da2303a7-5123-4f6b-98a8-2abaa72cc8b0\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/cards/da2303a7-5123-4f6b-98a8-2abaa72cc8b0",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"cards",
+								"da2303a7-5123-4f6b-98a8-2abaa72cc8b0"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Card | PUT",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"caption\": \"В рабкоте\",\r\n    \"priority\": 0,\r\n    \"board_id\": \"0eeee470-0cd9-442c-b302-e04ddd69233f\",\r\n    \"card_user_id\": \"\",\r\n    \"card_group_id\": \"503510af-c577-46d7-b33d-598f41c0fba4\",\r\n    \"id\": \"da2303a7-5123-4f6b-98a8-2abaa72cc8b0\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/cards/da2303a7-5123-4f6b-98a8-2abaa72cc8b0",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"cards",
+										"da2303a7-5123-4f6b-98a8-2abaa72cc8b0"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 27 Oct 2019 21:18:53 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "212"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"caption\": \"В рабкоте\",\n    \"priority\": 0,\n    \"board_id\": \"0eeee470-0cd9-442c-b302-e04ddd69233f\",\n    \"card_user_id\": \"\",\n    \"card_group_id\": \"503510af-c577-46d7-b33d-598f41c0fba4\",\n    \"id\": \"da2303a7-5123-4f6b-98a8-2abaa72cc8b0\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Card | GET",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Origin",
+								"value": "http://localhost:3000",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/cards/422262ef-71d8-49f2-b3e4-3c5d2ddfbaff",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"cards",
+								"422262ef-71d8-49f2-b3e4-3c5d2ddfbaff"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Card | GET",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/cards/da2303a7-5123-4f6b-98a8-2abaa72cc8b0",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"cards",
+										"da2303a7-5123-4f6b-98a8-2abaa72cc8b0"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 27 Oct 2019 21:17:41 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "210"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"caption\": \"В работе\",\n    \"priority\": 0,\n    \"board_id\": \"0eeee470-0cd9-442c-b302-e04ddd69233f\",\n    \"card_user_id\": \"\",\n    \"card_group_id\": \"503510af-c577-46d7-b33d-598f41c0fba4\",\n    \"id\": \"da2303a7-5123-4f6b-98a8-2abaa72cc8b0\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Card | FETCH",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Origin",
+								"type": "text",
+								"value": "http://localhost:3000"
+							}
+						],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/cards",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"cards"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Card | FETCH",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Origin",
+										"type": "text",
+										"value": "http://localhost:3000"
+									}
+								],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/cards",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"cards"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "http://localhost:3000"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:37:35 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "774"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"caption\": \"В рабкоте\",\n        \"priority\": 0,\n        \"card_user_id\": \"\",\n        \"card_group_id\": \"503510af-c577-46d7-b33d-598f41c0fba4\",\n        \"tasks\": [\n            {\n                \"text\": \"Работай блядь\",\n                \"card_id\": \"da2303a7-5123-4f6b-98a8-2abaa72cc8b0\",\n                \"done\": false,\n                \"id\": \"a493011c-082f-4959-aa1d-ad5d5f6fd80c\"\n            },\n            {\n                \"text\": \"Работай блядь\",\n                \"card_id\": \"da2303a7-5123-4f6b-98a8-2abaa72cc8b0\",\n                \"done\": false,\n                \"id\": \"58672a11-65f6-4f26-9bc5-6cdc87bedd01\"\n            },\n            {\n                \"text\": \"Работай блядь\",\n                \"card_id\": \"da2303a7-5123-4f6b-98a8-2abaa72cc8b0\",\n                \"done\": false,\n                \"id\": \"d7dccb87-2708-4b58-a360-7657e60eae1b\"\n            }\n        ],\n        \"id\": \"da2303a7-5123-4f6b-98a8-2abaa72cc8b0\"\n    },\n    {\n        \"caption\": \"В работе\",\n        \"priority\": 0,\n        \"card_user_id\": \"\",\n        \"card_group_id\": \"f3f5b9b4-e444-4827-baf2-55377eba1978\",\n        \"tasks\": [],\n        \"id\": \"b6dc922c-27c1-4da7-ade1-95a081d446ef\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Card | DELETE",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/cards/5bc67349-5cfd-4549-9ed9-02212e4724d0",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"cards",
+								"5bc67349-5cfd-4549-9ed9-02212e4724d0"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Login | POST",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Origin",
+								"value": "http://localhost:3000",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"login\":\"Yuliya\",\n\t\"password\":\"1111\"\n }"
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/login",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Login | POST",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Origin",
+										"value": "http://localhost:3000",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"login\":\"Sanya2\",\n\t\"password\":\"1111\"\n }"
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/login",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "http://localhost:3000"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "session_id=c14e4273-3105-4bc1-b696-cba1469d585a; Expires=Tue, 29 Oct 2019 21:19:17 GMT"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 21:19:17 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "32"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/plain; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\"message\":\"Login\",\"error\":null}"
+						},
+						{
+							"name": "Login | POST",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Origin",
+										"value": "http://localhost:3000",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"login\":\"Лёха no3\",\n\t\"password\":\"1111\"\n }"
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/login",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "http://localhost:3000"
+								},
+								{
+									"key": "Access-Control-Expose-Headers",
+									"value": "Origin,Content-Type,Accept,X-CSRF-Token"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "session_id=d89e2ab8-070d-4864-9969-8049f648c347; Expires=Fri, 15 Nov 2019 20:49:51 GMT"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "X-Csrf-Token",
+									"value": "88713c5656373a4b90f308063c8d076aa9868c72b4bfd41e91d755bc40779b87:1574369390"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 14 Nov 2019 20:49:51 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "119"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"login\": \"Лёха no3\",\n    \"photo_id\": \"306ffe59-e4e9-4b9e-b95b-23871db92b79\",\n    \"id\": \"80e2c027-35cb-4330-8a0a-5c5e724c3bdf\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Logout | GET",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/logout",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"logout"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Logout | GET",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/logout",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"logout"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 23:00:17 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "33"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/plain; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\"message\":\"Logout\",\"error\":null}"
+						}
+					]
+				},
+				{
+					"name": "Registration | POST",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "1111",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"login\":\"Yuliya\",\n\t\"name\":\"1\",\n\t\"password\":\"1111\"\n}"
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/users/registration",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"users",
+								"registration"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Registration | POST",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"login\":\"Sanya2\",\n\t\"password\":\"1111\"\n}"
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/users/registration",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"users",
+										"registration"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "session_id=4d9c0b0a-7150-4d9c-aea1-09acc9bcb4c3; Expires=Fri, 25 Oct 2019 20:11:53 GMT"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 24 Oct 2019 20:11:53 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "97"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/plain; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\"message\":\"Registration is success, user id: 9ba3c360-501a-4c6e-a180-91ec0f059d55\",\"error\":null}"
+						}
+					]
+				},
+				{
+					"name": "User | PUT",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-Csrf-Token",
+								"value": "e0437d46f067533c641b3839b4a96e4cea006eb567dbdd4541546bf93f55d88d:1574097529",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"login\":\"Лёха no1\"\n}"
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/users",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User | GET",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Csrf-Token",
+								"value": "9a55711ca231583a84ef8a12bcf5a65ba8eb9f97f640134aba47f8c9d857a734:1574097342",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/users/80e2c027-35cb-4330-8a0a-5c5e724c3bdf",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"users",
+								"80e2c027-35cb-4330-8a0a-5c5e724c3bdf"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "User | GET",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/users",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 27 Oct 2019 23:18:58 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "113"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"login\": \"Sanya2\",\n    \"photo_id\": \"ece054d7-bcbf-417e-aaec-f11d2f26ed86\",\n    \"id\": \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n}"
+						}
+					]
+				},
+				{
+					"name": "User | FETCH",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/users/all",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"users",
+								"all"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "User | FETCH",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/users/all",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"users",
+										"all"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 23:00:56 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1194"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"login\": \"sanya\",\n        \"password\": \"1111\",\n        \"id\": \"26f37a95-857e-4410-8c0a-c4eaf4b0c128\"\n    },\n    {\n        \"login\": \"sanya23\",\n        \"password\": \"1111\",\n        \"id\": \"7b3489fc-85d9-4b6c-b5c7-94599e1e2fd4\"\n    },\n    {\n        \"login\": \"sanya23125\",\n        \"password\": \"1111\",\n        \"id\": \"05064f6f-f4b7-47df-8dfe-bf01f99a80ff\"\n    },\n    {\n        \"login\": \"sanya231251\",\n        \"password\": \"1111\",\n        \"id\": \"0faef57e-e9fd-405e-a360-02bdff0f274a\"\n    },\n    {\n        \"login\": \"sanya2\",\n        \"password\": \"1111\",\n        \"id\": \"580b4331-757c-4e85-87ce-0574c70bcdf2\"\n    },\n    {\n        \"login\": \"sanya222\",\n        \"password\": \"1111\",\n        \"id\": \"5a220042-159c-4710-a048-bad333df5697\"\n    },\n    {\n        \"login\": \"Sanya1\",\n        \"password\": \"1111\",\n        \"id\": \"6e1d998d-4f9b-4123-b5a7-8a35f3a8e19d\"\n    },\n    {\n        \"login\": \"Sanya123\",\n        \"password\": \"1\",\n        \"id\": \"b4179dbf-2fe1-4419-83ae-de7187284c48\"\n    },\n    {\n        \"login\": \"abc@mail.ru\",\n        \"password\": \"qwerty\",\n        \"id\": \"b09bcc1e-4627-4f0a-b103-e1d2ffea7b84\"\n    },\n    {\n        \"login\": \"\",\n        \"photo_id\": \"5ace5bd2-7851-49fc-bed2-f954aecb509a\",\n        \"id\": \"84bfed5d-0a4d-40c0-bed5-0bc33298dfb5\"\n    },\n    {\n        \"login\": \"sany\",\n        \"password\": \"1111\",\n        \"id\": \"832f62a6-3279-44f5-86a5-288cc4078417\"\n    },\n    {\n        \"login\": \"lyoha\",\n        \"password\": \"111\",\n        \"photo_id\": \"9d350891-1d02-47b4-b163-dbb9922ecf97\",\n        \"id\": \"f4552b47-0ab3-4ab2-8a77-6e77bf554a53\"\n    },\n    {\n        \"login\": \"Sanya2\",\n        \"password\": \"1111\",\n        \"photo_id\": \"ece054d7-bcbf-417e-aaec-f11d2f26ed86\",\n        \"id\": \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n    }\n]"
+						}
+					]
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Photo",
+			"item": [
+				{
+					"name": "Photo | POST",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": "/C:/Users/Sanya/Pictures/мем.jpg"
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/photo",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"photo"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Photo | POST",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/x-www-form-urlencoded",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "file",
+									"file": {
+										"src": "/C:/Users/Sanya/Pictures/мем.jpg"
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/photo",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"photo"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 27 Oct 2019 23:15:51 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "0"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Photo | GET",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/photo/306ffe59-e4e9-4b9e-b95b-23871db92b79",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"photo",
+								"306ffe59-e4e9-4b9e-b95b-23871db92b79"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Board",
+			"item": [
+				{
+					"name": "Board | POST",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\":\"test123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/board",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"board"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Board | POST",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\":\"test1\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/board",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"board"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:38:29 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "136"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"name\": \"test1\",\n    \"board_users_id\": \"cc2908ae-ce66-4ed6-ad7d-4ba0049e7d1f\",\n    \"card_groups\": null,\n    \"id\": \"d30272ef-5258-486b-8185-db511d3dcb3e\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Board Attach user | POST",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"user_id\":\"80e2c027-35cb-4330-8a0a-5c5e724c3bdf\",\n\t\"board_id\":\"69a274a9-4837-4916-8554-5389ce7ba188\"\n}"
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/board/user/attach",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"board",
+								"user",
+								"attach"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Card | POST",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"caption\":\"В работе\",\n\t\"card_group_id\":\"b99b8741-4d72-4531-947a-c965c2f9642d\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/cards",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"cards"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:37:52 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "209"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"caption\": \"В работе\",\n    \"priority\": 0,\n    \"card_user_id\": \"4af32966-7d93-4df8-9b4e-782a050684cf\",\n    \"card_group_id\": \"b99b8741-4d72-4531-947a-c965c2f9642d\",\n    \"tasks\": null,\n    \"id\": \"b37e44cd-cd6d-4ea2-a02d-fce1ffcfba38\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Board Detach user | POST",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"user_id\":\"1111b438-cd5a-48cb-9fb2-db1876102ada\",\n\t\"board_id\":\"69a274a9-4837-4916-8554-5389ce7ba188\"\n}"
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/board/user/detach",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"board",
+								"user",
+								"detach"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Card | POST",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"caption\":\"В работе\",\n\t\"card_group_id\":\"b99b8741-4d72-4531-947a-c965c2f9642d\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/cards",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"cards"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:37:52 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "209"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"caption\": \"В работе\",\n    \"priority\": 0,\n    \"card_user_id\": \"4af32966-7d93-4df8-9b4e-782a050684cf\",\n    \"card_group_id\": \"b99b8741-4d72-4531-947a-c965c2f9642d\",\n    \"tasks\": null,\n    \"id\": \"b37e44cd-cd6d-4ea2-a02d-fce1ffcfba38\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Board | GET",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/board/69a274a9-4837-4916-8554-5389ce7ba188",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"board",
+								"69a274a9-4837-4916-8554-5389ce7ba188"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Board | GET",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/board/0eeee470-0cd9-442c-b302-e04ddd69233f",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"board",
+										"0eeee470-0cd9-442c-b302-e04ddd69233f"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:44:43 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1219"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"name\": \"test1\",\n    \"board_users_id\": \"\",\n    \"card_groups\": [\n        {\n            \"name\": \"Завтра защита, а ты всё ещё глупый!\",\n            \"board_id\": \"0eeee470-0cd9-442c-b302-e04ddd69233f\",\n            \"cards\": [\n                {\n                    \"caption\": \"В работе\",\n                    \"priority\": 0,\n                    \"card_user_id\": \"\",\n                    \"card_group_id\": \"b99b8741-4d72-4531-947a-c965c2f9642d\",\n                    \"tasks\": [],\n                    \"id\": \"c981e74b-bd45-4377-a7e3-1193a9888469\"\n                },\n                {\n                    \"caption\": \"В работе\",\n                    \"priority\": 0,\n                    \"card_user_id\": \"\",\n                    \"card_group_id\": \"b99b8741-4d72-4531-947a-c965c2f9642d\",\n                    \"tasks\": [],\n                    \"id\": \"cea35b91-7772-4c36-bce1-3b60806b6a6c\"\n                },\n                {\n                    \"caption\": \"В работе\",\n                    \"priority\": 0,\n                    \"card_user_id\": \"\",\n                    \"card_group_id\": \"b99b8741-4d72-4531-947a-c965c2f9642d\",\n                    \"tasks\": [\n                        {\n                            \"text\": \"Работай блядь\",\n                            \"card_id\": \"b37e44cd-cd6d-4ea2-a02d-fce1ffcfba38\",\n                            \"done\": false,\n                            \"id\": \"f7f09086-06f3-47a0-9934-b2649f8954b0\"\n                        },\n                        {\n                            \"text\": \"Работай блядь\",\n                            \"card_id\": \"b37e44cd-cd6d-4ea2-a02d-fce1ffcfba38\",\n                            \"done\": false,\n                            \"id\": \"e930febd-37dd-490e-aebc-1498ad90e618\"\n                        },\n                        {\n                            \"text\": \"Работай блядь!!!\",\n                            \"card_id\": \"b37e44cd-cd6d-4ea2-a02d-fce1ffcfba38\",\n                            \"done\": false,\n                            \"id\": \"f90b173e-47b4-4181-ad37-82729a0fd029\"\n                        }\n                    ],\n                    \"id\": \"b37e44cd-cd6d-4ea2-a02d-fce1ffcfba38\"\n                }\n            ],\n            \"id\": \"b99b8741-4d72-4531-947a-c965c2f9642d\"\n        }\n    ],\n    \"id\": \"0eeee470-0cd9-442c-b302-e04ddd69233f\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Board | FETCH",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/board",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"board"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Board | FETCH",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/board",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"board"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 23:01:56 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "2047"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"abed8024-f0c6-4299-ac4d-872b9dad5285\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"bfcbc6b1-d3c7-4a23-a64a-19c0e6d94745\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"fbff9480-84ef-42d5-bb42-a0cc80319922\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"da2967b9-eef9-4f42-a10d-58ff061e3074\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"c25d2103-a0b3-49b7-83b2-cbc80769b341\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"fdb71c91-090a-44dd-8178-0f1ac0dde750\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"660da74d-c428-4caa-ac0e-12aff137083a\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"0eeee470-0cd9-442c-b302-e04ddd69233f\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"b522b575-4f61-4ad2-a3b3-0cd47381a635\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"1\",\n        \"card_groups\": null,\n        \"id\": \"38c5ce8c-b3ca-4a1e-b0e4-eaaad2e77829\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"f13d9e27-a260-4ad4-9ec3-55f79fcb8f0a\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"47a6ea39-26c2-4554-902d-23a8d6fec07a\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"e64fcd46-2f46-44fc-9fca-1fb2e1d52bd2\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"06887abf-f9d7-489a-b213-5e42cbbc52a7\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"9fd6f18d-a7a8-4140-9327-3504cd677ea3\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"451243c1-55ed-4fe0-a49f-826904882ba0\",\n        \"card_groups\": null,\n        \"id\": \"8c65f26f-c41c-45ce-8dd3-7d901fbe41cf\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"7d3a292c-d282-4c33-bb83-9182ae22ce2a\",\n        \"card_groups\": null,\n        \"id\": \"ae05efd6-1611-4de9-9e47-7c884074bf26\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"90f0477f-47da-4fae-91d9-0be6cee066df\",\n        \"card_groups\": null,\n        \"id\": \"4cd2a9cc-656c-4653-901e-8f552a0d8832\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"cc2908ae-ce66-4ed6-ad7d-4ba0049e7d1f\",\n        \"card_groups\": null,\n        \"id\": \"d30272ef-5258-486b-8185-db511d3dcb3e\"\n    }\n]"
+						},
+						{
+							"name": "Board | FETCH",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/board",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"board"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Access-Control-Expose-Headers",
+									"value": "Origin,Content-Type,Accept,X-CSRF-Token"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 14 Nov 2019 21:25:05 GMT"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"name\": \"test1\",\n        \"users\": [],\n        \"card_groups\": null,\n        \"id\": \"abed8024-f0c6-4299-ac4d-872b9dad5285\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [],\n        \"card_groups\": null,\n        \"id\": \"bfcbc6b1-d3c7-4a23-a64a-19c0e6d94745\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [],\n        \"card_groups\": null,\n        \"id\": \"fbff9480-84ef-42d5-bb42-a0cc80319922\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"da2967b9-eef9-4f42-a10d-58ff061e3074\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"c25d2103-a0b3-49b7-83b2-cbc80769b341\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [],\n        \"card_groups\": null,\n        \"id\": \"fdb71c91-090a-44dd-8178-0f1ac0dde750\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"660da74d-c428-4caa-ac0e-12aff137083a\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"0eeee470-0cd9-442c-b302-e04ddd69233f\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"b522b575-4f61-4ad2-a3b3-0cd47381a635\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"38c5ce8c-b3ca-4a1e-b0e4-eaaad2e77829\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"f13d9e27-a260-4ad4-9ec3-55f79fcb8f0a\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"47a6ea39-26c2-4554-902d-23a8d6fec07a\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"e64fcd46-2f46-44fc-9fca-1fb2e1d52bd2\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"06887abf-f9d7-489a-b213-5e42cbbc52a7\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"9fd6f18d-a7a8-4140-9327-3504cd677ea3\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"8c65f26f-c41c-45ce-8dd3-7d901fbe41cf\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"ae05efd6-1611-4de9-9e47-7c884074bf26\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"4cd2a9cc-656c-4653-901e-8f552a0d8832\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"9ba3c360-501a-4c6e-a180-91ec0f059d55\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"d30272ef-5258-486b-8185-db511d3dcb3e\"\n    },\n    {\n        \"name\": \"test1\",\n        \"users\": [\n            \"ad6700d8-d0f6-43b9-8b80-e3b426a54e0a\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"94c604a3-6a0c-406e-81ae-917269ac559f\"\n    },\n    {\n        \"name\": \"test222\",\n        \"users\": [\n            \"9306b438-cd5a-48cb-9fb2-db1876102ada\",\n            \"9306b438-cd5a-48cb-9fb2-db1876102ada\",\n            \"80e2c027-35cb-4330-8a0a-5c5e724c3bdf\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"69a274a9-4837-4916-8554-5389ce7ba188\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Boards by user | GET",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/board/user/80e2c027-35cb-4330-8a0a-5c5e724c3bdf",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"board",
+								"user",
+								"80e2c027-35cb-4330-8a0a-5c5e724c3bdf"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Boards by user | GET",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/board/user/80e2c027-35cb-4330-8a0a-5c5e724c3bdf",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"board",
+										"user",
+										"80e2c027-35cb-4330-8a0a-5c5e724c3bdf"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Access-Control-Expose-Headers",
+									"value": "Origin,Content-Type,Accept,X-CSRF-Token"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 14 Nov 2019 21:24:20 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "211"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"name\": \"test222\",\n        \"users\": [\n            \"9306b438-cd5a-48cb-9fb2-db1876102ada\",\n            \"9306b438-cd5a-48cb-9fb2-db1876102ada\",\n            \"80e2c027-35cb-4330-8a0a-5c5e724c3bdf\"\n        ],\n        \"card_groups\": null,\n        \"id\": \"69a274a9-4837-4916-8554-5389ce7ba188\"\n    }\n]"
+						},
+						{
+							"name": "Boards by user | GET",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/board/user/9ba3c360-501a-4c6e-a180-91ec0f059d55",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"board",
+										"user",
+										"9ba3c360-501a-4c6e-a180-91ec0f059d55"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 23:01:35 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1647"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"da2967b9-eef9-4f42-a10d-58ff061e3074\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"c25d2103-a0b3-49b7-83b2-cbc80769b341\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"660da74d-c428-4caa-ac0e-12aff137083a\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"0eeee470-0cd9-442c-b302-e04ddd69233f\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"b522b575-4f61-4ad2-a3b3-0cd47381a635\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"1\",\n        \"card_groups\": null,\n        \"id\": \"38c5ce8c-b3ca-4a1e-b0e4-eaaad2e77829\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"f13d9e27-a260-4ad4-9ec3-55f79fcb8f0a\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"47a6ea39-26c2-4554-902d-23a8d6fec07a\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"e64fcd46-2f46-44fc-9fca-1fb2e1d52bd2\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"06887abf-f9d7-489a-b213-5e42cbbc52a7\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"\",\n        \"card_groups\": null,\n        \"id\": \"9fd6f18d-a7a8-4140-9327-3504cd677ea3\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"451243c1-55ed-4fe0-a49f-826904882ba0\",\n        \"card_groups\": null,\n        \"id\": \"8c65f26f-c41c-45ce-8dd3-7d901fbe41cf\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"7d3a292c-d282-4c33-bb83-9182ae22ce2a\",\n        \"card_groups\": null,\n        \"id\": \"ae05efd6-1611-4de9-9e47-7c884074bf26\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"90f0477f-47da-4fae-91d9-0be6cee066df\",\n        \"card_groups\": null,\n        \"id\": \"4cd2a9cc-656c-4653-901e-8f552a0d8832\"\n    },\n    {\n        \"name\": \"test1\",\n        \"board_users_id\": \"cc2908ae-ce66-4ed6-ad7d-4ba0049e7d1f\",\n        \"card_groups\": null,\n        \"id\": \"d30272ef-5258-486b-8185-db511d3dcb3e\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Board | PUT",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\":\"test222\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/board/69a274a9-4837-4916-8554-5389ce7ba188",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"board",
+								"69a274a9-4837-4916-8554-5389ce7ba188"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Board | DELETE",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"caption\":\"test222\",\n\t\"users\":null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/board/5a1d64c0-3c6f-48c4-b0ea-4edcf25cdd64",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"board",
+								"5a1d64c0-3c6f-48c4-b0ea-4edcf25cdd64"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Comment",
+			"item": [
+				{
+					"name": "Comments | POST",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"text\":\"Работай блядь\",\n\t\"card_id\":\"da2303a7-5123-4f6b-98a8-2abaa72cc8b0\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/comments",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"comments"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Task | POST",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"text\":\"Работай блядь!!!\",\n\t\"card_id\":\"b37e44cd-cd6d-4ea2-a02d-fce1ffcfba38\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/tasks",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"tasks"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:38:06 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "146"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"text\": \"Работай блядь!!!\",\n    \"card_id\": \"b37e44cd-cd6d-4ea2-a02d-fce1ffcfba38\",\n    \"done\": false,\n    \"id\": \"f90b173e-47b4-4181-ad37-82729a0fd029\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Comments | PUT",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"caption\":\"Я сказал работать\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/comments/3ec24fcf-ed39-417b-b60f-1cafe2601486",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"comments",
+								"3ec24fcf-ed39-417b-b60f-1cafe2601486"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Task | PUT",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"text\": \"1111\",\n    \"card_id\": \"\",\n    \"done\": false\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/tasks/3ec24fcf-ed39-417b-b60f-1cafe2601486",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"tasks",
+										"3ec24fcf-ed39-417b-b60f-1cafe2601486"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:59:43 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "86"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"text\": \"1111\",\n    \"card_id\": \"\",\n    \"done\": false,\n    \"id\": \"3ec24fcf-ed39-417b-b60f-1cafe2601486\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Comments | GET",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b286cb4b-f35f-4b62-87ee-5e5d0a78f439",
+								"exec": [
+									"var Header = require('postman-collection').Header\r",
+									"pm.request.headers.add(new Header(\"X-Csrf-Token: \" + pm.environment.get('d4691bd793d86b640f3f4dc749f4339e1818394757856a4845d9269e8b905a31:1574283209')))\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Csrf-Token",
+								"value": "d4691bd793d86b640f3f4dc749f4339e1818394757856a4845d9269e8b905a31:1574283209",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/comments/3ec24fcf-ed39-417b-b60f-1cafe2601486",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"comments",
+								"3ec24fcf-ed39-417b-b60f-1cafe2601486"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Task  | GET",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/tasks/3ec24fcf-ed39-417b-b60f-1cafe2601486",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"tasks",
+										"3ec24fcf-ed39-417b-b60f-1cafe2601486"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:59:11 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "82"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"text\": \"\",\n    \"card_id\": \"\",\n    \"done\": false,\n    \"id\": \"3ec24fcf-ed39-417b-b60f-1cafe2601486\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Comments | DELETE",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/comments/5bc67349-5cfd-4549-9ed9-02212e4724d0",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"comments",
+								"5bc67349-5cfd-4549-9ed9-02212e4724d0"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "apikey",
+				"apikey": [
+					{
+						"key": "value",
+						"value": "{{X-Csrf-Token}}",
+						"type": "string"
+					},
+					{
+						"key": "key",
+						"value": "X-Csrf-Token",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "75685871-13dd-4e56-8aeb-c805e451014d",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "bf5ac465-5707-4313-b9fe-6239861c2435",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Card group",
+			"item": [
+				{
+					"name": "Card-group | POST",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\":\"Сделайте плес\",\n\t\"board_id\":\"69a274a9-4837-4916-8554-5389ce7ba188\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/card-group",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"card-group"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Card-group | POST",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\":\"Завтра защита, а ты всё ещё глупый!\",\n\t\"board_id\":\"0eeee470-0cd9-442c-b302-e04ddd69233f\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/card-group",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"card-group"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:37:20 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "181"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"name\": \"Завтра защита, а ты всё ещё глупый!\",\n    \"board_id\": \"0eeee470-0cd9-442c-b302-e04ddd69233f\",\n    \"cards\": null,\n    \"id\": \"b99b8741-4d72-4531-947a-c965c2f9642d\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Card-group | GET",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/card-group/503510af-c577-46d7-b33d-598f41c0fba4",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"card-group",
+								"503510af-c577-46d7-b33d-598f41c0fba4"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Card-group | GET",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/card-group/503510af-c577-46d7-b33d-598f41c0fba4",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"card-group",
+										"503510af-c577-46d7-b33d-598f41c0fba4"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 27 Oct 2019 19:59:22 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "81"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"name\": \"Сделайте плес\",\n    \"id\": \"503510af-c577-46d7-b33d-598f41c0fba4\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Card-group | FETCH",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/card-group",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"card-group"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Card-group | FETCH",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/card-group",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"card-group"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:56:09 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "636"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"name\": \"Сделайте плес!!!!\",\n        \"board_id\": \"\",\n        \"cards\": null,\n        \"id\": \"503510af-c577-46d7-b33d-598f41c0fba4\"\n    },\n    {\n        \"name\": \"Давай блэт!\",\n        \"board_id\": \"\",\n        \"cards\": null,\n        \"id\": \"ee642d0d-55df-4a7b-9e6a-5e4d08c78296\"\n    },\n    {\n        \"name\": \"Ну же!\",\n        \"board_id\": \"\",\n        \"cards\": null,\n        \"id\": \"a6127471-490f-4486-aba0-fe4ab9dc699b\"\n    },\n    {\n        \"name\": \"Завтра защита, а ты всё ещё глупый!\",\n        \"board_id\": \"\",\n        \"cards\": null,\n        \"id\": \"f3f5b9b4-e444-4827-baf2-55377eba1978\"\n    },\n    {\n        \"name\": \"Завтра защита, а ты всё ещё глупый!\",\n        \"board_id\": \"0eeee470-0cd9-442c-b302-e04ddd69233f\",\n        \"cards\": null,\n        \"id\": \"b99b8741-4d72-4531-947a-c965c2f9642d\"\n    }\n]"
+						},
+						{
+							"name": "Card-group | FETCH",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/card-group",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"card-group"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:56:09 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "636"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"name\": \"Сделайте плес!!!!\",\n        \"board_id\": \"\",\n        \"cards\": null,\n        \"id\": \"503510af-c577-46d7-b33d-598f41c0fba4\"\n    },\n    {\n        \"name\": \"Давай блэт!\",\n        \"board_id\": \"\",\n        \"cards\": null,\n        \"id\": \"ee642d0d-55df-4a7b-9e6a-5e4d08c78296\"\n    },\n    {\n        \"name\": \"Ну же!\",\n        \"board_id\": \"\",\n        \"cards\": null,\n        \"id\": \"a6127471-490f-4486-aba0-fe4ab9dc699b\"\n    },\n    {\n        \"name\": \"Завтра защита, а ты всё ещё глупый!\",\n        \"board_id\": \"\",\n        \"cards\": null,\n        \"id\": \"f3f5b9b4-e444-4827-baf2-55377eba1978\"\n    },\n    {\n        \"name\": \"Завтра защита, а ты всё ещё глупый!\",\n        \"board_id\": \"0eeee470-0cd9-442c-b302-e04ddd69233f\",\n        \"cards\": null,\n        \"id\": \"b99b8741-4d72-4531-947a-c965c2f9642d\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Card-group | PUT",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-CSRF-Token",
+								"value": "18add9af3039a1c97dd347947f239fd309464ebe4b3f510c48f31c088dd026a4:1573604040",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\":\"Сделайте плес!!!!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/card-group/503510af-c577-46d7-b33d-598f41c0fba4",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"card-group",
+								"503510af-c577-46d7-b33d-598f41c0fba4"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Card-group | POST Copy Copy",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\":\"Сделайте плес!!!!\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/card-group/503510af-c577-46d7-b33d-598f41c0fba4",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"card-group",
+										"503510af-c577-46d7-b33d-598f41c0fba4"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 27 Oct 2019 19:59:36 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "85"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"name\": \"Сделайте плес!!!!\",\n    \"id\": \"503510af-c577-46d7-b33d-598f41c0fba4\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Card-group | DELETE",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/card-group/503510af-c577-46d7-b33d-598f41c0fba4",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"card-group",
+								"503510af-c577-46d7-b33d-598f41c0fba4"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Tag",
+			"item": [
+				{
+					"name": "Tag | POST",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"text\":\"Работай блядь\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/card/422262ef-71d8-49f2-b3e4-3c5d2ddfbaff/tags",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"card",
+								"422262ef-71d8-49f2-b3e4-3c5d2ddfbaff",
+								"tags"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Task | POST",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"text\":\"Работай блядь!!!\",\n\t\"card_id\":\"b37e44cd-cd6d-4ea2-a02d-fce1ffcfba38\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/tasks",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"tasks"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:38:06 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "146"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"text\": \"Работай блядь!!!\",\n    \"card_id\": \"b37e44cd-cd6d-4ea2-a02d-fce1ffcfba38\",\n    \"done\": false,\n    \"id\": \"f90b173e-47b4-4181-ad37-82729a0fd029\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Tag| PUT",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"caption\":\"Я сказал работать\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/tags/3ec24fcf-ed39-417b-b60f-1cafe2601486",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"tags",
+								"3ec24fcf-ed39-417b-b60f-1cafe2601486"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Task | PUT",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"text\": \"1111\",\n    \"card_id\": \"\",\n    \"done\": false\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/tasks/3ec24fcf-ed39-417b-b60f-1cafe2601486",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"tasks",
+										"3ec24fcf-ed39-417b-b60f-1cafe2601486"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:59:43 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "86"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"text\": \"1111\",\n    \"card_id\": \"\",\n    \"done\": false,\n    \"id\": \"3ec24fcf-ed39-417b-b60f-1cafe2601486\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Tag| GET",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b286cb4b-f35f-4b62-87ee-5e5d0a78f439",
+								"exec": [
+									"var Header = require('postman-collection').Header\r",
+									"pm.request.headers.add(new Header(\"X-Csrf-Token: \" + pm.environment.get('d4691bd793d86b640f3f4dc749f4339e1818394757856a4845d9269e8b905a31:1574283209')))\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Csrf-Token",
+								"type": "text",
+								"value": "d4691bd793d86b640f3f4dc749f4339e1818394757856a4845d9269e8b905a31:1574283209",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/tags/3ec24fcf-ed39-417b-b60f-1cafe2601486",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"tags",
+								"3ec24fcf-ed39-417b-b60f-1cafe2601486"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Task  | GET",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/tasks/3ec24fcf-ed39-417b-b60f-1cafe2601486",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"tasks",
+										"3ec24fcf-ed39-417b-b60f-1cafe2601486"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:59:11 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "82"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"text\": \"\",\n    \"card_id\": \"\",\n    \"done\": false,\n    \"id\": \"3ec24fcf-ed39-417b-b60f-1cafe2601486\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Tag| FETCH",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b286cb4b-f35f-4b62-87ee-5e5d0a78f439",
+								"exec": [
+									"var Header = require('postman-collection').Header\r",
+									"pm.request.headers.add(new Header(\"X-Csrf-Token: \" + pm.environment.get('d4691bd793d86b640f3f4dc749f4339e1818394757856a4845d9269e8b905a31:1574283209')))\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Csrf-Token",
+								"type": "text",
+								"value": "d4691bd793d86b640f3f4dc749f4339e1818394757856a4845d9269e8b905a31:1574283209",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/tags",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"tags"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Task  | GET",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}{{default_port}}/tasks/3ec24fcf-ed39-417b-b60f-1cafe2601486",
+									"host": [
+										"{{localhost}}{{default_port}}"
+									],
+									"path": [
+										"tasks",
+										"3ec24fcf-ed39-417b-b60f-1cafe2601486"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=UTF-8"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 28 Oct 2019 22:59:11 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "82"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"text\": \"\",\n    \"card_id\": \"\",\n    \"done\": false,\n    \"id\": \"3ec24fcf-ed39-417b-b60f-1cafe2601486\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Tag| DELETE",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{X-Csrf-Token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "X-Csrf-Token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/tags/5bc67349-5cfd-4549-9ed9-02212e4724d0",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"tags",
+								"5bc67349-5cfd-4549-9ed9-02212e4724d0"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "apikey",
+				"apikey": [
+					{
+						"key": "value",
+						"value": "{{X-Csrf-Token}}",
+						"type": "string"
+					},
+					{
+						"key": "key",
+						"value": "X-Csrf-Token",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "75685871-13dd-4e56-8aeb-c805e451014d",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "bf5ac465-5707-4313-b9fe-6239861c2435",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Prometeus | GET",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{X-Csrf-Token}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "X-Csrf-Token",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Origin",
+						"value": "http://localhost:3000",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{localhost}}{{default_port}}/cards/422262ef-71d8-49f2-b3e4-3c5d2ddfbaff",
+					"host": [
+						"{{localhost}}{{default_port}}"
+					],
+					"path": [
+						"cards",
+						"422262ef-71d8-49f2-b3e4-3c5d2ddfbaff"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Card | GET",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}{{default_port}}/cards/da2303a7-5123-4f6b-98a8-2abaa72cc8b0",
+							"host": [
+								"{{localhost}}{{default_port}}"
+							],
+							"path": [
+								"cards",
+								"da2303a7-5123-4f6b-98a8-2abaa72cc8b0"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": ""
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Vary",
+							"value": "Origin"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 27 Oct 2019 21:17:41 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "210"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"caption\": \"В работе\",\n    \"priority\": 0,\n    \"board_id\": \"0eeee470-0cd9-442c-b302-e04ddd69233f\",\n    \"card_user_id\": \"\",\n    \"card_group_id\": \"503510af-c577-46d7-b33d-598f41c0fba4\",\n    \"id\": \"da2303a7-5123-4f6b-98a8-2abaa72cc8b0\"\n}"
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "ab74577f442353131df539651d11ab42289debba849ae1b8109fa32526a3f7b4:1574341451",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "X-Csrf-Token",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "f730cfdb-d8d2-4996-903d-faa28967d10a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "aec14542-a0b6-467e-95b7-0b77de472952",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "8b1d6feb-c933-4947-a70b-c49f756f0f8c",
+			"key": "localhost",
+			"value": "http://localhost:",
+			"type": "string"
+		},
+		{
+			"id": "d066ddae-c811-4623-8a4e-cb8ded7d8dfc",
+			"key": "default_port",
+			"value": "8080",
+			"type": "string"
+		},
+		{
+			"id": "fc9b9ffb-5155-401b-8a7e-afe1b4dc1121",
+			"key": "X-Csrf-Token",
+			"value": "f9bb7f7c65f1ca1165bd9d8f4247bb0adb3ac4f0f9f12d56eba507c6e685e8d2:1574881984",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
