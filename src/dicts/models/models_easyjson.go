@@ -1277,6 +1277,10 @@ func easyjsonD2b7633eDecode20192ShtobyShtoSrcDictsModels13(in *jlexer.Lexer, out
 				}
 				in.Delim(']')
 			}
+		case "deadline":
+			if data := in.Raw(); in.Ok() {
+				in.AddError((out.Deadline).UnmarshalJSON(data))
+			}
 		case "id":
 			out.ID = customType.StringUUID(in.String())
 		default:
@@ -1370,6 +1374,11 @@ func easyjsonD2b7633eEncode20192ShtobyShtoSrcDictsModels13(out *jwriter.Writer, 
 			}
 			out.RawByte(']')
 		}
+	}
+	{
+		const prefix string = ",\"deadline\":"
+		out.RawString(prefix)
+		out.Raw((in.Deadline).MarshalJSON())
 	}
 	{
 		const prefix string = ",\"id\":"

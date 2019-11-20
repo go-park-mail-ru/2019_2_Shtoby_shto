@@ -3,6 +3,7 @@ package models
 import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts"
+	"time"
 )
 
 const cardTableName = "cards"
@@ -20,6 +21,7 @@ type Card struct {
 	Comments    []Comment             `json:"comments" sql:"-"`
 	Tags        []Tag                 `json:"tags" sql:"-"`
 	Users       []string              `json:"users" sql:"-"`
+	Deadline    time.Time             `json:"deadline"`
 }
 
 func (b Card) GetTableName() string {
