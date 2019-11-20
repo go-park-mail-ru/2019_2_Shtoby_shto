@@ -1,13 +1,14 @@
 {
   "trello.service.port": 8080,
   "trello.service.frontend.url": "http://localhost:3000",
+  "trello.service.security.url": "127.0.0.1:8081",
   "trello.service.image.path": "./image",
   "trello.service.storage.access.key": "ikWLxqGuW1kivBRAv2agu3",
   "trello.service.storage.secret.key": "f2oKA3BZKQ7vYjNtA1CmDPV9DeY7KLovBJdH4rwsqVn2",
   "trello.service.storage.region": "ru-msk",
   "trello.service.storage.endpoint": "http://hb.bizmrg.com",
   "trello.service.storage.bucket": "photo_storage",
-  "trello.service.db.config":"host='localhost' port=5432 user=postgres dbname='postgres' sslmode=disable password='1111'",
+  "trello.service.db.config":"host='localhost' port=5432 user=postgres dbname='trello' sslmode=disable password='1111'",
   "trello.service.redis.config":"localhost:6379",
   "trello.service.redis.password":"",
   "trello.service.redis.db.number":0

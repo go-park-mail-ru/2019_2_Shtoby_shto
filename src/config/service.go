@@ -20,6 +20,7 @@ const (
 type Config struct {
 	Port             int    `json:"trello.service.port"`
 	FrontendURL      string `json:"trello.service.frontend.url"`
+	SecurityURL      string `json:"trello.service.security.url"`
 	ImagePath        string `json:"trello.service.image.path"`
 	StorageAccessKey string `json:"trello.service.storage.access.key"`
 	StorageSecretKey string `json:"trello.service.storage.secret.key"`

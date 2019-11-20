@@ -1,4 +1,4 @@
-package security
+package session
 
 import (
 	. "2019_2_Shtoby_shto/src/customType"
@@ -45,7 +45,7 @@ func (sm SessionManager) Create(userID StringUUID) (*Session, error) {
 	if err != nil {
 		return nil, err
 	}
-	HMACHashToken, err := utils.NewHMACHashToken("1111")
+	HMACHashToken, err := NewHMACHashToken("1111")
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (sm *SessionManager) Check(sessionID string) (*Session, error) {
 	if err := s.UnmarshalJSON([]byte(sessionInfo)); err != nil {
 		return nil, err
 	}
-	HMACHashToken, err := utils.NewHMACHashToken("1111")
+	HMACHashToken, err := NewHMACHashToken("1111")
 	if err != nil {
 		return nil, err
 	}

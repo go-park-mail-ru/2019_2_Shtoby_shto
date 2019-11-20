@@ -19,10 +19,14 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoLog "github.com/labstack/gommon/log"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/common/log"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/balancer/roundrobin"
 	"net/http"
 	"os"
 	"os/signal"
@@ -50,6 +54,8 @@ func main() {
 
 	conf := config.GetInstance()
 
+	conn, err := ConnectGRPC(conf.SecurityURL, "security_service")
+
 	httpAddr := ":" + strconv.Itoa(conf.Port)
 	e.Logger.Info("API Url:", httpAddr)
 
@@ -57,7 +63,7 @@ func main() {
 	db, err := dbService.DbConnect("postgres", conf.DbConfig)
 	if err != nil {
 		e.Logger.Error(err)
-		os.Exit(1)
+		os.Exit(3)
 	}
 	dm := database.NewDataManager(db)
 	defer dm.CloseConnection()
@@ -150,4 +156,14 @@ func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	cardGroup.NewCardGroupHandler(e, cardGroupService, securityService)
 	comment.NewCommentHandler(e, userService, commentService, securityService)
 	tag.NewTagHandler(e, userService, tagService, cardTagsService, securityService)
+}
+
+func ConnectGRPC(addr string, name string) (*grpc.ClientConn, error) {
+	conn, err := grpc.Dial(fmt.Sprintf("srv://%s/%s", addr, name),
+		grpc.WithInsecure(), grpc.WithBalancerName(roundrobin.Name), grpc.WithBlock())
+	if err != nil {
+		log.Error("Can't connect to security service:", err)
+		return nil, err
+	}
+	return conn, nil
 }

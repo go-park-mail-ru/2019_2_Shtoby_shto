@@ -40,6 +40,8 @@ func easyjsonCd93bc43Decode20192ShtobyShtoSrcConfig(in *jlexer.Lexer, out *Confi
 			out.Port = int(in.Int())
 		case "trello.service.frontend.url":
 			out.FrontendURL = string(in.String())
+		case "trello.service.security.url":
+			out.SecurityURL = string(in.String())
 		case "trello.service.image.path":
 			out.ImagePath = string(in.String())
 		case "trello.service.storage.access.key":
@@ -83,6 +85,11 @@ func easyjsonCd93bc43Encode20192ShtobyShtoSrcConfig(out *jwriter.Writer, in Conf
 		const prefix string = ",\"trello.service.frontend.url\":"
 		out.RawString(prefix)
 		out.String(string(in.FrontendURL))
+	}
+	{
+		const prefix string = ",\"trello.service.security.url\":"
+		out.RawString(prefix)
+		out.String(string(in.SecurityURL))
 	}
 	{
 		const prefix string = ",\"trello.service.image.path\":"
