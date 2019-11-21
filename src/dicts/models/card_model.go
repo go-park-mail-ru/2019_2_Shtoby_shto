@@ -13,6 +13,7 @@ type Card struct {
 	Caption     string                `json:"caption"`
 	Text        string                `json:"text"`
 	Priority    int                   `json:"priority"`
+	FileID      customType.StringUUID `json:"file_id"`
 	CardUserID  customType.StringUUID `json:"-"`
 	CardGroupID customType.StringUUID `json:"card_group_id"`
 	Comments    []Comment             `json:"comments" sql:"-"`

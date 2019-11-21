@@ -5,8 +5,13 @@ import (
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/dicts/models"
+	"2019_2_Shtoby_shto/src/fileLoader"
 	"2019_2_Shtoby_shto/src/handle"
+	"2019_2_Shtoby_shto/src/utils"
+	"bufio"
+	"bytes"
 	"github.com/pkg/errors"
+	"io/ioutil"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=usecase_mock.go -package=$GOPACKAGE
@@ -20,16 +25,20 @@ type HandlerCardService interface {
 	DeleteCard(id customType.StringUUID) error
 	FetchCards(limit, offset int) (cards []models.Card, err error)
 	FillLookupFields(card *models.Card, comments []models.Comment) error
+	AttachFile(cardID customType.StringUUID, file *bufio.Reader) (*models.Card, error)
+	GetCardFile(fileID customType.StringUUID) ([]byte, error)
 }
 
 type service struct {
 	handle.HandlerImpl
 	db database.IDataManager
+	fl fileLoader.IFileLoaderManager
 }
 
-func CreateInstance(db database.IDataManager) HandlerCardService {
+func CreateInstance(db database.IDataManager, manager fileLoader.IFileLoaderManager) HandlerCardService {
 	return &service{
 		db: db,
+		fl: manager,
 	}
 }
 
@@ -99,4 +108,42 @@ func (s service) FetchCardsByCardGroupIDs(cardGroupIDs []string) (cards []models
 
 func (s service) FillLookupFields(card *models.Card, comments []models.Comment) error {
 	return nil
+}
+
+func (s service) AttachFile(cardID customType.StringUUID, file *bufio.Reader) (*models.Card, error) {
+	uuid, err := utils.GenerateUUID()
+	if err != nil {
+		return nil, err
+	}
+	card := &models.Card{
+		BaseInfo: dicts.BaseInfo{
+			ID: cardID,
+		},
+		FileID: customType.StringUUID(uuid.String()),
+	}
+	cardData, err := card.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	newCard, err := s.UpdateCard(cardData, cardID)
+	if err != nil {
+		return nil, err
+	}
+	buf := bytes.Buffer{}
+	if _, err := buf.ReadFrom(file); err != nil {
+		return nil, err
+	}
+	err = s.fl.DownloadFile(uuid.String(), buf.Bytes())
+	if err != nil {
+		return nil, err
+	}
+	return newCard, nil
+}
+
+func (s service) GetCardFile(fileID customType.StringUUID) ([]byte, error) {
+	file, err := s.fl.UploadFile(fileID.String())
+	if err != nil {
+		return nil, err
+	}
+	return ioutil.ReadAll(file)
 }

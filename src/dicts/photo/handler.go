@@ -42,11 +42,11 @@ func (h Handler) Get(ctx echo.Context) error {
 		return err
 	}
 	ctx.Response().Header().Add("Content-Type", "multipart/form-data")
-	if _, err := ctx.Response().Write([]byte(photo)); err != nil {
+	if _, err := ctx.Response().Write(photo); err != nil {
 		ctx.Logger().Error(err)
 		return err
 	}
-	return ctx.JSON(http.StatusOK, photo)
+	return nil
 }
 
 func (h Handler) Post(ctx echo.Context) error {
