@@ -13,7 +13,7 @@ import (
 type SessionHandler interface {
 	Create(userID StringUUID) (*Session, error)
 	Check(ctx *echo.Context) error
-	Delete(ctx echo.Context) error
+	Delete(sessionID string) error
 }
 
 //easyjson:json
@@ -83,13 +83,11 @@ func (sm *SessionManager) getSession(cacheID string) (string, error) {
 	return val, nil
 }
 
-func (sm *SessionManager) Delete(ctx echo.Context) error {
-	s := ctx.Get("session_id")
-	if s == nil {
-		return errors.New("Error session")
+func (sm *SessionManager) Delete(sessionID string) error {
+	if sessionID == "" {
+		return errors.New("Error session ")
 	}
-	ctx.Set("session_id", "")
-	return sm.cache.Del(s.(string)).Err()
+	return sm.cache.Del(sessionID).Err()
 }
 
 func (sm *SessionManager) Check(sessionID string) (*Session, error) {
@@ -99,7 +97,7 @@ func (sm *SessionManager) Check(sessionID string) (*Session, error) {
 		return nil, err
 	}
 	if sessionInfo == "" {
-		return nil, errors.New("Missing session info")
+		return nil, errors.New("Missing session info ")
 	}
 	if err := s.UnmarshalJSON([]byte(sessionInfo)); err != nil {
 		return nil, err

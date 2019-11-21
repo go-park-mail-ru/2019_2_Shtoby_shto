@@ -9,6 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+//go:generate mockgen -source=$GOFILE -destination=usecase_mock.go -package=$GOPACKAGE
+
 type HandlerCardService interface {
 	FindCardByID(id customType.StringUUID) (*models.Card, error)
 	FetchCardsByIDs(ids []string) (cards []models.Card, err error)

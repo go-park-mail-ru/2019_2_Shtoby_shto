@@ -9,6 +9,8 @@ import (
 	"errors"
 )
 
+//go:generate mockgen -source=$GOFILE -destination=service_mock.go -package=$GOPACKAGE
+
 type HandlerBoardUsersService interface {
 	CreateBoardUsers(boardUsersID, userID, boardID customType.StringUUID) (*models.BoardUsers, error)
 	FindBoardUsersByIDs(userID, boardID customType.StringUUID) (int, error)

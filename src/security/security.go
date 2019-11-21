@@ -2,7 +2,8 @@ package security
 
 import (
 	"2019_2_Shtoby_shto/src/customType"
-	"2019_2_Shtoby_shto/src/errors"
+	errLib "2019_2_Shtoby_shto/src/errors"
+	"errors"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"sync"
@@ -33,9 +34,14 @@ func CreateInstance(sm *SessionManager) HandlerSecurity {
 }
 
 func (s *service) DeleteSession(ctx echo.Context) error {
-	if err := s.Sm.Delete(ctx); err != nil {
+	sessionID, ok := ctx.Get("session_id").(string)
+	if !ok {
+		return errors.New("Session ID is not valid ")
+	}
+	if err := s.Sm.Delete(sessionID); err != nil {
 		return err
 	}
+	ctx.Set("session_id", "")
 	return nil
 }
 
@@ -70,16 +76,16 @@ func (s *service) CheckSession(h echo.HandlerFunc) echo.HandlerFunc {
 		}
 		cookieSessionID, err := ctx.Cookie("session_id")
 		if err == http.ErrNoCookie {
-			errors.ErrorHandler(ctx.Response(), "No session_id", http.StatusUnauthorized, err)
+			errLib.ErrorHandler(ctx.Response(), "No session_id", http.StatusUnauthorized, err)
 			return err
 		} else if err != nil {
-			errors.ErrorHandler(ctx.Response(), "Error cookie", http.StatusUnauthorized, err)
+			errLib.ErrorHandler(ctx.Response(), "Error cookie", http.StatusUnauthorized, err)
 			return err
 		}
 		ctx.Logger().Info(ctx.Request().Host, ctx.Request().RequestURI)
 		session, err := s.Sm.Check(cookieSessionID.Value)
 		if err != nil {
-			errors.ErrorHandler(ctx.Response(), "Error check session", http.StatusUnauthorized, err)
+			errLib.ErrorHandler(ctx.Response(), "Error check session", http.StatusUnauthorized, err)
 			return err
 		}
 		ctx.Set("session_id", cookieSessionID.Value)
