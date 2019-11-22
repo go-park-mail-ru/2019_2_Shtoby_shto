@@ -15,6 +15,7 @@ import (
 	"2019_2_Shtoby_shto/src/dicts/user"
 	"2019_2_Shtoby_shto/src/fileLoader"
 	"2019_2_Shtoby_shto/src/initDB"
+	"2019_2_Shtoby_shto/src/metric"
 	"2019_2_Shtoby_shto/src/security"
 	"context"
 	"errors"
@@ -22,7 +23,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoLog "github.com/labstack/gommon/log"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/common/log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -42,6 +45,9 @@ func main() {
 	})
 
 	e.POST("/api/v1/query", echo.WrapHandler(promhttp.Handler()))
+
+	// Register prometheus metrics
+	metric.RegisterAccessHitsMetric("api_service")
 
 	if err := config.InitConfig(); err != nil {
 		e.Logger.Error(err)
@@ -104,7 +110,8 @@ func newServer(e *echo.Echo, httpAddr string) {
 			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderXCSRFToken},
 			ExposeHeaders:    []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderXCSRFToken},
 		}),
-		checkCSRF)
+		checkCSRF,
+		AccessHitsMiddleware)
 
 	e.Server = &http.Server{
 		Addr:           httpAddr,
@@ -150,4 +157,25 @@ func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	cardGroup.NewCardGroupHandler(e, cardGroupService, securityService)
 	comment.NewCommentHandler(e, userService, commentService, securityService)
 	tag.NewTagHandler(e, userService, tagService, cardTagsService, securityService)
+}
+
+func AccessHitsMiddleware(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) (err error) {
+		start := time.Now()
+		log.Info(start)
+
+		// Write hits metric
+		if metric.AccessHits != nil {
+			metric.AccessHits.With(prometheus.Labels{
+				"path":        ctx.Request().URL.Path,
+				"method":      ctx.Request().Method,
+				"status_code": strconv.Itoa(ctx.Response().Status),
+			}).Inc()
+		}
+
+		log.Info("Finish with status code",
+			"status_code", ctx.Response().Status,
+			"work_time", time.Since(start))
+		return h(ctx)
+	}
 }
