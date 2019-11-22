@@ -3,12 +3,15 @@ package config
 import (
 	"errors"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 )
 
 const (
-	localSettingsFile = "session-settings.json"
+	localSettingsFile  = "session-local-settings.json"
+	remoteSettingsFile = "session-settings.json"
+	deployEnvVar       = "DEPLOYAPI"
 )
 
 //easyjson:json
@@ -43,7 +46,19 @@ func InitConfig() error {
 		return err
 	}
 
-	var settingsFileName = localSettingsFile
+	deployVar := os.Getenv(deployEnvVar)
+
+	var settingsFileName string
+
+	if deployVar == "" {
+		log.Printf(
+			"%s not set, expecting requests from api on localhost deployment\n",
+			deployEnvVar,
+		)
+		settingsFileName = localSettingsFile
+	} else {
+		settingsFileName = remoteSettingsFile
+	}
 
 	configFileName := path.Join(dir, settingsFileName)
 	ToolConfig = new(Config)
