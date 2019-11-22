@@ -20,7 +20,6 @@ import (
 	"context"
 	"errors"
 	"flag"
-	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoLog "github.com/labstack/gommon/log"
@@ -166,7 +165,7 @@ func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config, s
 }
 
 func ConnectGRPC(addr string, name string) (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(fmt.Sprintf("srv://%s/%s", addr, name),
+	conn, err := grpc.Dial(addr,
 		grpc.WithInsecure(), grpc.WithBalancerName(roundrobin.Name), grpc.WithBlock())
 	if err != nil {
 		log.Error("Can't connect to security service:", err)

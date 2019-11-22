@@ -83,12 +83,7 @@ func (s *service) CheckSession(h echo.HandlerFunc) echo.HandlerFunc {
 			return err
 		}
 		ctx.Logger().Info(ctx.Request().Host, ctx.Request().RequestURI)
-		userID, ok := ctx.Get("user_id").(string)
-		if !ok {
-			errLib.ErrorHandler(ctx.Response(), "Error check user id", http.StatusUnauthorized, err)
-			return err
-		}
-		sess, err := s.Sm.Check(cookieSessionID.Value, userID)
+		sess, err := s.Sm.Check(cookieSessionID.Value)
 		if err != nil {
 			errLib.ErrorHandler(ctx.Response(), "Error check session", http.StatusUnauthorized, err)
 			return err

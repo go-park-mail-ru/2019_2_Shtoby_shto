@@ -10,7 +10,7 @@ import (
 // Обработчик сессий
 type SessionHandler interface {
 	Create(userID StringUUID) (*session.Session, error)
-	Check(sessionID, userID string) (*session.Session, error)
+	Check(sessionID string) (*session.Session, error)
 	Delete(sessionID string) error
 }
 
@@ -55,10 +55,9 @@ func (sm *SessionManager) Delete(sessionID string) error {
 	return nil
 }
 
-func (sm *SessionManager) Check(sessionID, userID string) (*session.Session, error) {
+func (sm *SessionManager) Check(sessionID string) (*session.Session, error) {
 	sessInfo := &session.SessionInfo{
-		ID:     sessionID,
-		UserID: userID,
+		ID: sessionID,
 	}
 	s, err := (*sm.sessService).Check(context.Background(), sessInfo)
 	if err != nil {

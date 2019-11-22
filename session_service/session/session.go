@@ -107,7 +107,7 @@ func (sm *SessionManager) Check(ctx context.Context, session *SessionInfo) (*Ses
 	if err != nil {
 		return nil, err
 	}
-	_, err = HMACHashToken.Check(session.ID, session.UserID, s.CsrfToken)
+	_, err = HMACHashToken.Check(s.ID, session.UserID, s.CsrfToken)
 	if err != nil {
 		return nil, err
 	}
