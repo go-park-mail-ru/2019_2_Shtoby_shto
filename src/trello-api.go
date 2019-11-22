@@ -1,6 +1,7 @@
 package main
 
 import (
+	"2019_2_Shtoby_shto/session_service/session"
 	"2019_2_Shtoby_shto/src/config"
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts/board"
@@ -54,7 +55,13 @@ func main() {
 
 	conf := config.GetInstance()
 
-	//sessionService, err := ConnectGRPC(conf.SecurityURL, "security_service")
+	sessService, err := ConnectGRPC(conf.SecurityURL, "security_service")
+
+	if err != nil {
+		e.Logger.Error(err)
+		os.Exit(1)
+	}
+	securityClient := session.NewSecurityClient(sessService)
 
 	httpAddr := ":" + strconv.Itoa(conf.Port)
 	e.Logger.Info("API Url:", httpAddr)
@@ -69,7 +76,7 @@ func main() {
 	defer dm.CloseConnection()
 
 	e.Logger.SetLevel(echoLog.DEBUG)
-	InitServices(e, dm, conf)
+	InitServices(e, dm, conf, securityClient)
 	newServer(e, httpAddr)
 
 	// great shutdown
@@ -134,8 +141,8 @@ func checkCSRF(h echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config) {
-	sessionService := security.NewSessionManager(conf.RedisConfig, conf.RedisPass, conf.RedisDbNumber)
+func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config, sessService session.SecurityClient) {
+	sessionService := security.NewSessionManager(&sessService)
 	fl := fileLoader.CreateFileLoaderInstance(conf.StorageRegion, conf.StorageEndpoint, conf.StorageBucket)
 	userService := user.CreateInstance(db)
 	photoService := photo.CreateInstance(db, conf, fl)
