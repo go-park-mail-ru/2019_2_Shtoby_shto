@@ -7,7 +7,7 @@ require (
 	github.com/aws/aws-sdk-go v1.25.35
 	github.com/go-redis/redis v6.15.5+incompatible
 	github.com/golang/mock v1.2.0
-	github.com/golang/protobuf v1.3.2 // indirect
+	github.com/golang/protobuf v1.3.2
 	github.com/gyepisam/mcf v0.0.0-20181020145543-a4d14a7af431
 	github.com/jinzhu/gorm v1.9.10
 	github.com/kr/pretty v0.1.0 // indirect

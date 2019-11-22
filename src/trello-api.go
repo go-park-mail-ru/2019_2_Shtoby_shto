@@ -54,7 +54,7 @@ func main() {
 
 	conf := config.GetInstance()
 
-	conn, err := ConnectGRPC(conf.SecurityURL, "security_service")
+	//sessionService, err := ConnectGRPC(conf.SecurityURL, "security_service")
 
 	httpAddr := ":" + strconv.Itoa(conf.Port)
 	e.Logger.Info("API Url:", httpAddr)
