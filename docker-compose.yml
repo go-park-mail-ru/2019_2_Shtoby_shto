@@ -20,6 +20,20 @@ services:
     environment:
       - DEPLOYAPI
 
+  security-service:
+    build:
+      context: .
+      args:
+        - VER=1.0
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - hohoho
+    environment:
+      - DEPLOYAPI
+
   postgres:
     image: postgres:latest
     environment:
