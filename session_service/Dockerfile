@@ -8,7 +8,6 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /go/app/security-service /
 
 FROM base
 COPY --from=go-builder /go/app/security-service /security-service
-COPY --from=go-builder /go/app/session-local-settings.json /session-local-settings.json
-COPY --from=go-builder /go/app/session-settings.json /session-settings.json
-COPY --from=go-builder /go/app/keys /keys
+COPY --from=go-builder /go/app/session_service/session-local-settings.json /session-local-settings.json
+COPY --from=go-builder /go/app/session_service/session-settings.json /session-settings.json
 CMD ["/security-service"]

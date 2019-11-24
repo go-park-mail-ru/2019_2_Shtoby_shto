@@ -23,6 +23,7 @@ services:
   security-service:
     build:
       context: .
+      dockerfile: ./session_service/Dockerfile
       args:
         - VER=1.0
     ports:
@@ -41,7 +42,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1111
     ports:
-      - "8001:5432"
+      - "5432:5432"
     networks:
       - hohoho
 
