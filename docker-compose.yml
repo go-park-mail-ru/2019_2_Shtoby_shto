@@ -5,6 +5,8 @@ networks:
 
 services:
   trello-api:
+    security_opt:
+      - seccomp:unconfined
     build:
       context: .
       args:
@@ -12,16 +14,19 @@ services:
     ports:
       - "80:8080"
       - "443:443"
+      - "40000:40000"
     depends_on:
       - postgres
       - redis
-      - security-service
+      # - security-service
     networks:
       - hohoho
     environment:
       - DEPLOYAPI
+    tty: true
+    stdin_open: true
 
-  security-service:
+  security:
     build:
       context: .
       dockerfile: ./session_service/Dockerfile
@@ -35,6 +40,8 @@ services:
       - hohoho
     environment:
       - DEPLOYAPI
+    tty: true
+    stdin_open: true
 
   postgres:
     image: postgres:latest

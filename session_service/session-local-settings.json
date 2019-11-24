@@ -1,6 +1,6 @@
 {
   "trello.service.port": ":8081",
-  "trello.service.redis.config":"localhost:6379",
+  "trello.service.redis.config":"redis:6379",
   "trello.service.redis.password":"",
   "trello.service.redis.db.number":0
 }
