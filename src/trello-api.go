@@ -37,6 +37,10 @@ import (
 	//"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+var (
+	securityService security.HandlerSecurity
+)
+
 func main() {
 	flag.Parse()
 	e := echo.New()
@@ -116,6 +120,7 @@ func newServer(e *echo.Echo, httpAddr string) {
 			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderXCSRFToken},
 			ExposeHeaders:    []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderXCSRFToken},
 		}),
+		securityService.CheckSession,
 		checkCSRF)
 
 	e.Server = &http.Server{
@@ -153,8 +158,7 @@ func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config, s
 	commentService := comment.CreateInstance(db)
 	tagService := tag.CreateInstance(db)
 	cardTagsService := cardTags.CreateInstance(db)
-	securityService := security.CreateInstance(sessionService)
-	e.Use(securityService.CheckSession)
+	securityService = security.CreateInstance(sessionService)
 	user.NewUserHandler(e, userService, boardUsersService, cardUsersService, securityService)
 	photo.NewPhotoHandler(e, photoService, userService, securityService)
 	board.NewBoardHandler(e, userService, boardService, boardUsersService, cardService, cardUsersService, cardGroupService, tagService, cardTagsService, commentService, securityService)
