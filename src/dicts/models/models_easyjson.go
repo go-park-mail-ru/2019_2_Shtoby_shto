@@ -134,6 +134,8 @@ func easyjsonD2b7633eDecode20192ShtobyShtoSrcDictsModels1(in *jlexer.Lexer, out 
 		switch key {
 		case "text":
 			out.Text = string(in.String())
+		case "color":
+			out.Color = string(in.String())
 		case "id":
 			out.ID = customType.StringUUID(in.String())
 		default:
@@ -154,6 +156,11 @@ func easyjsonD2b7633eEncode20192ShtobyShtoSrcDictsModels1(out *jwriter.Writer, i
 		const prefix string = ",\"text\":"
 		out.RawString(prefix[1:])
 		out.String(string(in.Text))
+	}
+	{
+		const prefix string = ",\"color\":"
+		out.RawString(prefix)
+		out.String(string(in.Color))
 	}
 	{
 		const prefix string = ",\"id\":"
@@ -1228,7 +1235,7 @@ func easyjsonD2b7633eDecode20192ShtobyShtoSrcDictsModels13(in *jlexer.Lexer, out
 				in.Delim('[')
 				if out.Tags == nil {
 					if !in.IsDelim(']') {
-						out.Tags = make([]Tag, 0, 2)
+						out.Tags = make([]Tag, 0, 1)
 					} else {
 						out.Tags = []Tag{}
 					}
