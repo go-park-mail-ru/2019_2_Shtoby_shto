@@ -4,17 +4,18 @@ import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts"
+	"2019_2_Shtoby_shto/src/dicts/models"
 	"2019_2_Shtoby_shto/src/handle"
 	"errors"
 )
 
 type HandlerBoardService interface {
-	FindBoardByID(id customType.StringUUID) (*Board, error)
-	CreateBoard(data []byte, boardUserID customType.StringUUID) (*Board, error)
-	UpdateBoard(data []byte, id customType.StringUUID) (*Board, error)
+	FindBoardByID(id customType.StringUUID) (*models.Board, error)
+	CreateBoard(data []byte, boardUserID customType.StringUUID) (*models.Board, error)
+	UpdateBoard(data []byte, id customType.StringUUID) (*models.Board, error)
 	DeleteBoard(id customType.StringUUID) error
-	FetchBoards(limit, offset int) (boards []Board, err error)
-	FetchBoardsByIDs(boardsIDs []string) (boards []Board, err error)
+	FetchBoards(limit, offset int) (boards []models.Board, err error)
+	FetchBoardsByIDs(boardsIDs []string) (boards []models.Board, err error)
 }
 
 type service struct {
@@ -28,8 +29,8 @@ func CreateInstance(db database.IDataManager) HandlerBoardService {
 	}
 }
 
-func (s service) FindBoardByID(id customType.StringUUID) (*Board, error) {
-	board := &Board{
+func (s service) FindBoardByID(id customType.StringUUID) (*models.Board, error) {
+	board := &models.Board{
 		BaseInfo: dicts.BaseInfo{
 			ID: id,
 		},
@@ -38,8 +39,8 @@ func (s service) FindBoardByID(id customType.StringUUID) (*Board, error) {
 	return board, err
 }
 
-func (s service) CreateBoard(data []byte, boardUserID customType.StringUUID) (*Board, error) {
-	board := &Board{
+func (s service) CreateBoard(data []byte, boardUserID customType.StringUUID) (*models.Board, error) {
+	board := &models.Board{
 		BoardUsersID: boardUserID,
 	}
 	if err := board.UnmarshalJSON(data); err != nil {
@@ -52,30 +53,33 @@ func (s service) CreateBoard(data []byte, boardUserID customType.StringUUID) (*B
 	return board, err
 }
 
-func (s service) UpdateBoard(data []byte, id customType.StringUUID) (*Board, error) {
-	board := &Board{}
+func (s service) UpdateBoard(data []byte, id customType.StringUUID) (*models.Board, error) {
+	board := &models.Board{}
 	if err := board.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
-	//if !board.IsValid() {
-	//	return nil, errors.New("Board body is not valid")
-	//}
-	err := s.db.UpdateRecord(board, id)
+	board.ID = id
+	err := s.db.UpdateRecord(board)
 	return board, err
 }
 
 func (s service) DeleteBoard(id customType.StringUUID) error {
-	board := &Board{}
-	return s.db.DeleteRecord(board, id)
+	board := &models.Board{
+		BaseInfo: dicts.BaseInfo{
+			ID: id,
+		},
+	}
+	return s.db.DeleteRecord(board)
 }
 
-func (s service) FetchBoards(limit, offset int) (boards []Board, err error) {
-	_, err = s.db.FetchDict(&boards, "boards", limit, offset, nil, nil)
+func (s service) FetchBoards(limit, offset int) (boards []models.Board, err error) {
+	boardModel := &models.Board{}
+	_, err = s.db.FetchDict(&boards, boardModel, limit, offset)
 	return boards, err
 }
 
-func (s service) FetchBoardsByIDs(boardsIDs []string) (boards []Board, err error) {
+func (s service) FetchBoardsByIDs(boardsIDs []string) (boards []models.Board, err error) {
 	where := []string{"id in(?)"}
-	_, err = s.db.FetchDict(&boards, "boards", 10000, 0, where, boardsIDs)
+	_, err = s.db.FetchDictBySlice(&boards, "boards", 10000, 0, where, boardsIDs)
 	return boards, err
 }

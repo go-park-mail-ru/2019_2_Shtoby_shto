@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package file;
+
+service IFileLoaderManager {
+    rpc DownloadFile(File) returns (Nothing) {}
+    rpc UploadFile(FileID) returns (File) {}
+}
+
+message File {
+    string ID = 1;
+    bytes data = 2;
+}
+
+message FileID {
+    string ID = 1;
+}
+
+message Nothing {}

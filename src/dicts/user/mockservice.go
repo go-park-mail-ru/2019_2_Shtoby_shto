@@ -6,6 +6,7 @@ package user
 
 import (
 	. "2019_2_Shtoby_shto/src/customType"
+	"2019_2_Shtoby_shto/src/dicts/models"
 	"github.com/golang/mock/gomock"
 	"reflect"
 )
@@ -34,10 +35,10 @@ func (m *MockHandlerUserService) EXPECT() *MockHandlerUserServiceMockRecorder {
 }
 
 // CreateUser mocks base method
-func (m *MockHandlerUserService) CreateUser(data []byte) (*User, error) {
+func (m *MockHandlerUserService) CreateUser(data []byte) (*models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", data)
-	ret0, _ := ret[0].(*User)
+	ret0, _ := ret[0].(*models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -63,10 +64,10 @@ func (mr *MockHandlerUserServiceMockRecorder) UpdateUser(data, id interface{}) *
 }
 
 // GetUserById mocks base method
-func (m *MockHandlerUserService) GetUserById(id StringUUID) (User, error) {
+func (m *MockHandlerUserService) GetUserById(id StringUUID) (models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserById", id)
-	ret0, _ := ret[0].(User)
+	ret0, _ := ret[0].(models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -78,10 +79,10 @@ func (mr *MockHandlerUserServiceMockRecorder) GetUserById(id interface{}) *gomoc
 }
 
 // GetUserByLogin mocks base method
-func (m *MockHandlerUserService) GetUserByLogin(data []byte) (*User, error) {
+func (m *MockHandlerUserService) GetUserByLogin(data []byte) (*models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserByLogin", data)
-	ret0, _ := ret[0].(*User)
+	ret0, _ := ret[0].(*models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -93,10 +94,10 @@ func (mr *MockHandlerUserServiceMockRecorder) GetUserByLogin(data interface{}) *
 }
 
 // FetchUsers mocks base method
-func (m *MockHandlerUserService) FetchUsers(limit, offset int) ([]User, error) {
+func (m *MockHandlerUserService) FetchUsers(limit, offset int) ([]models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FetchUsers", limit, offset)
-	ret0, _ := ret[0].([]User)
+	ret0, _ := ret[0].([]models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

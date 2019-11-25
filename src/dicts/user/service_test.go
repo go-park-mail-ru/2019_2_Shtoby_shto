@@ -3,6 +3,7 @@ package user
 import (
 	_ "2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts"
+	"2019_2_Shtoby_shto/src/dicts/models"
 	"fmt"
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
@@ -16,7 +17,7 @@ import (
 
 func TestService_CreateUser(t *testing.T) {
 
-	mokUser := &User{
+	mokUser := &models.User{
 		BaseInfo: dicts.BaseInfo{},
 		Login:    "Ivan",
 		Password: "123456",

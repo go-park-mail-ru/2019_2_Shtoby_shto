@@ -12,17 +12,26 @@ const (
 	localSettingsFile  = "trello-local-settings.json"
 	remoteSettingsFile = "trello-settings.json"
 	deployEnvVar       = "DEPLOYAPI"
+	awsAccessKeyID     = "AWS_ACCESS_KEY_ID"
+	awsSecretAccessKey = "AWS_SECRET_ACCESS_KEY"
 )
 
 //easyjson:json
 type Config struct {
-	Port          int    `json:"trello.service.port"`
-	FrontendURL   string `json:"trello.service.frontend.url"`
-	ImagePath     string `json:"trello.service.image.path"`
-	DbConfig      string `json:"trello.service.db.config"`
-	RedisConfig   string `json:"trello.service.redis.config"`
-	RedisPass     string `json:"trello.service.redis.password"`
-	RedisDbNumber int    `json:"trello.service.redis.db.number"`
+	Port             int    `json:"trello.service.port"`
+	FrontendURL      string `json:"trello.service.frontend.url"`
+	SecurityURL      string `json:"trello.service.security.url"`
+	FileLoaderURL    string `json:"trello.service.file.loader.url"`
+	ImagePath        string `json:"trello.service.image.path"`
+	StorageAccessKey string `json:"trello.service.storage.access.key"`
+	StorageSecretKey string `json:"trello.service.storage.secret.key"`
+	StorageRegion    string `json:"trello.service.storage.region"`
+	StorageEndpoint  string `json:"trello.service.storage.endpoint"`
+	StorageBucket    string `json:"trello.service.storage.bucket"`
+	DbConfig         string `json:"trello.service.db.config"`
+	RedisConfig      string `json:"trello.service.redis.config"`
+	RedisPass        string `json:"trello.service.redis.password"`
+	RedisDbNumber    int    `json:"trello.service.redis.db.number"`
 }
 
 var ToolConfig *Config
@@ -66,6 +75,13 @@ func InitConfig() error {
 	configFileName := path.Join(dir, settingsFileName)
 	ToolConfig = new(Config)
 	if err := readConfig(configFileName); err != nil {
+		return err
+	}
+	// s3 set env
+	if err = os.Setenv(awsAccessKeyID, ToolConfig.StorageAccessKey); err != nil {
+		return err
+	}
+	if err = os.Setenv(awsSecretAccessKey, ToolConfig.StorageSecretKey); err != nil {
 		return err
 	}
 	return nil

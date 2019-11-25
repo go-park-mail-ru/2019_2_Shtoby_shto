@@ -17,11 +17,12 @@ type IDataManager interface {
 	CloseConnection() error
 	ExecuteQuery(sql string, args ...string) error
 	FindDictById(p interface{}) error
-	FindDictByColumn(p interface{}, where, whereArg []string) error
+	FindDictByColumn(p interface{}) (int, error)
 	CreateRecord(p interface{}) error
-	UpdateRecord(p interface{}, id customType.StringUUID) error
-	DeleteRecord(p interface{}, id customType.StringUUID) error
-	FetchDict(data interface{}, table string, limit, offset int, where, whereArg []string) (int, error)
+	UpdateRecord(p interface{}) error
+	DeleteRecord(p interface{}) error
+	FetchDict(data, findRequest interface{}, limit, offset int) (int, error)
+	FetchDictBySlice(data interface{}, table string, limit, offset int, where, whereArg []string) (int, error)
 }
 
 type DataManager struct {
@@ -63,24 +64,36 @@ func (d DataManager) FindDictById(p interface{}) error {
 	return nil
 }
 
-func (d DataManager) FindDictByColumn(p interface{}, where, whereArg []string) error {
+func (d DataManager) FindDictByColumn(p interface{}) (int, error) {
+	count := 0
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
-	if len(where) != len(whereArg) {
-		return errors.New("Not valid where ")
-	}
-	whereResult := strings.Join(where, " and ")
-	res := d.db.Table(obj.GetTableName()).Where(whereResult, whereArg).First(p)
-	if res.RecordNotFound() || res.Error != nil {
+	res := d.db.Table(obj.GetTableName()).Where(p).First(p).Count(&count)
+	if res.Error != nil {
 		log.Println(res)
-		return res.Error
+		return 0, res.Error
 	}
-	return nil
+	if res.RecordNotFound() {
+		return 0, nil
+	}
+	return count, nil
 }
 
-func (d DataManager) FetchDict(data interface{}, table string, limit, offset int, where, whereArg []string) (int, error) {
+func (d DataManager) FetchDict(data, findRequest interface{}, limit, offset int) (int, error) {
+	fetchLen := 0
+	obj := reflect.ValueOf(findRequest).Interface().(dicts.Dict)
+	res := d.db.Table(obj.GetTableName()).Where(findRequest).Limit(limit).Offset(offset).Find(data).Count(&fetchLen)
+	if res.RecordNotFound() {
+		return 0, nil
+	} else if res.Error != nil {
+		return 0, res.Error
+	}
+	return fetchLen, nil
+}
+
+func (d DataManager) FetchDictBySlice(data interface{}, table string, limit, offset int, where, whereArg []string) (int, error) {
 	fetchLen := 0
 	whereResult := strings.Join(where, " and ")
-	res := d.db.Table(table).Where(whereResult, whereArg).Limit(limit).Offset(offset).Find(data)
+	res := d.db.Table(table).Where(whereResult, whereArg).Limit(limit).Offset(offset).Find(data).Count(&fetchLen)
 	if res.RecordNotFound() {
 		return 0, nil
 	} else if res.Error != nil {
@@ -107,9 +120,8 @@ func (d DataManager) CreateRecord(p interface{}) error {
 	return nil
 }
 
-func (d DataManager) UpdateRecord(p interface{}, id customType.StringUUID) error {
+func (d DataManager) UpdateRecord(p interface{}) error {
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
-	obj.SetId(id)
 	res := d.db.Model(obj).UpdateColumns(p)
 	if res.Error != nil {
 		return res.Error
@@ -117,9 +129,9 @@ func (d DataManager) UpdateRecord(p interface{}, id customType.StringUUID) error
 	return nil
 }
 
-func (d DataManager) DeleteRecord(p interface{}, id customType.StringUUID) error {
+func (d DataManager) DeleteRecord(p interface{}) error {
 	obj := reflect.ValueOf(p).Interface().(dicts.Dict)
-	res := d.db.Table(obj.GetTableName()).Delete(p, "id = ?", id)
+	res := d.db.Table(obj.GetTableName()).Where(p).Delete(p)
 	if res.Error != nil {
 		return res.Error
 	}
