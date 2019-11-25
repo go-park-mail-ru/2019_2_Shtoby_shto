@@ -153,7 +153,7 @@ func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config, s
 	boardService := board.CreateInstance(db)
 	boardUsersService := boardUsers.CreateInstance(db)
 	cardUsersService := сardUsers.CreateInstance(db)
-	cardService := card.CreateInstance(db)
+	cardService := card.CreateInstance(db, fl)
 	cardGroupService := cardGroup.CreateInstance(db)
 	commentService := comment.CreateInstance(db)
 	tagService := tag.CreateInstance(db)

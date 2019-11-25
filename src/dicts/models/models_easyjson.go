@@ -1204,6 +1204,8 @@ func easyjsonD2b7633eDecode20192ShtobyShtoSrcDictsModels13(in *jlexer.Lexer, out
 			out.Priority = int(in.Int())
 		case "card_group_id":
 			out.CardGroupID = customType.StringUUID(in.String())
+		case "file":
+			out.File = customType.StringUUID(in.String())
 		case "comments":
 			if in.IsNull() {
 				in.Skip()
@@ -1308,6 +1310,11 @@ func easyjsonD2b7633eEncode20192ShtobyShtoSrcDictsModels13(out *jwriter.Writer, 
 		const prefix string = ",\"card_group_id\":"
 		out.RawString(prefix)
 		out.String(string(in.CardGroupID))
+	}
+	{
+		const prefix string = ",\"file\":"
+		out.RawString(prefix)
+		out.String(string(in.File))
 	}
 	{
 		const prefix string = ",\"comments\":"

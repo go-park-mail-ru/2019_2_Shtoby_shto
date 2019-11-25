@@ -5,8 +5,12 @@ import (
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/dicts/models"
+	"2019_2_Shtoby_shto/src/fileLoader"
 	"2019_2_Shtoby_shto/src/handle"
+	"bufio"
+	"bytes"
 	"github.com/pkg/errors"
+	"io/ioutil"
 )
 
 type HandlerCardService interface {
@@ -15,6 +19,8 @@ type HandlerCardService interface {
 	FetchCardsByCardGroupIDs(cardGroupIDs []string) (cards []models.Card, err error)
 	CreateCard(data []byte) (*models.Card, error)
 	UpdateCard(data []byte, id customType.StringUUID) (*models.Card, error)
+	DownloadFileToCard(file *bufio.Reader, cardID customType.StringUUID) (*models.Card, error)
+	GetCardFile(cardID customType.StringUUID) ([]byte, error)
 	DeleteCard(id customType.StringUUID) error
 	FetchCards(limit, offset int) (cards []models.Card, err error)
 	FillLookupFields(card *models.Card, comments []models.Comment) error
@@ -23,11 +29,13 @@ type HandlerCardService interface {
 type service struct {
 	handle.HandlerImpl
 	db database.IDataManager
+	fl fileLoader.IFileLoaderManager
 }
 
-func CreateInstance(db database.IDataManager) HandlerCardService {
+func CreateInstance(db database.IDataManager, fileLoader fileLoader.IFileLoaderManager) HandlerCardService {
 	return &service{
 		db: db,
+		fl: fileLoader,
 	}
 }
 
@@ -97,4 +105,28 @@ func (s service) FetchCardsByCardGroupIDs(cardGroupIDs []string) (cards []models
 
 func (s service) FillLookupFields(card *models.Card, comments []models.Comment) error {
 	return nil
+}
+
+func (s service) DownloadFileToCard(file *bufio.Reader, cardID customType.StringUUID) (*models.Card, error) {
+	buf := bytes.Buffer{}
+	if _, err := buf.ReadFrom(file); err != nil {
+		return nil, err
+	}
+	err := s.fl.DownloadFile(cardID.String(), buf.Bytes())
+	if err != nil {
+		return nil, err
+	}
+	card := models.Card{
+		File: cardID,
+	}
+	data, err := card.MarshalJSON()
+	return s.UpdateCard(data, cardID)
+}
+
+func (s service) GetCardFile(cardID customType.StringUUID) ([]byte, error) {
+	file, err := s.fl.UploadFile(cardID.String())
+	if err != nil {
+		return nil, err
+	}
+	return ioutil.ReadAll(file)
 }
