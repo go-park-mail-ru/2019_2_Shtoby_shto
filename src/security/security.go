@@ -58,6 +58,7 @@ func (s *service) CreateSession(ctx *echo.Context, userID customType.StringUUID)
 	}
 	(*ctx).Response().Header().Add(echo.HeaderXCSRFToken, session.CsrfToken)
 	http.SetCookie((*ctx).Response(), &cookie)
+	println(session.CsrfToken, session.ID)
 	return nil
 }
 
@@ -89,7 +90,7 @@ func (s *service) CheckSession(h echo.HandlerFunc) echo.HandlerFunc {
 			return err
 		}
 		ctx.Set("session_id", cookieSessionID.Value)
-		ctx.Set("user_id", sess.UserID)
+		ctx.Set("user_id", customType.StringUUID(sess.UserID))
 		ctx.Set("csrf_token", sess.CsrfToken)
 		return h(ctx)
 	}
