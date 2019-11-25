@@ -1,0 +1,6 @@
+{
+  "trello.service.port": 8081,
+  "trello.service.frontend.url": "http://localhost:3000",
+  "trello.service.security.url": "127.0.0.1:8081",
+  "trello.service.db.config":"host='localhost' port=5432 user=postgres dbname='trello' sslmode=disable password='1111'"
+}

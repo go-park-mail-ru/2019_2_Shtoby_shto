@@ -40,8 +40,22 @@ func easyjsonCd93bc43Decode20192ShtobyShtoSrcConfig(in *jlexer.Lexer, out *Confi
 			out.Port = int(in.Int())
 		case "trello.service.frontend.url":
 			out.FrontendURL = string(in.String())
+		case "trello.service.security.url":
+			out.SecurityURL = string(in.String())
+		case "trello.service.file.loader.url":
+			out.FileLoaderURL = string(in.String())
 		case "trello.service.image.path":
 			out.ImagePath = string(in.String())
+		case "trello.service.storage.access.key":
+			out.StorageAccessKey = string(in.String())
+		case "trello.service.storage.secret.key":
+			out.StorageSecretKey = string(in.String())
+		case "trello.service.storage.region":
+			out.StorageRegion = string(in.String())
+		case "trello.service.storage.endpoint":
+			out.StorageEndpoint = string(in.String())
+		case "trello.service.storage.bucket":
+			out.StorageBucket = string(in.String())
 		case "trello.service.db.config":
 			out.DbConfig = string(in.String())
 		case "trello.service.redis.config":
@@ -75,9 +89,44 @@ func easyjsonCd93bc43Encode20192ShtobyShtoSrcConfig(out *jwriter.Writer, in Conf
 		out.String(string(in.FrontendURL))
 	}
 	{
+		const prefix string = ",\"trello.service.security.url\":"
+		out.RawString(prefix)
+		out.String(string(in.SecurityURL))
+	}
+	{
+		const prefix string = ",\"trello.service.file.loader.url\":"
+		out.RawString(prefix)
+		out.String(string(in.FileLoaderURL))
+	}
+	{
 		const prefix string = ",\"trello.service.image.path\":"
 		out.RawString(prefix)
 		out.String(string(in.ImagePath))
+	}
+	{
+		const prefix string = ",\"trello.service.storage.access.key\":"
+		out.RawString(prefix)
+		out.String(string(in.StorageAccessKey))
+	}
+	{
+		const prefix string = ",\"trello.service.storage.secret.key\":"
+		out.RawString(prefix)
+		out.String(string(in.StorageSecretKey))
+	}
+	{
+		const prefix string = ",\"trello.service.storage.region\":"
+		out.RawString(prefix)
+		out.String(string(in.StorageRegion))
+	}
+	{
+		const prefix string = ",\"trello.service.storage.endpoint\":"
+		out.RawString(prefix)
+		out.String(string(in.StorageEndpoint))
+	}
+	{
+		const prefix string = ",\"trello.service.storage.bucket\":"
+		out.RawString(prefix)
+		out.String(string(in.StorageBucket))
 	}
 	{
 		const prefix string = ",\"trello.service.db.config\":"

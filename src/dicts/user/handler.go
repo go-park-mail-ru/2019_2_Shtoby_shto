@@ -35,20 +35,14 @@ func NewUserHandler(e *echo.Echo, userService HandlerUserService,
 	e.POST("/login", handler.Login)
 	e.GET("/logout", handler.Logout)
 	e.GET("/users/all", handler.Fetch)
-	e.GET("/users", handler.Get)
+	e.GET("/users/:id", handler.Get)
 	e.POST("/users/registration", handler.Post)
 	e.PUT("/users", handler.Put)
-	e.DELETE("/users/:id", handler.Delete)
+	e.DELETE("/users", handler.Delete)
 }
 
 func (h Handler) Get(ctx echo.Context) error {
-	userID, ok := ctx.Get("user_id").(customType.StringUUID)
-	if !ok {
-		ctx.Logger().Error("get user_id failed")
-		errorsLib.ErrorHandler(ctx.Response(), "get user_id failed", http.StatusInternalServerError, errors.New("download fail"))
-		return errors.New("get user_id failed")
-	}
-
+	userID := customType.StringUUID(ctx.Param("id"))
 	user, err := h.userService.GetUserById(userID)
 	if err != nil {
 		ctx.Logger().Error(err)
@@ -79,11 +73,6 @@ func (h Handler) Post(ctx echo.Context) error {
 	user, err := h.userService.CreateUser(body)
 	if err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "User not valid", http.StatusBadRequest, err)
-		ctx.Logger().Error(err)
-		return err
-	}
-	if err := h.securityService.CreateSession(&ctx, user.ID); err != nil {
-		errorsLib.ErrorHandler(ctx.Response(), "Create session error", http.StatusInternalServerError, err)
 		ctx.Logger().Error(err)
 		return err
 	}
@@ -132,8 +121,7 @@ func (h Handler) Login(ctx echo.Context) error {
 		return err
 	}
 	ctx.Set("user_id", user.ID)
-	h.SecurityResponse(ctx.Response(), http.StatusOK, "Login", err)
-	return nil
+	return ctx.JSON(http.StatusOK, user)
 }
 
 func (h Handler) Logout(ctx echo.Context) (err error) {
@@ -145,4 +133,19 @@ func (h Handler) Logout(ctx echo.Context) (err error) {
 	ctx.Response().Header().Del("session_id")
 	h.SecurityResponse(ctx.Response(), http.StatusOK, "Logout", err)
 	return err
+}
+
+func (h Handler) Delete(ctx echo.Context) error {
+	userID, ok := ctx.Get("user_id").(customType.StringUUID)
+	if !ok {
+		ctx.Logger().Error("get user_id failed")
+		errorsLib.ErrorHandler(ctx.Response(), "get user_id failed", http.StatusInternalServerError, errors.New("get user_id failed"))
+		return errors.New("get user_id failed")
+	}
+	if err := h.userService.DeleteUser(userID); err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "DeleteUser failed", http.StatusInternalServerError, errors.New("DeleteUser failed"))
+		return err
+	}
+	return ctx.JSON(http.StatusOK, userID)
 }

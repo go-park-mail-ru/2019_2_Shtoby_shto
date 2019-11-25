@@ -1,155 +1,61 @@
 package user
 
 import (
-	. "2019_2_Shtoby_shto/src/customType"
-	"2019_2_Shtoby_shto/src/database"
-	"reflect"
+	_ "2019_2_Shtoby_shto/src/customType"
+	"2019_2_Shtoby_shto/src/dicts"
+	"2019_2_Shtoby_shto/src/dicts/models"
+	"fmt"
+	"github.com/golang/mock/gomock"
+	"github.com/labstack/echo/v4"
+	"github.com/stretchr/testify/assert"
+	_ "io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
-func TestCreateInstance(t *testing.T) {
-	type args struct {
-		db database.IDataManager
-	}
-	tests := []struct {
-		name string
-		args args
-		want HandlerUserService
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := CreateInstance(tt.args.db); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("CreateInstance() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+func TestService_CreateUser(t *testing.T) {
 
-func Test_service_CreateUser(t *testing.T) {
-	type fields struct {
-		db database.IDataManager
+	mokUser := &models.User{
+		BaseInfo: dicts.BaseInfo{},
+		Login:    "Ivan",
+		Password: "123456",
+		PhotoID:  nil,
 	}
-	type args struct {
-		data []byte
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *User
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &service{
-				db: tt.fields.db,
-			}
-			got, err := s.CreateUser(tt.args.data)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("service.CreateUser() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("service.CreateUser() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
 
-func Test_service_GetUserById(t *testing.T) {
-	type fields struct {
-		db database.IDataManager
-	}
-	type args struct {
-		id StringUUID
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    User
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &service{
-				db: tt.fields.db,
-			}
-			got, err := s.GetUserById(tt.args.id)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("service.GetUserById() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("service.GetUserById() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+	data, _ := mokUser.MarshalJSON()
 
-func Test_service_GetUserByLogin(t *testing.T) {
-	type fields struct {
-		db database.IDataManager
-	}
-	type args struct {
-		data []byte
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *User
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &service{
-				db: tt.fields.db,
-			}
-			got, err := s.GetUserByLogin(tt.args.data)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("service.GetUserByLogin() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("service.GetUserByLogin() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
-func Test_service_UpdateUser(t *testing.T) {
-	type fields struct {
-		db database.IDataManager
+	service := NewMockHandlerUserService(ctrl)
+	service.EXPECT().CreateUser(data).Return(mokUser, nil)
+
+	handler := Handler{userService: service}
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/users/registration", strings.NewReader(string(data)))
+	//req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/users/registration")
+
+	body, err := handler.userService.CreateUser([]byte(fmt.Sprintf("%v", c)))
+	if err != nil {
+		t.Errorf("err is not nil: %s", err)
 	}
-	type args struct {
-		data []byte
-		id   StringUUID
+
+	comparable, _ := body.MarshalJSON()
+	//body,_ := ioutil.ReadAll(rec.Body)
+	//t.Log(body)
+
+	if string(comparable) != string(data) {
+		t.Errorf("Expected: %s , got: %s", string(data), string(comparable))
 	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &service{
-				db: tt.fields.db,
-			}
-			if err := s.UpdateUser(tt.args.data, tt.args.id); (err != nil) != tt.wantErr {
-				t.Errorf("service.UpdateUser() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
+
+	if assert.NoError(t, err) {
+		assert.Equal(t, http.StatusCreated, rec.Code)
+		assert.Equal(t, mokUser, rec.Body.String())
 	}
 }

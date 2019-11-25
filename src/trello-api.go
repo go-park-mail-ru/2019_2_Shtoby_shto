@@ -1,23 +1,32 @@
 package main
 
 import (
+	"2019_2_Shtoby_shto/file_service/file"
+	"2019_2_Shtoby_shto/session_service/session"
 	"2019_2_Shtoby_shto/src/config"
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts/board"
 	"2019_2_Shtoby_shto/src/dicts/boardUsers"
 	"2019_2_Shtoby_shto/src/dicts/card"
 	"2019_2_Shtoby_shto/src/dicts/cardGroup"
+	"2019_2_Shtoby_shto/src/dicts/cardTags"
 	сardUsers "2019_2_Shtoby_shto/src/dicts/cardUsers"
+	"2019_2_Shtoby_shto/src/dicts/comment"
 	"2019_2_Shtoby_shto/src/dicts/photo"
-	"2019_2_Shtoby_shto/src/dicts/task"
+	"2019_2_Shtoby_shto/src/dicts/tag"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	"2019_2_Shtoby_shto/src/initDB"
 	"2019_2_Shtoby_shto/src/security"
 	"context"
+	"errors"
 	"flag"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoLog "github.com/labstack/gommon/log"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/common/log"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/balancer/roundrobin"
 	"net/http"
 	"os"
 	"os/signal"
@@ -29,16 +38,7 @@ import (
 )
 
 var (
-	securityService   security.HandlerSecurity
-	userService       user.HandlerUserService
-	photoService      photo.HandlerPhotoService
-	boardService      board.HandlerBoardService
-	boardUsersService boardUsers.HandlerBoardUsersService
-	cardUsersService  сardUsers.HandlerCardUsersService
-	cardService       card.HandlerCardService
-	cardGroupService  cardGroup.HandlerCardGroupService
-	taskService       task.HandlerTaskService
-	dbService         initDB.InitDBManager
+	securityService security.HandlerSecurity
 )
 
 func main() {
@@ -49,6 +49,8 @@ func main() {
 		return ctx.Redirect(http.StatusPermanentRedirect, "https://app.swaggerhub.com/apis/aleksandrkhoroshenin/trello-api/4.0")
 	})
 
+	e.POST("/api/v1/query", echo.WrapHandler(promhttp.Handler()))
+
 	if err := config.InitConfig(); err != nil {
 		e.Logger.Error(err)
 		os.Exit(1)
@@ -56,20 +58,34 @@ func main() {
 
 	conf := config.GetInstance()
 
-	httpAddr := ":" + strconv.Itoa(conf.Port)
-	e.Logger.Info("API Url:", httpAddr)
-
-	dbService = initDB.Init()
-	db, err := dbService.DbConnect("postgres", conf.DbConfig)
+	sessService, err := ConnectGRPC(conf.SecurityURL, "security_service")
 	if err != nil {
 		e.Logger.Error(err)
 		os.Exit(1)
 	}
+	securityClient := session.NewSecurityClient(sessService)
+
+	fileService, err := ConnectGRPC(conf.FileLoaderURL, "file_service")
+	if err != nil {
+		e.Logger.Error(err)
+		os.Exit(1)
+	}
+	fileLoaderClient := file.NewIFileLoaderManagerClient(fileService)
+
+	httpAddr := ":" + strconv.Itoa(conf.Port)
+	e.Logger.Info("API Url:", httpAddr)
+
+	dbService := initDB.Init()
+	db, err := dbService.DbConnect("postgres", conf.DbConfig)
+	if err != nil {
+		e.Logger.Error(err)
+		os.Exit(3)
+	}
 	dm := database.NewDataManager(db)
 	defer dm.CloseConnection()
 
-	e.Logger.SetLevel(echoLog.INFO)
-	initService(e, dm, conf)
+	e.Logger.SetLevel(echoLog.DEBUG)
+	InitServices(e, dm, conf, securityClient, fileLoaderClient)
 	newServer(e, httpAddr)
 
 	// great shutdown
@@ -85,7 +101,6 @@ func main() {
 			}
 		}
 	}()
-
 	// Wait for interrupt signal to gracefully shutdown the server with
 	// a timeout of 10 seconds.
 	quit := make(chan os.Signal)
@@ -108,21 +123,11 @@ func newServer(e *echo.Echo, httpAddr string) {
 			AllowOrigins:     []string{apiURL},
 			AllowCredentials: true,
 			AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete, http.MethodOptions},
-			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderXCSRFToken},
+			ExposeHeaders:    []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderXCSRFToken},
 		}),
 		securityService.CheckSession,
-		middleware.CSRFWithConfig(middleware.CSRFConfig{
-			Skipper: func(ctx echo.Context) bool {
-				csrfRequest := ctx.Request().Header.Get(echo.HeaderXCSRFToken)
-				csrfCurrent := ctx.Get("csrf_token")
-				return csrfRequest == csrfCurrent || ctx.Get("not_security") == "done"
-			},
-			TokenLength:  32,
-			TokenLookup:  "header:" + echo.HeaderXCSRFToken,
-			ContextKey:   "csrf",
-			CookieName:   "_csrf",
-			CookieMaxAge: 86400,
-		}))
+		checkCSRF)
 
 	e.Server = &http.Server{
 		Addr:           httpAddr,
@@ -132,21 +137,48 @@ func newServer(e *echo.Echo, httpAddr string) {
 	}
 }
 
-func initService(e *echo.Echo, db database.IDataManager, conf *config.Config) {
-	sessionService := security.NewSessionManager(conf.RedisConfig, conf.RedisPass, conf.RedisDbNumber)
-	userService = user.CreateInstance(db)
-	photoService = photo.CreateInstance(db)
-	boardService = board.CreateInstance(db)
-	boardUsersService = boardUsers.CreateInstance(db)
-	cardUsersService = сardUsers.CreateInstance(db)
-	cardService = card.CreateInstance(db)
-	cardGroupService = cardGroup.CreateInstance(db)
-	taskService = task.CreateInstance(db)
+func checkCSRF(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) (err error) {
+		csrfRequest := ctx.Request().Header.Get(echo.HeaderXCSRFToken)
+		csrfCurrent := ctx.Get("csrf_token")
+		if ctx.Get("not_security") == "done" {
+			return h(ctx)
+		}
+		if csrfRequest != csrfCurrent {
+			return errors.New("csrf error")
+		}
+		return h(ctx)
+	}
+}
+
+func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config, sessService session.SecurityClient, fileService file.IFileLoaderManagerClient) {
+	sessionService := security.NewSessionManager(&sessService)
+	userService := user.CreateInstance(db)
+	photoService := photo.CreateInstance(db, conf, fileService)
+	boardService := board.CreateInstance(db)
+	boardUsersService := boardUsers.CreateInstance(db)
+	cardUsersService := сardUsers.CreateInstance(db)
+	cardService := card.CreateInstance(db, fileService)
+	cardGroupService := cardGroup.CreateInstance(db)
+	commentService := comment.CreateInstance(db)
+	tagService := tag.CreateInstance(db)
+	cardTagsService := cardTags.CreateInstance(db)
 	securityService = security.CreateInstance(sessionService)
 	user.NewUserHandler(e, userService, boardUsersService, cardUsersService, securityService)
 	photo.NewPhotoHandler(e, photoService, userService, securityService)
-	board.NewBoardHandler(e, userService, boardService, boardUsersService, cardService, cardGroupService, taskService, securityService)
-	card.NewCardHandler(e, userService, cardService, cardUsersService, taskService, securityService)
+	board.NewBoardHandler(e, userService, boardService, boardUsersService, cardService, cardUsersService, cardGroupService, tagService, cardTagsService, commentService, securityService)
+	card.NewCardHandler(e, userService, cardService, cardUsersService, tagService, cardTagsService, commentService, securityService)
 	cardGroup.NewCardGroupHandler(e, cardGroupService, securityService)
-	task.NewTaskHandler(e, userService, taskService, securityService)
+	comment.NewCommentHandler(e, userService, commentService, securityService)
+	tag.NewTagHandler(e, userService, tagService, cardTagsService, securityService)
+}
+
+func ConnectGRPC(addr string, name string) (*grpc.ClientConn, error) {
+	conn, err := grpc.Dial(addr,
+		grpc.WithInsecure(), grpc.WithBalancerName(roundrobin.Name), grpc.WithBlock())
+	if err != nil {
+		log.Error("Can't connect to security service:", err)
+		return nil, err
+	}
+	return conn, nil
 }

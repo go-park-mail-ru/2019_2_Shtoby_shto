@@ -3,17 +3,20 @@ package user
 import (
 	. "2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
+	"2019_2_Shtoby_shto/src/dicts"
+	"2019_2_Shtoby_shto/src/dicts/models"
 	"bytes"
 	"github.com/gyepisam/mcf/pbkdf2"
 	"github.com/pkg/errors"
 )
 
 type HandlerUserService interface {
-	CreateUser(data []byte) (*User, error)
+	CreateUser(data []byte) (*models.User, error)
 	UpdateUser(data []byte, id StringUUID) error
-	GetUserById(id StringUUID) (User, error)
-	GetUserByLogin(data []byte) (*User, error)
-	FetchUsers(limit, offset int) (users []User, err error)
+	GetUserById(id StringUUID) (models.User, error)
+	DeleteUser(id StringUUID) error
+	GetUserByLogin(data []byte) (*models.User, error)
+	FetchUsers(limit, offset int) (users []models.User, err error)
 }
 
 type service struct {
@@ -34,8 +37,8 @@ func CreateInstance(db database.IDataManager) HandlerUserService {
 	}
 }
 
-func (s *service) CreateUser(data []byte) (*User, error) {
-	user := &User{}
+func (s *service) CreateUser(data []byte) (*models.User, error) {
+	user := &models.User{}
 	if err := user.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
@@ -49,7 +52,7 @@ func (s *service) CreateUser(data []byte) (*User, error) {
 	return user, err
 }
 
-func (s service) setPasswordPBKDF2(user *User) error {
+func (s service) setPasswordPBKDF2(user *models.User) error {
 	salt, err := s.cfg.Salt()
 	if err != nil {
 		return err
@@ -71,24 +74,27 @@ func (s service) getCryptPass(password string, salt []byte) ([]byte, error) {
 	return passCrypt, nil
 }
 
-func (s *service) GetUserById(id StringUUID) (User, error) {
-	user := User{}
+func (s *service) GetUserById(id StringUUID) (models.User, error) {
+	user := models.User{}
 	user.ID = id
 	err := s.db.FindDictById(&user)
 	return user, err
 }
 
-func (s *service) GetUserByLogin(data []byte) (*User, error) {
-	curUser := User{}
+func (s *service) GetUserByLogin(data []byte) (*models.User, error) {
+	curUser := models.User{}
 	if err := curUser.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
-	user := &User{}
-	where := []string{"login = ?"}
-	whereArgs := []string{curUser.Login}
-	err := s.db.FindDictByColumn(user, where, whereArgs)
+	user := &models.User{
+		Login: curUser.Login,
+	}
+	count, err := s.db.FindDictByColumn(user)
 	if err != nil {
 		return nil, err
+	}
+	if count == 0 {
+		return nil, errors.New("User not found")
 	}
 	pass, err := s.getCryptPass(curUser.Password, user.Salt)
 	if err != nil {
@@ -101,23 +107,37 @@ func (s *service) GetUserByLogin(data []byte) (*User, error) {
 }
 
 func (s *service) UpdateUser(data []byte, id StringUUID) error {
-	user := &User{}
+	user := &models.User{}
 	if err := user.UnmarshalJSON(data); err != nil {
 		return err
 	}
-	if !user.IsValid() {
-		return errors.New("User not valid!")
+	user.ID = id
+	//if !user.IsValid() {
+	//	return errors.New("User not valid!")
+	//}
+	if len(user.Password) > 0 {
+		err := s.setPasswordPBKDF2(user)
+		if err != nil {
+			return err
+		}
 	}
-	if err := s.setPasswordPBKDF2(user); err != nil {
-		return err
-	}
-	if err := s.db.UpdateRecord(user, id); err != nil {
+	if err := s.db.UpdateRecord(user); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s service) FetchUsers(limit, offset int) (users []User, err error) {
-	_, err = s.db.FetchDict(&users, "users", limit, offset, nil, nil)
+func (s service) FetchUsers(limit, offset int) (users []models.User, err error) {
+	userModel := &models.User{}
+	_, err = s.db.FetchDict(&users, userModel, limit, offset)
 	return users, err
+}
+
+func (s service) DeleteUser(id StringUUID) error {
+	userModel := &models.User{
+		BaseInfo: dicts.BaseInfo{
+			ID: id,
+		},
+	}
+	return s.db.DeleteRecord(userModel)
 }

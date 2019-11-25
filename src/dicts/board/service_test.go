@@ -3,6 +3,7 @@ package board
 import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
+	"2019_2_Shtoby_shto/src/dicts/models"
 	"reflect"
 	"testing"
 )
@@ -35,7 +36,7 @@ func Test_service_FindBoardByID(t *testing.T) {
 		name    string
 		s       service
 		args    args
-		want    *Board
+		want    *models.Board
 		wantErr bool
 	}{
 		// TODO: Add test cases.
@@ -62,7 +63,7 @@ func Test_service_CreateBoard(t *testing.T) {
 		name    string
 		s       service
 		args    args
-		want    *Board
+		want    *models.Board
 		wantErr bool
 	}{
 		// TODO: Add test cases.
@@ -90,7 +91,7 @@ func Test_service_UpdateBoard(t *testing.T) {
 		name    string
 		s       service
 		args    args
-		want    *Board
+		want    *models.Board
 		wantErr bool
 	}{
 		// TODO: Add test cases.

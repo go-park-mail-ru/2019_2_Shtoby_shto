@@ -2,7 +2,6 @@ package security
 
 import (
 	"2019_2_Shtoby_shto/src/customType"
-	"net/http"
 	"reflect"
 	"testing"
 
@@ -52,7 +51,6 @@ func Test_service_DeleteSession(t *testing.T) {
 
 func Test_service_CreateSession(t *testing.T) {
 	type args struct {
-		w      http.ResponseWriter
 		userID customType.StringUUID
 	}
 	tests := []struct {
@@ -65,7 +63,7 @@ func Test_service_CreateSession(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.s.CreateSession(tt.args.w, tt.args.userID); (err != nil) != tt.wantErr {
+			if err := tt.s.CreateSession(nil, tt.args.userID); (err != nil) != tt.wantErr {
 				t.Errorf("service.CreateSession() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
