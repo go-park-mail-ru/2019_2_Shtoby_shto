@@ -8,11 +8,11 @@ COPY . /go/app/src
 WORKDIR /go/app/src
 # COPY . /go/app
 
-# COPY ./trello-local-settings.json /trello-local-settings.json
-# COPY ./trello-settings.json /trello-settings.json
+# COPY ./file-local-settings.json /file-local-settings.json
+# COPY ./file-settings.json /file-settings.json
 
-# COPY ./trello-local-settings.json /go/app/src/trello-local-settings.json
-# COPY ./trello-settings.json /go/app/src/trello-settings.json
+# COPY ./file-local-settings.json /go/app/src/file-local-settings.json
+# COPY ./file-settings.json /go/app/src/file-settings.json
 
 COPY ./trello-local-settings.json .
 COPY ./trello-settings.json .
@@ -38,7 +38,7 @@ CMD ["/trello-api"]
 
 # FROM base
 # COPY --from=go-builder /go/app/trello-api /trello-api
-# COPY --from=go-builder /go/app/trello-local-settings.json /trello-local-settings.json
-# COPY --from=go-builder /go/app/trello-settings.json /trello-settings.json
+# COPY --from=go-builder /go/app/file-local-settings.json /file-local-settings.json
+# COPY --from=go-builder /go/app/file-settings.json /file-settings.json
 # COPY --from=go-builder /go/app/keys /keys
 # CMD ["/trello-api"]

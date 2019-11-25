@@ -43,6 +43,21 @@ services:
     tty: true
     stdin_open: true
 
+  file-loader:
+    build:
+      context: .
+      dockerfile: ./file_service/Dockerfile
+      args:
+        - VER=1.0
+    ports:
+      - "8082:8082"
+    networks:
+      - hohoho
+    environment:
+      - DEPLOYAPI
+    tty: true
+    stdin_open: true
+
   postgres:
     image: postgres:latest
     environment:

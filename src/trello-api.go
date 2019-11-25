@@ -1,6 +1,7 @@
 package main
 
 import (
+	"2019_2_Shtoby_shto/file_service/file"
 	"2019_2_Shtoby_shto/session_service/session"
 	"2019_2_Shtoby_shto/src/config"
 	"2019_2_Shtoby_shto/src/database"
@@ -14,7 +15,6 @@ import (
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/tag"
 	"2019_2_Shtoby_shto/src/dicts/user"
-	"2019_2_Shtoby_shto/src/fileLoader"
 	"2019_2_Shtoby_shto/src/initDB"
 	"2019_2_Shtoby_shto/src/security"
 	"context"
@@ -59,12 +59,18 @@ func main() {
 	conf := config.GetInstance()
 
 	sessService, err := ConnectGRPC(conf.SecurityURL, "security_service")
-
 	if err != nil {
 		e.Logger.Error(err)
 		os.Exit(1)
 	}
 	securityClient := session.NewSecurityClient(sessService)
+
+	fileService, err := ConnectGRPC(conf.FileLoaderURL, "file_service")
+	if err != nil {
+		e.Logger.Error(err)
+		os.Exit(1)
+	}
+	fileLoaderClient := file.NewIFileLoaderManagerClient(fileService)
 
 	httpAddr := ":" + strconv.Itoa(conf.Port)
 	e.Logger.Info("API Url:", httpAddr)
@@ -79,7 +85,7 @@ func main() {
 	defer dm.CloseConnection()
 
 	e.Logger.SetLevel(echoLog.DEBUG)
-	InitServices(e, dm, conf, securityClient)
+	InitServices(e, dm, conf, securityClient, fileLoaderClient)
 	newServer(e, httpAddr)
 
 	// great shutdown
@@ -145,15 +151,14 @@ func checkCSRF(h echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config, sessService session.SecurityClient) {
+func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config, sessService session.SecurityClient, fileService file.IFileLoaderManagerClient) {
 	sessionService := security.NewSessionManager(&sessService)
-	fl := fileLoader.CreateFileLoaderInstance(conf.StorageRegion, conf.StorageEndpoint, conf.StorageBucket)
 	userService := user.CreateInstance(db)
-	photoService := photo.CreateInstance(db, conf, fl)
+	photoService := photo.CreateInstance(db, conf, fileService)
 	boardService := board.CreateInstance(db)
 	boardUsersService := boardUsers.CreateInstance(db)
 	cardUsersService := сardUsers.CreateInstance(db)
-	cardService := card.CreateInstance(db, fl)
+	cardService := card.CreateInstance(db, fileService)
 	cardGroupService := cardGroup.CreateInstance(db)
 	commentService := comment.CreateInstance(db)
 	tagService := tag.CreateInstance(db)

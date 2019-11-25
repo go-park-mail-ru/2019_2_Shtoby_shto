@@ -2,6 +2,7 @@
   "trello.service.port": 8080,
   "trello.service.frontend.url": "http://localhost:3000",
   "trello.service.security.url": "security:8081",
+  "trello.service.file.loader.url": "file-loader:8082",
   "trello.service.image.path": "./image",
   "trello.service.storage.access.key": "ikWLxqGuW1kivBRAv2agu3",
   "trello.service.storage.secret.key": "f2oKA3BZKQ7vYjNtA1CmDPV9DeY7KLovBJdH4rwsqVn2",

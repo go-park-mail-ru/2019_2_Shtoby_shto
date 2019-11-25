@@ -1,16 +1,16 @@
 package card
 
 import (
+	"2019_2_Shtoby_shto/file_service/file"
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/dicts/models"
-	"2019_2_Shtoby_shto/src/fileLoader"
 	"2019_2_Shtoby_shto/src/handle"
 	"bufio"
 	"bytes"
+	"context"
 	"github.com/pkg/errors"
-	"io/ioutil"
 )
 
 type HandlerCardService interface {
@@ -29,10 +29,10 @@ type HandlerCardService interface {
 type service struct {
 	handle.HandlerImpl
 	db database.IDataManager
-	fl fileLoader.IFileLoaderManager
+	fl file.IFileLoaderManagerClient
 }
 
-func CreateInstance(db database.IDataManager, fileLoader fileLoader.IFileLoaderManager) HandlerCardService {
+func CreateInstance(db database.IDataManager, fileLoader file.IFileLoaderManagerClient) HandlerCardService {
 	return &service{
 		db: db,
 		fl: fileLoader,
@@ -107,12 +107,16 @@ func (s service) FillLookupFields(card *models.Card, comments []models.Comment) 
 	return nil
 }
 
-func (s service) DownloadFileToCard(file *bufio.Reader, cardID customType.StringUUID) (*models.Card, error) {
+func (s service) DownloadFileToCard(reader *bufio.Reader, cardID customType.StringUUID) (*models.Card, error) {
 	buf := bytes.Buffer{}
-	if _, err := buf.ReadFrom(file); err != nil {
+	if _, err := buf.ReadFrom(reader); err != nil {
 		return nil, err
 	}
-	err := s.fl.DownloadFile(cardID.String(), buf.Bytes())
+	newFile := &file.File{
+		ID:   cardID.String(),
+		Data: buf.Bytes(),
+	}
+	_, err := s.fl.DownloadFile(context.Background(), newFile)
 	if err != nil {
 		return nil, err
 	}
@@ -124,9 +128,12 @@ func (s service) DownloadFileToCard(file *bufio.Reader, cardID customType.String
 }
 
 func (s service) GetCardFile(cardID customType.StringUUID) ([]byte, error) {
-	file, err := s.fl.UploadFile(cardID.String())
+	fileID := &file.FileID{
+		ID: cardID.String(),
+	}
+	uploadFile, err := s.fl.UploadFile(context.Background(), fileID)
 	if err != nil {
 		return nil, err
 	}
-	return ioutil.ReadAll(file)
+	return uploadFile.Data, nil
 }
