@@ -16,7 +16,7 @@ WORKDIR /go/app/src
 
 COPY ./trello-local-settings.json .
 COPY ./trello-settings.json .
-
+COPY build/config/ build/config/
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /trello-api ./src
 CMD ["/trello-api"]
