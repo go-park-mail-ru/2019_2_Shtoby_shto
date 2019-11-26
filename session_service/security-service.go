@@ -3,6 +3,7 @@ package main
 import (
 	"2019_2_Shtoby_shto/session_service/config"
 	"2019_2_Shtoby_shto/session_service/session"
+	"2019_2_Shtoby_shto/src/metric"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -19,6 +20,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
+	metric.RegisterAccessHitsMetric("security_service")
 
 	sHandler := session.NewSessionManager(conf.RedisConfig, conf.RedisPass, conf.RedisDbNumber)
 

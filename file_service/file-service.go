@@ -3,6 +3,7 @@ package main
 import (
 	"2019_2_Shtoby_shto/file_service/config"
 	"2019_2_Shtoby_shto/file_service/file"
+	"2019_2_Shtoby_shto/src/metric"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -15,6 +16,8 @@ func main() {
 		os.Exit(1)
 	}
 	conf := config.GetInstance()
+
+	metric.RegisterAccessHitsMetric("file_service")
 
 	lis, err := net.Listen("tcp", conf.Port)
 	if err != nil {
