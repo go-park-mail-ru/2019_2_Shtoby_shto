@@ -24,7 +24,7 @@ func TestNewBoardHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			NewBoardHandler(tt.args.e, tt.args.userService, tt.args.boardService, tt.args.securityService)
+			//NewBoardHandler(tt.args.e, tt.args.userService, tt.args.boardService, tt.args.securityService)
 		})
 	}
 }

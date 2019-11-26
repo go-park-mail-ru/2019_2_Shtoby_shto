@@ -11,6 +11,8 @@ import (
 	"strings"
 )
 
+//go:generate mockgen -source=$GOFILE -destination=data_manager_mock.go -package=$GOPACKAGE
+
 type IDataManager interface {
 	Db() *gorm.DB
 	SetDb(db *gorm.DB)
@@ -114,7 +116,9 @@ func (d DataManager) CreateRecord(p interface{}) error {
 	}
 	obj.SetId(customType.StringUUID(id))
 	res := d.db.Table(obj.GetTableName()).Create(p)
-	if res.Error != nil {
+	if res.RecordNotFound() {
+		return errors.New("Record not found ")
+	} else if res.Error != nil {
 		return res.Error
 	}
 	return nil

@@ -98,20 +98,17 @@ func TestSessionManager_getSession(t *testing.T) {
 }
 
 func TestSessionManager_Delete(t *testing.T) {
-	type args struct {
-		ctx echo.Context
-	}
 	tests := []struct {
-		name    string
-		sm      *SessionManager
-		args    args
-		wantErr bool
+		name      string
+		sm        *SessionManager
+		sessionID string
+		wantErr   bool
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.sm.Delete(tt.args.ctx); (err != nil) != tt.wantErr {
+			if err := tt.sm.Delete(tt.sessionID); (err != nil) != tt.wantErr {
 				t.Errorf("SessionManager.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

@@ -3,7 +3,8 @@ module 2019_2_Shtoby_shto
 go 1.12
 
 require (
-	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
+	github.com/DATA-DOG/go-sqlmock v1.3.3
+	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/aws/aws-sdk-go v1.25.35
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/gabrie30/ghorg v1.0.7 // indirect
@@ -16,7 +17,6 @@ require (
 	github.com/gyepisam/mcf v0.0.0-20181020145543-a4d14a7af431
 	github.com/jinzhu/gorm v1.9.10
 	github.com/joho/godotenv v1.3.0 // indirect
-	github.com/kr/pretty v0.1.0 // indirect
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.0.0
 	github.com/labstack/gommon v0.3.0
@@ -29,8 +29,8 @@ require (
 	github.com/prometheus/common v0.2.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.4.0
+	github.com/swaggo/swag v1.6.3
 	golang.org/x/net v0.0.0-20190611141213-3f473d35a33a
-	golang.org/x/text v0.3.2 // indirect
 	google.golang.org/grpc v1.19.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
