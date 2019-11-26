@@ -8,6 +8,5 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /go/app/file-service /go/a
 
 FROM base
 COPY --from=go-builder /go/app/file-service /file-service
-COPY --from=go-builder /go/app/file_service/file-local-settings.json /file-local-settings.json
 COPY --from=go-builder /go/app/file_service/file-settings.json /file-settings.json
 CMD ["/file-service"]
