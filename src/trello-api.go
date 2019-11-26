@@ -1,6 +1,8 @@
 package main
 
 import (
+	"2019_2_Shtoby_shto/file_service/file"
+	"2019_2_Shtoby_shto/session_service/session"
 	"2019_2_Shtoby_shto/src/config"
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts/board"
@@ -13,9 +15,7 @@ import (
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/tag"
 	"2019_2_Shtoby_shto/src/dicts/user"
-	"2019_2_Shtoby_shto/src/fileLoader"
 	"2019_2_Shtoby_shto/src/initDB"
-	"2019_2_Shtoby_shto/src/metric"
 	"2019_2_Shtoby_shto/src/security"
 	"context"
 	"errors"
@@ -23,9 +23,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoLog "github.com/labstack/gommon/log"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/log"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/balancer/roundrobin"
 	"net/http"
 	"os"
 	"os/signal"
@@ -34,6 +35,10 @@ import (
 	// TODO::"github.com/microcosm-cc/bluemonday"
 	//"github.com/prometheus/client_golang/prometheus"
 	//"github.com/prometheus/client_golang/prometheus/promhttp"
+)
+
+var (
+	securityService security.HandlerSecurity
 )
 
 func main() {
@@ -46,15 +51,26 @@ func main() {
 
 	e.POST("/api/v1/query", echo.WrapHandler(promhttp.Handler()))
 
-	// Register prometheus metrics
-	metric.RegisterAccessHitsMetric("api_service")
-
 	if err := config.InitConfig(); err != nil {
 		e.Logger.Error(err)
 		os.Exit(1)
 	}
 
 	conf := config.GetInstance()
+
+	sessService, err := ConnectGRPC(conf.SecurityURL, "security_service")
+	if err != nil {
+		e.Logger.Error(err)
+		os.Exit(1)
+	}
+	securityClient := session.NewSecurityClient(sessService)
+
+	fileService, err := ConnectGRPC(conf.FileLoaderURL, "file_service")
+	if err != nil {
+		e.Logger.Error(err)
+		os.Exit(1)
+	}
+	fileLoaderClient := file.NewIFileLoaderManagerClient(fileService)
 
 	httpAddr := ":" + strconv.Itoa(conf.Port)
 	e.Logger.Info("API Url:", httpAddr)
@@ -63,13 +79,13 @@ func main() {
 	db, err := dbService.DbConnect("postgres", conf.DbConfig)
 	if err != nil {
 		e.Logger.Error(err)
-		os.Exit(1)
+		os.Exit(3)
 	}
 	dm := database.NewDataManager(db)
 	defer dm.CloseConnection()
 
 	e.Logger.SetLevel(echoLog.DEBUG)
-	InitServices(e, dm, conf)
+	InitServices(e, dm, conf, securityClient, fileLoaderClient)
 	newServer(e, httpAddr)
 
 	// great shutdown
@@ -104,14 +120,14 @@ func newServer(e *echo.Echo, httpAddr string) {
 	e.Use(
 		middleware.Logger(),
 		middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins:     []string{apiURL, "https://aleksandrkhoroshenin.grafana.net/"},
+			AllowOrigins:     []string{apiURL},
 			AllowCredentials: true,
 			AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodDelete, http.MethodOptions},
 			AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderXCSRFToken},
 			ExposeHeaders:    []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderXCSRFToken},
 		}),
-		checkCSRF,
-		AccessHitsMiddleware)
+		securityService.CheckSession,
+		checkCSRF)
 
 	e.Server = &http.Server{
 		Addr:           httpAddr,
@@ -135,21 +151,19 @@ func checkCSRF(h echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config) {
-	sessionService := security.NewSessionManager(conf.RedisConfig, conf.RedisPass, conf.RedisDbNumber)
-	fl := fileLoader.CreateFileLoaderInstance(conf.StorageRegion, conf.StorageEndpoint, conf.StorageBucket)
+func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config, sessService session.SecurityClient, fileService file.IFileLoaderManagerClient) {
+	sessionService := security.NewSessionManager(&sessService)
 	userService := user.CreateInstance(db)
-	photoService := photo.CreateInstance(db, conf, fl)
+	photoService := photo.CreateInstance(db, conf, fileService)
 	boardService := board.CreateInstance(db)
 	boardUsersService := boardUsers.CreateInstance(db)
 	cardUsersService := сardUsers.CreateInstance(db)
-	cardService := card.CreateInstance(db, fl)
+	cardService := card.CreateInstance(db, fileService)
 	cardGroupService := cardGroup.CreateInstance(db)
 	commentService := comment.CreateInstance(db)
 	tagService := tag.CreateInstance(db)
 	cardTagsService := cardTags.CreateInstance(db)
-	securityService := security.CreateInstance(sessionService)
-	e.Use(securityService.CheckSession)
+	securityService = security.CreateInstance(sessionService)
 	user.NewUserHandler(e, userService, boardUsersService, cardUsersService, securityService)
 	photo.NewPhotoHandler(e, photoService, userService, securityService)
 	board.NewBoardHandler(e, userService, boardService, boardUsersService, cardService, cardUsersService, cardGroupService, tagService, cardTagsService, commentService, securityService)
@@ -159,23 +173,12 @@ func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config) {
 	tag.NewTagHandler(e, userService, tagService, cardTagsService, securityService)
 }
 
-func AccessHitsMiddleware(h echo.HandlerFunc) echo.HandlerFunc {
-	return func(ctx echo.Context) (err error) {
-		start := time.Now()
-		log.Info(start)
-
-		// Write hits metric
-		if metric.AccessHits != nil {
-			metric.AccessHits.With(prometheus.Labels{
-				"path":        ctx.Request().URL.Path,
-				"method":      ctx.Request().Method,
-				"status_code": strconv.Itoa(ctx.Response().Status),
-			}).Inc()
-		}
-
-		log.Info("Finish with status code",
-			"status_code", ctx.Response().Status,
-			"work_time", time.Since(start))
-		return h(ctx)
+func ConnectGRPC(addr string, name string) (*grpc.ClientConn, error) {
+	conn, err := grpc.Dial(addr,
+		grpc.WithInsecure(), grpc.WithBalancerName(roundrobin.Name), grpc.WithBlock())
+	if err != nil {
+		log.Error("Can't connect to security service:", err)
+		return nil, err
 	}
+	return conn, nil
 }

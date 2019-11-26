@@ -33,6 +33,7 @@ var tables = []tabler{
 	&models.CardUsers{},
 	&models.CardGroup{},
 	&models.CardTags{},
+	&models.Message{},
 }
 
 func Tables() []tabler {

@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package main;
+
+service Security {
+    rpc Create(UserID) returns (Session) {}
+	rpc Check(SessionInfo) returns (Session) {}
+	rpc Delete(SessionId) returns (Nothing) {}
+}
+
+message SessionId {
+    string sessionID = 1;
+}
+
+message UserID {
+    string userID = 1;
+}
+
+message Session {
+    string ID = 1;
+    string UserID = 2;
+    string CsrfToken = 3;
+}
+
+message SessionInfo {
+    string ID = 1;
+    string UserID = 2;
+}
+
+message Nothing {}

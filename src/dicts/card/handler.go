@@ -49,9 +49,9 @@ func NewCardHandler(e *echo.Echo, userService user.HandlerUserService,
 	//e.POST( "/cards/board", handler.PostCardsBoard)
 	e.POST("/cards/user", handler.FetchUserCards)
 	e.POST("/cards/user/attach", handler.AttachUserToCard)
+	e.POST("/cards/user/detach", handler.DetachUserToCard)
 	e.POST("/cards/:id/file/attach", handler.AttachFileToCard)
 	e.GET("/cards/:id/file", handler.GetCardFile)
-	e.POST("/cards/user/detach", handler.DetachUserToCard)
 	e.POST("/cards", handler.Post)
 	e.PUT("/cards/:id", handler.Put)
 	e.DELETE("/cards/:id", handler.Delete)
@@ -177,10 +177,10 @@ func (h Handler) AttachUserToCard(ctx echo.Context) error {
 
 func (h Handler) AttachFileToCard(ctx echo.Context) error {
 	rr := bufio.NewReader(ctx.Request().Body)
-	card, err := h.cardService.AttachFile(customType.StringUUID(ctx.Param("id")), rr)
+	card, err := h.cardService.DownloadFileToCard(rr, customType.StringUUID(ctx.Param("id")))
 	if err != nil {
 		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "FindBoardUsersByIDs error", http.StatusInternalServerError, err)
+		errorsLib.ErrorHandler(ctx.Response(), "download fail", http.StatusInternalServerError, err)
 		return err
 	}
 	return ctx.JSON(http.StatusOK, card)
@@ -190,15 +190,15 @@ func (h Handler) GetCardFile(ctx echo.Context) error {
 	file, err := h.cardService.GetCardFile(customType.StringUUID(ctx.Param("id")))
 	if err != nil {
 		ctx.Logger().Error(err)
-		errorsLib.ErrorHandler(ctx.Response(), "FindBoardUsersByIDs error", http.StatusInternalServerError, err)
+		errorsLib.ErrorHandler(ctx.Response(), "download fail", http.StatusInternalServerError, err)
 		return err
 	}
 	ctx.Response().Header().Add("Content-Type", "multipart/form-data")
-	if _, err := ctx.Response().Write(file); err != nil {
+	if _, err := ctx.Response().Write([]byte(file)); err != nil {
 		ctx.Logger().Error(err)
 		return err
 	}
-	return nil
+	return ctx.JSON(http.StatusOK, file)
 }
 
 func (h Handler) Post(ctx echo.Context) error {

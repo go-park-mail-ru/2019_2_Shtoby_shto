@@ -17,7 +17,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjsonCd93bc43Decode20192ShtobyShtoSrcConfig(in *jlexer.Lexer, out *Config) {
+func easyjsonCd93bc43Decode20192ShtobyShtoFileServiceConfig(in *jlexer.Lexer, out *Config) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -37,15 +37,7 @@ func easyjsonCd93bc43Decode20192ShtobyShtoSrcConfig(in *jlexer.Lexer, out *Confi
 		}
 		switch key {
 		case "trello.service.port":
-			out.Port = int(in.Int())
-		case "trello.service.frontend.url":
-			out.FrontendURL = string(in.String())
-		case "trello.service.security.url":
-			out.SecurityURL = string(in.String())
-		case "trello.service.file.loader.url":
-			out.FileLoaderURL = string(in.String())
-		case "trello.service.image.path":
-			out.ImagePath = string(in.String())
+			out.Port = string(in.String())
 		case "trello.service.storage.access.key":
 			out.StorageAccessKey = string(in.String())
 		case "trello.service.storage.secret.key":
@@ -56,14 +48,6 @@ func easyjsonCd93bc43Decode20192ShtobyShtoSrcConfig(in *jlexer.Lexer, out *Confi
 			out.StorageEndpoint = string(in.String())
 		case "trello.service.storage.bucket":
 			out.StorageBucket = string(in.String())
-		case "trello.service.db.config":
-			out.DbConfig = string(in.String())
-		case "trello.service.redis.config":
-			out.RedisConfig = string(in.String())
-		case "trello.service.redis.password":
-			out.RedisPass = string(in.String())
-		case "trello.service.redis.db.number":
-			out.RedisDbNumber = int(in.Int())
 		default:
 			in.SkipRecursive()
 		}
@@ -74,34 +58,14 @@ func easyjsonCd93bc43Decode20192ShtobyShtoSrcConfig(in *jlexer.Lexer, out *Confi
 		in.Consumed()
 	}
 }
-func easyjsonCd93bc43Encode20192ShtobyShtoSrcConfig(out *jwriter.Writer, in Config) {
+func easyjsonCd93bc43Encode20192ShtobyShtoFileServiceConfig(out *jwriter.Writer, in Config) {
 	out.RawByte('{')
 	first := true
 	_ = first
 	{
 		const prefix string = ",\"trello.service.port\":"
 		out.RawString(prefix[1:])
-		out.Int(int(in.Port))
-	}
-	{
-		const prefix string = ",\"trello.service.frontend.url\":"
-		out.RawString(prefix)
-		out.String(string(in.FrontendURL))
-	}
-	{
-		const prefix string = ",\"trello.service.security.url\":"
-		out.RawString(prefix)
-		out.String(string(in.SecurityURL))
-	}
-	{
-		const prefix string = ",\"trello.service.file.loader.url\":"
-		out.RawString(prefix)
-		out.String(string(in.FileLoaderURL))
-	}
-	{
-		const prefix string = ",\"trello.service.image.path\":"
-		out.RawString(prefix)
-		out.String(string(in.ImagePath))
+		out.String(string(in.Port))
 	}
 	{
 		const prefix string = ",\"trello.service.storage.access.key\":"
@@ -128,49 +92,29 @@ func easyjsonCd93bc43Encode20192ShtobyShtoSrcConfig(out *jwriter.Writer, in Conf
 		out.RawString(prefix)
 		out.String(string(in.StorageBucket))
 	}
-	{
-		const prefix string = ",\"trello.service.db.config\":"
-		out.RawString(prefix)
-		out.String(string(in.DbConfig))
-	}
-	{
-		const prefix string = ",\"trello.service.redis.config\":"
-		out.RawString(prefix)
-		out.String(string(in.RedisConfig))
-	}
-	{
-		const prefix string = ",\"trello.service.redis.password\":"
-		out.RawString(prefix)
-		out.String(string(in.RedisPass))
-	}
-	{
-		const prefix string = ",\"trello.service.redis.db.number\":"
-		out.RawString(prefix)
-		out.Int(int(in.RedisDbNumber))
-	}
 	out.RawByte('}')
 }
 
 // MarshalJSON supports json.Marshaler interface
 func (v Config) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonCd93bc43Encode20192ShtobyShtoSrcConfig(&w, v)
+	easyjsonCd93bc43Encode20192ShtobyShtoFileServiceConfig(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Config) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonCd93bc43Encode20192ShtobyShtoSrcConfig(w, v)
+	easyjsonCd93bc43Encode20192ShtobyShtoFileServiceConfig(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Config) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonCd93bc43Decode20192ShtobyShtoSrcConfig(&r, v)
+	easyjsonCd93bc43Decode20192ShtobyShtoFileServiceConfig(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Config) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonCd93bc43Decode20192ShtobyShtoSrcConfig(l, v)
+	easyjsonCd93bc43Decode20192ShtobyShtoFileServiceConfig(l, v)
 }

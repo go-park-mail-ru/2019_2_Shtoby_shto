@@ -17,12 +17,12 @@ type HandlerSecurity interface {
 }
 
 type service struct {
-	Sm                *SessionManager
+	Sm                SessionHandler
 	noSecurityRouters map[string]struct{}
 	mx                sync.Mutex
 }
 
-func CreateInstance(sm *SessionManager) HandlerSecurity {
+func CreateInstance(sm SessionHandler) HandlerSecurity {
 	return &service{
 		Sm: sm,
 		noSecurityRouters: map[string]struct{}{
@@ -36,7 +36,7 @@ func CreateInstance(sm *SessionManager) HandlerSecurity {
 func (s *service) DeleteSession(ctx echo.Context) error {
 	sessionID, ok := ctx.Get("session_id").(string)
 	if !ok {
-		return errors.New("Session ID is not valid ")
+		return errors.New("Session Id is not valid! ")
 	}
 	if err := s.Sm.Delete(sessionID); err != nil {
 		return err
@@ -53,11 +53,12 @@ func (s *service) CreateSession(ctx *echo.Context, userID customType.StringUUID)
 	expiration := time.Now().Add(24 * time.Hour)
 	cookie := http.Cookie{
 		Name:    "session_id",
-		Value:   session.ID.String(),
+		Value:   session.ID,
 		Expires: expiration,
 	}
 	(*ctx).Response().Header().Add(echo.HeaderXCSRFToken, session.CsrfToken)
 	http.SetCookie((*ctx).Response(), &cookie)
+	println(session.CsrfToken, session.ID)
 	return nil
 }
 
@@ -83,14 +84,14 @@ func (s *service) CheckSession(h echo.HandlerFunc) echo.HandlerFunc {
 			return err
 		}
 		ctx.Logger().Info(ctx.Request().Host, ctx.Request().RequestURI)
-		session, err := s.Sm.Check(cookieSessionID.Value)
+		sess, err := s.Sm.Check(cookieSessionID.Value)
 		if err != nil {
 			errLib.ErrorHandler(ctx.Response(), "Error check session", http.StatusUnauthorized, err)
 			return err
 		}
 		ctx.Set("session_id", cookieSessionID.Value)
-		ctx.Set("user_id", session.UserID)
-		ctx.Set("csrf_token", session.CsrfToken)
+		ctx.Set("user_id", customType.StringUUID(sess.UserID))
+		ctx.Set("csrf_token", sess.CsrfToken)
 		return h(ctx)
 	}
 }

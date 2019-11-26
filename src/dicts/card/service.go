@@ -1,20 +1,17 @@
 package card
 
 import (
+	"2019_2_Shtoby_shto/file_service/file"
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/database"
 	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/dicts/models"
-	"2019_2_Shtoby_shto/src/fileLoader"
 	"2019_2_Shtoby_shto/src/handle"
-	"2019_2_Shtoby_shto/src/utils"
 	"bufio"
 	"bytes"
+	"context"
 	"github.com/pkg/errors"
-	"io/ioutil"
 )
-
-//go:generate mockgen -source=$GOFILE -destination=usecase_mock.go -package=$GOPACKAGE
 
 type HandlerCardService interface {
 	FindCardByID(id customType.StringUUID) (*models.Card, error)
@@ -22,23 +19,23 @@ type HandlerCardService interface {
 	FetchCardsByCardGroupIDs(cardGroupIDs []string) (cards []models.Card, err error)
 	CreateCard(data []byte) (*models.Card, error)
 	UpdateCard(data []byte, id customType.StringUUID) (*models.Card, error)
+	DownloadFileToCard(file *bufio.Reader, cardID customType.StringUUID) (*models.Card, error)
+	GetCardFile(cardID customType.StringUUID) ([]byte, error)
 	DeleteCard(id customType.StringUUID) error
 	FetchCards(limit, offset int) (cards []models.Card, err error)
 	FillLookupFields(card *models.Card, comments []models.Comment) error
-	AttachFile(cardID customType.StringUUID, file *bufio.Reader) (*models.Card, error)
-	GetCardFile(fileID customType.StringUUID) ([]byte, error)
 }
 
 type service struct {
 	handle.HandlerImpl
 	db database.IDataManager
-	fl fileLoader.IFileLoaderManager
+	fl file.IFileLoaderManagerClient
 }
 
-func CreateInstance(db database.IDataManager, manager fileLoader.IFileLoaderManager) HandlerCardService {
+func CreateInstance(db database.IDataManager, fileLoader file.IFileLoaderManagerClient) HandlerCardService {
 	return &service{
 		db: db,
-		fl: manager,
+		fl: fileLoader,
 	}
 }
 
@@ -110,40 +107,33 @@ func (s service) FillLookupFields(card *models.Card, comments []models.Comment) 
 	return nil
 }
 
-func (s service) AttachFile(cardID customType.StringUUID, file *bufio.Reader) (*models.Card, error) {
-	uuid, err := utils.GenerateUUID()
-	if err != nil {
-		return nil, err
-	}
-	card := &models.Card{
-		BaseInfo: dicts.BaseInfo{
-			ID: cardID,
-		},
-		FileID: customType.StringUUID(uuid.String()),
-	}
-	cardData, err := card.MarshalJSON()
-	if err != nil {
-		return nil, err
-	}
-	newCard, err := s.UpdateCard(cardData, cardID)
-	if err != nil {
-		return nil, err
-	}
+func (s service) DownloadFileToCard(reader *bufio.Reader, cardID customType.StringUUID) (*models.Card, error) {
 	buf := bytes.Buffer{}
-	if _, err := buf.ReadFrom(file); err != nil {
+	if _, err := buf.ReadFrom(reader); err != nil {
 		return nil, err
 	}
-	err = s.fl.DownloadFile(uuid.String(), buf.Bytes())
+	newFile := &file.File{
+		ID:   cardID.String(),
+		Data: buf.Bytes(),
+	}
+	_, err := s.fl.DownloadFile(context.Background(), newFile)
 	if err != nil {
 		return nil, err
 	}
-	return newCard, nil
+	card := models.Card{
+		File: cardID,
+	}
+	data, err := card.MarshalJSON()
+	return s.UpdateCard(data, cardID)
 }
 
-func (s service) GetCardFile(fileID customType.StringUUID) ([]byte, error) {
-	file, err := s.fl.UploadFile(fileID.String())
+func (s service) GetCardFile(cardID customType.StringUUID) ([]byte, error) {
+	fileID := &file.FileID{
+		ID: cardID.String(),
+	}
+	uploadFile, err := s.fl.UploadFile(context.Background(), fileID)
 	if err != nil {
 		return nil, err
 	}
-	return ioutil.ReadAll(file)
+	return uploadFile.Data, nil
 }

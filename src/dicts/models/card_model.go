@@ -16,6 +16,7 @@ type Card struct {
 	FileID      customType.StringUUID `json:"file_id"`
 	CardUserID  customType.StringUUID `json:"-"`
 	CardGroupID customType.StringUUID `json:"card_group_id"`
+	File        customType.StringUUID `json:"file"`
 	Comments    []Comment             `json:"comments" sql:"-"`
 	Tags        []Tag                 `json:"tags" sql:"-"`
 	Users       []string              `json:"users" sql:"-"`

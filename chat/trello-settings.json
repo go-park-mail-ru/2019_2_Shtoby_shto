@@ -1,0 +1,6 @@
+{
+  "trello.service.port": 443,
+  "trello.service.frontend.url": "https://front.aleshka2012.now.sh",
+  "trello.service.security.url": "127.0.0.1:8081",
+  "trello.service.db.config":"host='postgres' port=5432 user=postgres dbname='trello' sslmode=disable password='1111'"
+}

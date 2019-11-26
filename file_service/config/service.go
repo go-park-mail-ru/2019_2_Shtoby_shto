@@ -3,14 +3,12 @@ package config
 import (
 	"errors"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 )
 
 const (
-	localSettingsFile  = "trello-local-settings.json"
-	remoteSettingsFile = "trello-settings.json"
+	remoteSettingsFile = "file-settings.json"
 	deployEnvVar       = "DEPLOYAPI"
 	awsAccessKeyID     = "AWS_ACCESS_KEY_ID"
 	awsSecretAccessKey = "AWS_SECRET_ACCESS_KEY"
@@ -18,20 +16,12 @@ const (
 
 //easyjson:json
 type Config struct {
-	Port             int    `json:"trello.service.port"`
-	FrontendURL      string `json:"trello.service.frontend.url"`
-	SecurityURL      string `json:"trello.service.security.url"`
-	FileLoaderURL    string `json:"trello.service.file.loader.url"`
-	ImagePath        string `json:"trello.service.image.path"`
+	Port             string `json:"trello.service.port"`
 	StorageAccessKey string `json:"trello.service.storage.access.key"`
 	StorageSecretKey string `json:"trello.service.storage.secret.key"`
 	StorageRegion    string `json:"trello.service.storage.region"`
 	StorageEndpoint  string `json:"trello.service.storage.endpoint"`
 	StorageBucket    string `json:"trello.service.storage.bucket"`
-	DbConfig         string `json:"trello.service.db.config"`
-	RedisConfig      string `json:"trello.service.redis.config"`
-	RedisPass        string `json:"trello.service.redis.password"`
-	RedisDbNumber    int    `json:"trello.service.redis.db.number"`
 }
 
 var ToolConfig *Config
@@ -58,21 +48,7 @@ func InitConfig() error {
 		return err
 	}
 
-	deployVar := os.Getenv(deployEnvVar)
-
-	var settingsFileName string
-
-	if deployVar == "" {
-		log.Printf(
-			"%s not set, expecting requests from api on localhost deployment\n",
-			deployEnvVar,
-		)
-		settingsFileName = localSettingsFile
-	} else {
-		settingsFileName = remoteSettingsFile
-	}
-
-	configFileName := path.Join(dir, settingsFileName)
+	configFileName := path.Join(dir, remoteSettingsFile)
 	ToolConfig = new(Config)
 	if err := readConfig(configFileName); err != nil {
 		return err
