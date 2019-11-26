@@ -16,6 +16,7 @@ import (
 	"2019_2_Shtoby_shto/src/dicts/tag"
 	"2019_2_Shtoby_shto/src/dicts/user"
 	"2019_2_Shtoby_shto/src/initDB"
+	"2019_2_Shtoby_shto/src/metric"
 	"2019_2_Shtoby_shto/src/security"
 	"context"
 	"errors"
@@ -23,6 +24,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoLog "github.com/labstack/gommon/log"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/log"
 	"google.golang.org/grpc"
@@ -50,6 +52,9 @@ func main() {
 	})
 
 	e.POST("/api/v1/query", echo.WrapHandler(promhttp.Handler()))
+
+	// Register prometheus metrics
+	metric.RegisterAccessHitsMetric("api_service")
 
 	if err := config.InitConfig(); err != nil {
 		e.Logger.Error(err)
@@ -127,6 +132,7 @@ func newServer(e *echo.Echo, httpAddr string) {
 			ExposeHeaders:    []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderXCSRFToken},
 		}),
 		securityService.CheckSession,
+		AccessHitsMiddleware,
 		checkCSRF)
 
 	e.Server = &http.Server{
@@ -181,4 +187,25 @@ func ConnectGRPC(addr string, name string) (*grpc.ClientConn, error) {
 		return nil, err
 	}
 	return conn, nil
+}
+
+func AccessHitsMiddleware(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) (err error) {
+		start := time.Now()
+		log.Info(start)
+
+		// Write hits metric
+		if metric.AccessHits != nil {
+			metric.AccessHits.With(prometheus.Labels{
+				"path":        ctx.Request().URL.Path,
+				"method":      ctx.Request().Method,
+				"status_code": strconv.Itoa(ctx.Response().Status),
+			}).Inc()
+		}
+
+		log.Info("Finish with status code",
+			"status_code", ctx.Response().Status,
+			"work_time", time.Since(start))
+		return h(ctx)
+	}
 }
