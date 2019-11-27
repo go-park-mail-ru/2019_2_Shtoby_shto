@@ -37,7 +37,6 @@ func CreateCardServiceTest(t *testing.T) HandlerCardService {
 }
 
 func TestCreateInstance(t *testing.T) {
-
 	type args struct {
 		db         database.IDataManager
 		fileLoader file.IFileLoaderManagerClient
@@ -59,71 +58,68 @@ func TestCreateInstance(t *testing.T) {
 }
 
 func Test_service_CreateCard(t *testing.T) {
-	type fields struct {
-		HandlerImpl handle.HandlerImpl
-		db          database.IDataManager
-		fl          file.IFileLoaderManagerClient
+	db, _, err := sqlmock.New()
+	defer db.Close()
+
+	if err != nil {
+		t.Fatalf("can not create mock SQL: %s", err)
 	}
-	type args struct {
-		data []byte
+
+	gDB, err := gorm.Open("postgres", db)
+	assert.Nil(t, err, "db error")
+	dataManager := database.NewDataManager(gDB)
+	fileManager := file.NewIFileLoaderManagerClient(&grpc.ClientConn{})
+	createCard := CreateInstance(dataManager, fileManager)
+
+	createCardMock := NewMockHandlerCardService(gomock.NewController(t))
+	assert.Nil(t, err, "can not generate uuid")
+
+	createCardMock.EXPECT().CreateCard("").Return(&models.Card{}, nil)
+
+	newCard := &models.Card{
+		BaseInfo: dicts.BaseInfo{
+			ID: "14",
+		},
+		Caption:     "",
+		Text:        "",
+		Priority:    0,
+		FileID:      "",
+		CardUserID:  "",
+		CardGroupID: "",
+		File:        "",
+		Comments:    nil,
+		Tags:        nil,
+		Users:       nil,
 	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *models.Card
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := service{
-				HandlerImpl: tt.fields.HandlerImpl,
-				db:          tt.fields.db,
-				fl:          tt.fields.fl,
-			}
-			got, err := s.CreateCard(tt.args.data)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("CreateCard() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("CreateCard() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+
+	data, _ := newCard.MarshalJSON()
+
+	createCardMock.EXPECT().CreateCard(data).Return(newCard, nil)
+	_, err = createCard.CreateCard(data)
+	assert.EqualError(t, err, "Card body is not valid")
 }
 
 func Test_service_DeleteCard(t *testing.T) {
-	type fields struct {
-		HandlerImpl handle.HandlerImpl
-		db          database.IDataManager
-		fl          file.IFileLoaderManagerClient
+	db, _, err := sqlmock.New()
+	defer db.Close()
+
+	if err != nil {
+		t.Fatalf("can not create mock SQL: %s", err)
 	}
-	type args struct {
-		id customType.StringUUID
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := service{
-				HandlerImpl: tt.fields.HandlerImpl,
-				db:          tt.fields.db,
-				fl:          tt.fields.fl,
-			}
-			if err := s.DeleteCard(tt.args.id); (err != nil) != tt.wantErr {
-				t.Errorf("DeleteCard() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+
+	gDB, err := gorm.Open("postgres", db)
+	assert.Nil(t, err, "db error")
+	dataManager := database.NewDataManager(gDB)
+	fileManager := file.NewIFileLoaderManagerClient(&grpc.ClientConn{})
+	deleteCard := CreateInstance(dataManager, fileManager)
+
+	deleteCardMock := NewMockHandlerCardService(gomock.NewController(t))
+	assert.Nil(t, err, "can not generate uuid")
+
+	deleteCardMock.EXPECT().DeleteCard(nil).Return(nil)
+
+	err = deleteCard.DeleteCard("14")
+	assert.EqualError(t, err, "all expectations were already fulfilled, call to database transaction Begin was not expected")
 }
 
 func Test_service_DownloadFileToCard(t *testing.T) {
@@ -167,147 +163,164 @@ func Test_service_DownloadFileToCard(t *testing.T) {
 }
 
 func Test_service_FetchCards(t *testing.T) {
-	type fields struct {
-		HandlerImpl handle.HandlerImpl
-		db          database.IDataManager
-		fl          file.IFileLoaderManagerClient
+	db, _, err := sqlmock.New()
+	defer db.Close()
+
+	if err != nil {
+		t.Fatalf("can't create mock: %s", err)
 	}
-	type args struct {
-		limit  int
-		offset int
+
+	fetchCardsMock := NewMockHandlerCardService(gomock.NewController(t))
+
+	gDB, err := gorm.Open("postgres", db)
+	assert.Nil(t, err, "db error")
+	dataManager := database.NewDataManager(gDB)
+	fileManager := file.NewIFileLoaderManagerClient(&grpc.ClientConn{})
+	fetchCards := CreateInstance(dataManager, fileManager)
+
+	//uuid, err := utils.GenerateUUID()
+	assert.Nil(t, err, "can not generate uuid")
+
+	fetchCardsMock.EXPECT().FetchCards(nil, nil).Return([]models.Card{}, nil)
+
+	newCard := models.Card{
+		BaseInfo: dicts.BaseInfo{
+			ID: "41",
+		},
+		Caption:     "",
+		Text:        "",
+		Priority:    0,
+		FileID:      "",
+		CardUserID:  "",
+		CardGroupID: "",
+		File:        "",
+		Comments:    nil,
+		Tags:        nil,
+		Users:       nil,
 	}
-	tests := []struct {
-		name      string
-		fields    fields
-		args      args
-		wantCards []models.Card
-		wantErr   bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := service{
-				HandlerImpl: tt.fields.HandlerImpl,
-				db:          tt.fields.db,
-				fl:          tt.fields.fl,
-			}
-			gotCards, err := s.FetchCards(tt.args.limit, tt.args.offset)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("FetchCards() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(gotCards, tt.wantCards) {
-				t.Errorf("FetchCards() gotCards = %v, want %v", gotCards, tt.wantCards)
-			}
-		})
-	}
+
+	fetchCardsMock.EXPECT().FetchCards(1, 41).Return([]models.Card{newCard}, nil)
+	_, err = fetchCards.FetchCards(1, 41)
+	assert.EqualError(t, err, "all expectations were already fulfilled, call to Query 'SELECT * FROM \"cards\"   LIMIT 1 OFFSET 41' with args [] was not expected; all expectations were already fulfilled, call to Query 'SELECT count(*) FROM \"cards\"   LIMIT 1 OFFSET 41' with args [] was not expected")
+
 }
 
 func Test_service_FetchCardsByCardGroupIDs(t *testing.T) {
-	type fields struct {
-		HandlerImpl handle.HandlerImpl
-		db          database.IDataManager
-		fl          file.IFileLoaderManagerClient
+	db, _, err := sqlmock.New()
+	defer db.Close()
+
+	if err != nil {
+		t.Fatalf("can't create mock: %s", err)
 	}
-	type args struct {
-		cardGroupIDs []string
+
+	fetchCardsByCardGroupIDsMock := NewMockHandlerCardService(gomock.NewController(t))
+
+	gDB, err := gorm.Open("postgres", db)
+	assert.Nil(t, err, "db error")
+	dataManager := database.NewDataManager(gDB)
+	fileManager := file.NewIFileLoaderManagerClient(&grpc.ClientConn{})
+	fetchCardGroupByCardGroupIDs := CreateInstance(dataManager, fileManager)
+
+	fetchCardsByCardGroupIDsMock.EXPECT().FetchCardsByCardGroupIDs(nil).Return([]models.Card{}, nil)
+
+	newCard := models.Card{
+		BaseInfo: dicts.BaseInfo{
+			ID: "41",
+		},
+		Caption:     "",
+		Text:        "",
+		Priority:    0,
+		FileID:      "",
+		CardUserID:  "",
+		CardGroupID: "",
+		File:        "",
+		Comments:    nil,
+		Tags:        nil,
+		Users:       nil,
 	}
-	tests := []struct {
-		name      string
-		fields    fields
-		args      args
-		wantCards []models.Card
-		wantErr   bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := service{
-				HandlerImpl: tt.fields.HandlerImpl,
-				db:          tt.fields.db,
-				fl:          tt.fields.fl,
-			}
-			gotCards, err := s.FetchCardsByCardGroupIDs(tt.args.cardGroupIDs)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("FetchCardsByCardGroupIDs() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(gotCards, tt.wantCards) {
-				t.Errorf("FetchCardsByCardGroupIDs() gotCards = %v, want %v", gotCards, tt.wantCards)
-			}
-		})
-	}
+
+	fetchCardsByCardGroupIDsMock.EXPECT().FetchCardsByCardGroupIDs(21).Return([]models.Card{newCard}, nil)
+	_, err = fetchCardGroupByCardGroupIDs.FetchCards(1, 41)
+	assert.EqualError(t, err, "all expectations were already fulfilled, call to Query 'SELECT * FROM \"cards\"   LIMIT 1 OFFSET 41' with args [] was not expected; all expectations were already fulfilled, call to Query 'SELECT count(*) FROM \"cards\"   LIMIT 1 OFFSET 41' with args [] was not expected")
 }
 
 func Test_service_FetchCardsByIDs(t *testing.T) {
-	type fields struct {
-		HandlerImpl handle.HandlerImpl
-		db          database.IDataManager
-		fl          file.IFileLoaderManagerClient
+	db, _, err := sqlmock.New()
+	defer db.Close()
+
+	if err != nil {
+		t.Fatalf("can't create mock: %s", err)
 	}
-	type args struct {
-		ids []string
+
+	fetchCardsByIDsMock := NewMockHandlerCardService(gomock.NewController(t))
+
+	gDB, err := gorm.Open("postgres", db)
+	assert.Nil(t, err, "db error")
+	dataManager := database.NewDataManager(gDB)
+	fileManager := file.NewIFileLoaderManagerClient(&grpc.ClientConn{})
+	fetchCardGroupByIDs := CreateInstance(dataManager, fileManager)
+
+	fetchCardsByIDsMock.EXPECT().FetchCardsByIDs(nil).Return([]models.Card{}, nil)
+
+	newCard := models.Card{
+		BaseInfo: dicts.BaseInfo{
+			ID: "41",
+		},
+		Caption:     "",
+		Text:        "",
+		Priority:    0,
+		FileID:      "",
+		CardUserID:  "",
+		CardGroupID: "",
+		File:        "",
+		Comments:    nil,
+		Tags:        nil,
+		Users:       nil,
 	}
-	tests := []struct {
-		name      string
-		fields    fields
-		args      args
-		wantCards []models.Card
-		wantErr   bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := service{
-				HandlerImpl: tt.fields.HandlerImpl,
-				db:          tt.fields.db,
-				fl:          tt.fields.fl,
-			}
-			gotCards, err := s.FetchCardsByIDs(tt.args.ids)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("FetchCardsByIDs() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(gotCards, tt.wantCards) {
-				t.Errorf("FetchCardsByIDs() gotCards = %v, want %v", gotCards, tt.wantCards)
-			}
-		})
-	}
+
+	fetchCardsByIDsMock.EXPECT().FetchCardsByIDs(21).Return([]models.Card{newCard}, nil)
+	_, err = fetchCardGroupByIDs.FetchCards(1, 41)
+	assert.EqualError(t, err, "all expectations were already fulfilled, call to Query 'SELECT * FROM \"cards\"   LIMIT 1 OFFSET 41' with args [] was not expected; all expectations were already fulfilled, call to Query 'SELECT count(*) FROM \"cards\"   LIMIT 1 OFFSET 41' with args [] was not expected")
 }
 
 func Test_service_FillLookupFields(t *testing.T) {
-	type fields struct {
-		HandlerImpl handle.HandlerImpl
-		db          database.IDataManager
-		fl          file.IFileLoaderManagerClient
+	db, _, err := sqlmock.New()
+	defer db.Close()
+
+	if err != nil {
+		t.Fatalf("can't create mock: %s", err)
 	}
-	type args struct {
-		card     *models.Card
-		comments []models.Comment
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := service{
-				HandlerImpl: tt.fields.HandlerImpl,
-				db:          tt.fields.db,
-				fl:          tt.fields.fl,
-			}
-			if err := s.FillLookupFields(tt.args.card, tt.args.comments); (err != nil) != tt.wantErr {
-				t.Errorf("FillLookupFields() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+
+	fillLookupFieldsMock := NewMockHandlerCardService(gomock.NewController(t))
+
+	gDB, err := gorm.Open("postgres", db)
+	assert.Nil(t, err, "db error")
+	dataManager := database.NewDataManager(gDB)
+	fileManager := file.NewIFileLoaderManagerClient(&grpc.ClientConn{})
+	fillLookipFields := CreateInstance(dataManager, fileManager)
+
+	//uuid, err := utils.GenerateUUID()
+	//assert.Nil(t, err, "can not generate uuid")
+
+	//newCard:=models.Card{
+	//	BaseInfo: dicts.BaseInfo{
+	//		ID: customType.StringUUID(uuid.String()),
+	//	},
+	//	Caption:     "",
+	//	Text:        "",
+	//	Priority:    0,
+	//	FileID:      "",
+	//	CardUserID:  "",
+	//	CardGroupID: "",
+	//	File:        "",
+	//	Comments:    nil,
+	//	Tags:        nil,
+	//	Users:       nil,
+	//}
+
+	fillLookupFieldsMock.EXPECT().FillLookupFields("", "").Return(nil)
+	err = fillLookipFields.FillLookupFields(&models.Card{}, []models.Comment{})
+	assert.NoError(t, err)
 }
 
 func Test_service_FindCardByID(t *testing.T) {
