@@ -1,13 +1,15 @@
 package utils
 
 import (
-	"reflect"
+	"github.com/stretchr/testify/assert"
 	"testing"
-
-	uuid "github.com/satori/go.uuid"
 )
 
 func TestIsUUID(t *testing.T) {
+
+	uuid, err := GenerateUUID()
+	assert.Nil(t, err, "can not generate uuid")
+
 	type args struct {
 		str string
 	}
@@ -16,7 +18,21 @@ func TestIsUUID(t *testing.T) {
 		args args
 		want bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "uuju",
+			args: args{},
+			want: false,
+		},
+		{
+			name: "1312",
+			args: args{},
+			want: false,
+		},
+		{
+			name: uuid.String(),
+			args: args{uuid.String()},
+			want: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -28,25 +44,7 @@ func TestIsUUID(t *testing.T) {
 }
 
 func TestGenerateUUID(t *testing.T) {
-	tests := []struct {
-		name    string
-		want    uuid.UUID
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := GenerateUUID()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GenerateUUID() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GenerateUUID() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+
 }
 
 func TestJoin(t *testing.T) {
