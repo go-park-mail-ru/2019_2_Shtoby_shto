@@ -10,7 +10,6 @@ import (
 	"2019_2_Shtoby_shto/src/utils"
 	"bufio"
 	"bytes"
-	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -82,12 +81,6 @@ func Test_service_DownloadPhoto(t *testing.T) {
 
 func Test_service_GetPhotoByUser(t *testing.T) {
 
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Print("panic, HA, LOSER!\n")
-		}
-	}()
-
 	db, _, err := sqlmock.New()
 	defer db.Close()
 
@@ -116,6 +109,11 @@ func Test_service_GetPhotoByUser(t *testing.T) {
 	}
 
 	GetPhotoByUser := CreateInstance(newdatabase, cfg, newIFileLoader)
+
+	defer func() {
+		if err := recover(); err != nil {
+		}
+	}()
 
 	//gDB, err := gorm.Open("postgres", db)
 	//assert.Nil(t, err, "db error")
