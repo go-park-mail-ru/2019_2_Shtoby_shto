@@ -35,8 +35,6 @@ import (
 	"strconv"
 	"time"
 	// TODO::"github.com/microcosm-cc/bluemonday"
-	//"github.com/prometheus/client_golang/prometheus"
-	//"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var (
@@ -51,7 +49,7 @@ func main() {
 		return ctx.Redirect(http.StatusPermanentRedirect, "https://app.swaggerhub.com/apis/aleksandrkhoroshenin/trello-api/4.0")
 	})
 
-	e.POST("/api/v1/query", echo.WrapHandler(promhttp.Handler()))
+	e.POST("/metrics", echo.WrapHandler(promhttp.Handler()))
 
 	// Register prometheus metrics
 	metric.RegisterAccessHitsMetric("api_service")
@@ -203,9 +201,9 @@ func AccessHitsMiddleware(h echo.HandlerFunc) echo.HandlerFunc {
 			}).Inc()
 		}
 
-		log.Info("Finish with status code",
-			"status_code", ctx.Response().Status,
-			"work_time", time.Since(start))
+		log.Info("Finish with status code ",
+			" status_code: ", ctx.Response().Status,
+			" work_time:", time.Since(start))
 		return h(ctx)
 	}
 }
