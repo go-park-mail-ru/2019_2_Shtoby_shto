@@ -9,6 +9,7 @@ import (
 )
 
 func TestNewBoardHandler(t *testing.T) {
+
 	type args struct {
 		e               *echo.Echo
 		userService     user.HandlerUserService

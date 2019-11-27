@@ -9,7 +9,7 @@ require (
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/gabrie30/ghorg v1.0.7 // indirect
 	github.com/go-redis/redis v6.15.5+incompatible
-	github.com/golang/mock v1.2.0
+	github.com/golang/mock v1.3.1
 	github.com/golang/protobuf v1.3.2
 	github.com/google/go-github v17.0.0+incompatible // indirect
 	github.com/google/go-querystring v1.0.0 // indirect

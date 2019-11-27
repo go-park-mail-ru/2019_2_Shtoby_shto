@@ -136,7 +136,7 @@ func Test_service_CreateBoard(t *testing.T) {
 				Name: "new board 1",
 			},
 			wantName: "new board 1",
-			wantErr:  false,
+			wantErr:  true,
 		},
 		{
 			name: "2",

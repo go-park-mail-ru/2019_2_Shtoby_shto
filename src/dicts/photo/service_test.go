@@ -115,7 +115,7 @@ func Test_service_GetPhotoByUser(t *testing.T) {
 	GetPhotoByUserMock.EXPECT().DownloadPhoto(data)
 	buf := bytes.NewReader(data)
 	r := bufio.NewReader(buf)
-	_, err = downloadPhotoService.DownloadPhoto(r)
+	_, err = GetPhotoByUser.DownloadPhoto(r)
 	assert.EqualError(t, err, "mkdir : The system cannot find the path specified.")
 
 	type fields struct {

@@ -1,6 +1,7 @@
 package security
 
 import (
+	"2019_2_Shtoby_shto/session_service/session"
 	. "2019_2_Shtoby_shto/src/customType"
 	"reflect"
 	"testing"
@@ -44,12 +45,12 @@ func TestSessionManager_putSession(t *testing.T) {
 	sm := NewSessionManager("localhost:6379", "", 0)
 	tests := []struct {
 		name    string
-		session Session
+		session session.Session
 		wantErr bool
 	}{
 		{
 			name: "test 1",
-			session: Session{
+			session: session.Session{
 				ID:        "11112c6b-6819-4254-b2e4-ee4b21fbbd10",
 				UserID:    "33b42c6b-6819-4254-b2e4-ee4b21fbbd10",
 				CsrfToken: "",
