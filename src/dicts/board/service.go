@@ -6,6 +6,7 @@ import (
 	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/dicts/models"
 	"2019_2_Shtoby_shto/src/handle"
+	"2019_2_Shtoby_shto/src/utils"
 	"errors"
 )
 
@@ -13,6 +14,7 @@ import (
 
 type HandlerBoardService interface {
 	FindBoardByID(id customType.StringUUID) (*models.Board, error)
+	FindBoardByURL(shortURL string) (*models.Board, error)
 	CreateBoard(data []byte, boardUserID customType.StringUUID) (*models.Board, error)
 	UpdateBoard(data []byte, id customType.StringUUID) (*models.Board, error)
 	DeleteBoard(id customType.StringUUID) error
@@ -41,15 +43,28 @@ func (s service) FindBoardByID(id customType.StringUUID) (*models.Board, error) 
 	return board, err
 }
 
+func (s service) FindBoardByURL(shortURL string) (*models.Board, error) {
+	board := &models.Board{
+		ShortURL: shortURL,
+	}
+	count, err := s.db.FindDictByColumn(board)
+	if count == 0 {
+		return nil, errors.New("Short URL is not valid! ")
+	}
+	return board, err
+}
+
 func (s service) CreateBoard(data []byte, boardUserID customType.StringUUID) (*models.Board, error) {
+
 	board := &models.Board{
 		BoardUsersID: boardUserID,
+		ShortURL:     utils.RandStringBytesRmndr(5),
 	}
 	if err := board.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}
 	if !board.IsValid() {
-		return nil, errors.New("Board body is not valid")
+		return nil, errors.New("Board body is not valid ")
 	}
 	err := s.db.CreateRecord(board)
 	return board, err

@@ -11,6 +11,7 @@ const boardTableName = "boards"
 type Board struct {
 	dicts.BaseInfo
 	Name         string                `json:"name"`
+	ShortURL     string                `json:"short_url"`
 	Users        []string              `json:"users" sql:"-"`
 	BoardUsersID customType.StringUUID `json:"-"`
 	CardGroups   []CardGroup           `json:"card_groups" sql:"-"`
@@ -22,4 +23,9 @@ func (b Board) GetTableName() string {
 
 func (b Board) IsValid() bool {
 	return b.Name != ""
+}
+
+//easyjson:json
+type ShortURL struct {
+	ShortURL string `json:"short_url"`
 }

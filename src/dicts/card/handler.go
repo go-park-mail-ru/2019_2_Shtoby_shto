@@ -4,6 +4,7 @@ import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts/cardTags"
 	сardUsers "2019_2_Shtoby_shto/src/dicts/cardUsers"
+	"2019_2_Shtoby_shto/src/dicts/checkList"
 	"2019_2_Shtoby_shto/src/dicts/comment"
 	"2019_2_Shtoby_shto/src/dicts/models"
 	"2019_2_Shtoby_shto/src/dicts/tag"
@@ -25,6 +26,7 @@ type Handler struct {
 	tagService       tag.HandlerTagService
 	cardTagsService  cardTags.HandlerCardTagsService
 	commentService   comment.HandlerCommentService
+	checkList        checkList.HandlerCheckListService
 	securityService  security.HandlerSecurity
 	handle.HandlerImpl
 }
@@ -34,7 +36,9 @@ func NewCardHandler(e *echo.Echo, userService user.HandlerUserService,
 	cardUsersService сardUsers.HandlerCardUsersService,
 	tagService tag.HandlerTagService,
 	cardTagsService cardTags.HandlerCardTagsService,
-	commentService comment.HandlerCommentService, securityService security.HandlerSecurity) {
+	commentService comment.HandlerCommentService,
+	checkList checkList.HandlerCheckListService,
+	securityService security.HandlerSecurity) {
 	handler := Handler{
 		userService:      userService,
 		cardService:      cardService,
@@ -42,6 +46,7 @@ func NewCardHandler(e *echo.Echo, userService user.HandlerUserService,
 		tagService:       tagService,
 		cardTagsService:  cardTagsService,
 		commentService:   commentService,
+		checkList:        checkList,
 		securityService:  securityService,
 	}
 	e.GET("/cards/:id", handler.Get)
@@ -267,6 +272,11 @@ func (h Handler) fillCardFields(card *models.Card) error {
 		return err
 	}
 	card.Comments = comments
+	checkLists, err := h.checkList.FetchCheckListsByCardID(card.ID.String())
+	if err != nil {
+		return err
+	}
+	card.CheckLists = checkLists
 	cardTags, err := h.cardTagsService.FindCardTagsByCardID(card.ID)
 	if err != nil {
 		return err

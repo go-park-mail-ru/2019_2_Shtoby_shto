@@ -11,6 +11,7 @@ import (
 	"2019_2_Shtoby_shto/src/dicts/cardGroup"
 	"2019_2_Shtoby_shto/src/dicts/cardTags"
 	сardUsers "2019_2_Shtoby_shto/src/dicts/cardUsers"
+	"2019_2_Shtoby_shto/src/dicts/checkList"
 	"2019_2_Shtoby_shto/src/dicts/comment"
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/tag"
@@ -165,15 +166,17 @@ func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config, s
 	cardService := card.CreateInstance(db, fileService)
 	cardGroupService := cardGroup.CreateInstance(db)
 	commentService := comment.CreateInstance(db)
+	checkListService := checkList.CreateInstance(db)
 	tagService := tag.CreateInstance(db)
 	cardTagsService := cardTags.CreateInstance(db)
 	securityService = security.CreateInstance(sessionService)
 	user.NewUserHandler(e, userService, boardUsersService, cardUsersService, securityService)
 	photo.NewPhotoHandler(e, photoService, userService, securityService)
-	board.NewBoardHandler(e, userService, boardService, boardUsersService, cardService, cardUsersService, cardGroupService, tagService, cardTagsService, commentService, securityService)
-	card.NewCardHandler(e, userService, cardService, cardUsersService, tagService, cardTagsService, commentService, securityService)
+	board.NewBoardHandler(e, userService, boardService, boardUsersService, cardService, cardUsersService, cardGroupService, tagService, cardTagsService, commentService, checkListService, securityService)
+	card.NewCardHandler(e, userService, cardService, cardUsersService, tagService, cardTagsService, commentService, checkListService, securityService)
 	cardGroup.NewCardGroupHandler(e, cardGroupService, securityService)
 	comment.NewCommentHandler(e, userService, commentService, securityService)
+	checkList.NewCheckListHandler(e, userService, checkListService, securityService)
 	tag.NewTagHandler(e, userService, tagService, cardTagsService, securityService)
 }
 

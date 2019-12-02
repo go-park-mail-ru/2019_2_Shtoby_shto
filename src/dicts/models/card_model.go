@@ -20,14 +20,15 @@ type Card struct {
 	Comments    []Comment             `json:"comments" sql:"-"`
 	Tags        []Tag                 `json:"tags" sql:"-"`
 	Users       []string              `json:"users" sql:"-"`
+	CheckLists  []CheckList           `json:"check_lists" sql:"-"`
 }
 
-func (b Card) GetTableName() string {
+func (c Card) GetTableName() string {
 	return cardTableName
 }
 
-func (b Card) IsValid() bool {
-	return b.Caption != "" && b.CardGroupID != ""
+func (c Card) IsValid() bool {
+	return c.Caption != "" && c.CardGroupID != ""
 }
 
 //easyjson:json

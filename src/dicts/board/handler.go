@@ -7,6 +7,7 @@ import (
 	"2019_2_Shtoby_shto/src/dicts/cardGroup"
 	"2019_2_Shtoby_shto/src/dicts/cardTags"
 	сardUsers "2019_2_Shtoby_shto/src/dicts/cardUsers"
+	"2019_2_Shtoby_shto/src/dicts/checkList"
 	"2019_2_Shtoby_shto/src/dicts/comment"
 	"2019_2_Shtoby_shto/src/dicts/models"
 	"2019_2_Shtoby_shto/src/dicts/tag"
@@ -29,6 +30,7 @@ type Handler struct {
 	tagService        tag.HandlerTagService
 	cardTagsService   cardTags.HandlerCardTagsService
 	commentService    comment.HandlerCommentService
+	checkListService  checkList.HandlerCheckListService
 	boardUsersService boardUsers.HandlerBoardUsersService
 	securityService   security.HandlerSecurity
 	handle.HandlerImpl
@@ -43,6 +45,7 @@ func NewBoardHandler(e *echo.Echo, userService user.HandlerUserService,
 	tagService tag.HandlerTagService,
 	cardTagService cardTags.HandlerCardTagsService,
 	commentService comment.HandlerCommentService,
+	checkListService checkList.HandlerCheckListService,
 	securityService security.HandlerSecurity) {
 	handler := Handler{
 		userService:       userService,
@@ -54,12 +57,14 @@ func NewBoardHandler(e *echo.Echo, userService user.HandlerUserService,
 		tagService:        tagService,
 		cardTagsService:   cardTagService,
 		commentService:    commentService,
+		checkListService:  checkListService,
 		securityService:   securityService,
 	}
 	e.GET("/board/:id", handler.Get)
 	e.GET("/board", handler.Fetch)
 	e.GET("/board/user/:id", handler.FetchUserBoards)
 	e.POST("/board", handler.Post)
+	e.GET("/:short-url", handler.GetShortURL)
 	e.POST("/board/user/attach", handler.AttachUserToBoard)
 	e.POST("/board/user/detach", handler.DetachUserToBoard)
 	e.PUT("/board/:id", handler.Put)
@@ -232,6 +237,29 @@ func (h Handler) Post(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, newBoard)
 }
 
+func (h Handler) GetShortURL(ctx echo.Context) error {
+	shortURL := ctx.Param("short-url")
+	board, err := h.boardService.FindBoardByURL(shortURL)
+	if err != nil {
+		errorsLib.ErrorHandler(ctx.Response(), "FindBoardByURL error", http.StatusBadRequest, err)
+		ctx.Logger().Error(err)
+		return err
+	}
+	userID, ok := ctx.Get("user_id").(customType.StringUUID)
+	if !ok {
+		ctx.Logger().Error("get user_id failed")
+		errorsLib.ErrorHandler(ctx.Response(), "get user_id failed", http.StatusInternalServerError, errors.New("download fail"))
+		return errors.New("get user_id failed")
+	}
+	boardUser, err := h.boardUsersService.CreateBoardUsers("", userID, board.ID)
+	if err != nil {
+		errorsLib.ErrorHandler(ctx.Response(), "Create error", http.StatusInternalServerError, err)
+		ctx.Logger().Error(err)
+		return err
+	}
+	return ctx.JSON(http.StatusOK, boardUser)
+}
+
 func (h Handler) Put(ctx echo.Context) error {
 	body, err := h.ReadBody(ctx.Request().Body)
 	if err != nil {
@@ -280,6 +308,11 @@ func (h Handler) fillBoardFields(board *models.Board) error {
 				return err
 			}
 			cards[j].Comments = comments
+			checkLists, err := h.checkListService.FetchCheckListsByCardID(card.ID.String())
+			if err != nil {
+				return err
+			}
+			cards[j].CheckLists = checkLists
 			cardTags, err := h.cardTagsService.FindCardTagsByCardID(card.ID)
 			if err != nil {
 				return err
