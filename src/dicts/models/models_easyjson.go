@@ -1437,6 +1437,10 @@ func easyjsonD2b7633eDecode20192ShtobyShtoSrcDictsModels15(in *jlexer.Lexer, out
 				}
 				in.Delim(']')
 			}
+		case "deadline":
+			if data := in.Raw(); in.Ok() {
+				in.AddError((out.Deadline).UnmarshalJSON(data))
+			}
 		case "check_lists":
 			if in.IsNull() {
 				in.Skip()
@@ -1553,6 +1557,11 @@ func easyjsonD2b7633eEncode20192ShtobyShtoSrcDictsModels15(out *jwriter.Writer, 
 			}
 			out.RawByte(']')
 		}
+	}
+	{
+		const prefix string = ",\"deadline\":"
+		out.RawString(prefix)
+		out.Raw((in.Deadline).MarshalJSON())
 	}
 	{
 		const prefix string = ",\"check_lists\":"
