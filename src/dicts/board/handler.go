@@ -251,13 +251,17 @@ func (h Handler) GetShortURL(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "get user_id failed", http.StatusInternalServerError, errors.New("download fail"))
 		return errors.New("get user_id failed")
 	}
-	boardUser, err := h.boardUsersService.CreateBoardUsers("", userID, board.ID)
+	count, _ := h.boardUsersService.FindBoardUsersByIDs(userID, board.ID)
+	if count != 0 {
+		return ctx.JSON(http.StatusOK, "already exist")
+	}
+	userBoard, err := h.boardUsersService.CreateBoardUsers("", userID, board.ID)
 	if err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "Create error", http.StatusInternalServerError, err)
 		ctx.Logger().Error(err)
 		return err
 	}
-	return ctx.JSON(http.StatusOK, boardUser)
+	return ctx.JSON(http.StatusOK, userBoard)
 }
 
 func (h Handler) Put(ctx echo.Context) error {

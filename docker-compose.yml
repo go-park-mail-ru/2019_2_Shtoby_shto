@@ -18,7 +18,8 @@ services:
     depends_on:
       - postgres
       - redis
-      # - security-service
+      - security
+      - file-loader
     networks:
       - hohoho
     environment:
