@@ -4,6 +4,7 @@ import (
 	"2019_2_Shtoby_shto/src/customType"
 	"2019_2_Shtoby_shto/src/dicts"
 	"2019_2_Shtoby_shto/src/utils"
+	"database/sql"
 	"errors"
 	"github.com/jinzhu/gorm"
 	"log"
@@ -17,7 +18,7 @@ type IDataManager interface {
 	Db() *gorm.DB
 	SetDb(db *gorm.DB)
 	CloseConnection() error
-	ExecuteQuery(sql string, args ...string) error
+	ExecuteQuery(sql string, args ...string) (*sql.Rows, error)
 	FindDictById(p interface{}) error
 	FindDictByColumn(p interface{}) (int, error)
 	CreateRecord(p interface{}) error
@@ -49,8 +50,8 @@ func (d *DataManager) CloseConnection() error {
 	return d.db.Close()
 }
 
-func (d DataManager) ExecuteQuery(sql string, args ...string) error {
-	return d.db.Exec(sql, args).Error
+func (d DataManager) ExecuteQuery(sql string, args ...string) (*sql.Rows, error) {
+	return d.db.Exec(sql, args).Rows()
 }
 
 func (d DataManager) FindDictById(p interface{}) error {

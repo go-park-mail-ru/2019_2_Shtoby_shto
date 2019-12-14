@@ -13,6 +13,7 @@ import (
 	сardUsers "2019_2_Shtoby_shto/src/dicts/cardUsers"
 	"2019_2_Shtoby_shto/src/dicts/checkList"
 	"2019_2_Shtoby_shto/src/dicts/comment"
+	"2019_2_Shtoby_shto/src/dicts/hub"
 	"2019_2_Shtoby_shto/src/dicts/photo"
 	"2019_2_Shtoby_shto/src/dicts/tag"
 	"2019_2_Shtoby_shto/src/dicts/user"
@@ -178,6 +179,10 @@ func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config, s
 	comment.NewCommentHandler(e, userService, commentService, securityService)
 	checkList.NewCheckListHandler(e, userService, checkListService, securityService)
 	tag.NewTagHandler(e, userService, tagService, cardTagsService, securityService)
+	// register ws channel
+	h := hub.NewHub(cardUsersService)
+	go h.Run()
+	hub.NewWsHandler(e, h)
 }
 
 func ConnectGRPC(addr string, name string) (*grpc.ClientConn, error) {

@@ -60,7 +60,42 @@ func NewCardHandler(e *echo.Echo, userService user.HandlerUserService,
 	e.POST("/cards", handler.Post)
 	e.PUT("/cards/:id", handler.Put)
 	e.DELETE("/cards/:id", handler.Delete)
+	//e.GET("/cards/ws", handler.CardNotification)
 }
+
+//var (
+//	upgrader = websocket.Upgrader{
+//		CheckOrigin: func(r *http.Request) bool {
+//			return true
+//		},
+//	}
+//)
+
+//func (h Handler) CardNotification(ctx echo.Context) error {
+//	ws, err := upgrader.Upgrade(ctx.Response(), ctx.Request(), nil)
+//	if err != nil {
+//		return err
+//	}
+//	defer ws.Close()
+//
+//	for {
+//		// Read
+//		attachRequest := &models.CardsUserAttachRequest{}
+//		_, msg, err := ws.ReadMessage()
+//		err = attachRequest.UnmarshalJSON(msg)
+//		if err != nil {
+//			ctx.Logger().Error(err)
+//		}
+//		userIDs, err := h.cardUsersService.FetchUserIDsByCardID(attachRequest.CardID)
+//		if err != nil {
+//			ctx.Logger().Error(err)
+//		}
+//		for _, value := range userIDs {
+//			println(value)
+//		}
+//		ws.WriteJSON()
+//	}
+//}
 
 func (h Handler) Get(ctx echo.Context) error {
 	card, err := h.cardService.FindCardByID(customType.StringUUID(ctx.Param("id")))
@@ -72,6 +107,11 @@ func (h Handler) Get(ctx echo.Context) error {
 	if err := h.fillCardFields(card); err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "fillCardFields error", http.StatusBadRequest, err)
+		return err
+	}
+	if err := h.fillCardUsers(card); err != nil {
+		ctx.Logger().Error(err)
+		errorsLib.ErrorHandler(ctx.Response(), "fillCardUsers error", http.StatusBadRequest, err)
 		return err
 	}
 	return ctx.JSON(http.StatusOK, card)

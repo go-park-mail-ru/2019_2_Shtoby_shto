@@ -18,6 +18,7 @@ type HandlerCardUsersService interface {
 	DeleteCardUsers(id customType.StringUUID) error
 	DeleteCardUsersByIDs(userID, сardID customType.StringUUID) error
 	FetchCardUsersByCardID(cardID customType.StringUUID) (cardUsers []models.CardUsers, err error)
+	FetchUserIDsByCardID(cardID customType.StringUUID) (users map[string]struct{}, err error)
 }
 
 type service struct {
@@ -31,7 +32,7 @@ func CreateInstance(db database.IDataManager) HandlerCardUsersService {
 	}
 }
 
-func (s service) FindCardUsersByUserID(userData []byte) (cardUsers []models.CardUsers, err error) {
+func (s *service) FindCardUsersByUserID(userData []byte) (cardUsers []models.CardUsers, err error) {
 	userIDs := models.CardsUserRequest{}
 	if err = userIDs.UnmarshalJSON(userData); err != nil {
 		return nil, err
@@ -45,7 +46,7 @@ func (s service) FindCardUsersByUserID(userData []byte) (cardUsers []models.Card
 	return cardUsers, err
 }
 
-func (s service) FindCardUsersByID(id customType.StringUUID) (*models.CardUsers, error) {
+func (s *service) FindCardUsersByID(id customType.StringUUID) (*models.CardUsers, error) {
 	сardUsers := &models.CardUsers{
 		BaseInfo: dicts.BaseInfo{
 			ID: id,
@@ -55,7 +56,7 @@ func (s service) FindCardUsersByID(id customType.StringUUID) (*models.CardUsers,
 	return сardUsers, err
 }
 
-func (s service) FindCardUsersByIDs(userID, cardID customType.StringUUID) (int, error) {
+func (s *service) FindCardUsersByIDs(userID, cardID customType.StringUUID) (int, error) {
 	cardUsers := &models.CardUsers{
 		CardID: cardID,
 		UserID: userID,
@@ -67,7 +68,7 @@ func (s service) FindCardUsersByIDs(userID, cardID customType.StringUUID) (int, 
 	return count, err
 }
 
-func (s service) CreateCardUsers(userID, сardID customType.StringUUID) (*models.CardUsers, error) {
+func (s *service) CreateCardUsers(userID, сardID customType.StringUUID) (*models.CardUsers, error) {
 	сardUsers := &models.CardUsers{
 		CardID: сardID,
 		UserID: userID,
@@ -79,7 +80,7 @@ func (s service) CreateCardUsers(userID, сardID customType.StringUUID) (*models
 	return сardUsers, err
 }
 
-func (s service) UpdateCardUsers(userID, сardID customType.StringUUID, id customType.StringUUID) (*models.CardUsers, error) {
+func (s *service) UpdateCardUsers(userID, сardID customType.StringUUID, id customType.StringUUID) (*models.CardUsers, error) {
 	boardUsers := &models.CardUsers{
 		BaseInfo: dicts.BaseInfo{
 			ID: id,
@@ -94,7 +95,7 @@ func (s service) UpdateCardUsers(userID, сardID customType.StringUUID, id custo
 	return boardUsers, err
 }
 
-func (s service) DeleteCardUsers(id customType.StringUUID) error {
+func (s *service) DeleteCardUsers(id customType.StringUUID) error {
 	cardUsers := &models.CardUsers{
 		BaseInfo: dicts.BaseInfo{
 			ID: id,
@@ -103,13 +104,13 @@ func (s service) DeleteCardUsers(id customType.StringUUID) error {
 	return s.db.DeleteRecord(cardUsers)
 }
 
-func (s service) FetchCardUsers(limit, offset int) (cardUsers []models.CardUsers, err error) {
+func (s *service) FetchCardUsers(limit, offset int) (cardUsers []models.CardUsers, err error) {
 	cardUser := &models.CardUsers{}
 	_, err = s.db.FetchDict(&cardUsers, cardUser, limit, offset)
 	return cardUsers, err
 }
 
-func (s service) FetchCardUsersByCardID(cardID customType.StringUUID) (cardUsers []models.CardUsers, err error) {
+func (s *service) FetchCardUsersByCardID(cardID customType.StringUUID) (cardUsers []models.CardUsers, err error) {
 	cardUser := &models.CardUsers{
 		CardID: cardID,
 	}
@@ -117,7 +118,7 @@ func (s service) FetchCardUsersByCardID(cardID customType.StringUUID) (cardUsers
 	return cardUsers, err
 }
 
-func (s service) DeleteCardUsersByIDs(userID, сardID customType.StringUUID) error {
+func (s *service) DeleteCardUsersByIDs(userID, сardID customType.StringUUID) error {
 	cardUsers := &models.CardUsers{
 		UserID: userID,
 		CardID: сardID,
@@ -127,4 +128,30 @@ func (s service) DeleteCardUsersByIDs(userID, сardID customType.StringUUID) err
 
 	}
 	return nil
+}
+
+func (s *service) FetchUserIDsByCardID(cardID customType.StringUUID) (userIDs map[string]struct{}, err error) {
+	userIDs = make(map[string]struct{}, 0)
+	cUsers := make([]models.CardUsers, 0)
+
+	where := []string{"card_id in (?)"}
+	whereArgs := []string{cardID.String()}
+	_, err = s.db.FetchDictBySlice(&cUsers, "card_users", 10000, 0, where, whereArgs)
+
+	//rows, err := s.db.ExecuteQuery("select user_id from card_users where card_id = $1", cardID.String())
+	//if err != nil {
+	//	return userIDs, err
+	//}
+	//for rows.Next() {
+	//	var id string
+	//	err = rows.Scan(&id)
+	//	if err != nil {
+	//		return userIDs, err
+	//	}
+	//	userIDs = append(userIDs, id)
+	//}
+	for _, cardUser := range cUsers {
+		userIDs[cardUser.UserID.String()] = struct{}{}
+	}
+	return userIDs, nil
 }

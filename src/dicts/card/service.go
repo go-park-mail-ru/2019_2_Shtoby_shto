@@ -52,7 +52,7 @@ func (s service) FindCardByID(id customType.StringUUID) (*models.Card, error) {
 
 func (s service) CreateCard(data []byte) (*models.Card, error) {
 	card := &models.Card{}
-	card.Deadline = time.Now();
+	card.Deadline = time.Now()
 	if err := card.UnmarshalJSON(data); err != nil {
 		return nil, err
 	}

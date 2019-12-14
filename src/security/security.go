@@ -29,6 +29,7 @@ func CreateInstance(sm SessionHandler) HandlerSecurity {
 			"/users/registration": {},
 			"/login":              {},
 			"/swagger/index.html": {},
+			"/cards/ws":           {},
 		},
 	}
 }
