@@ -40,8 +40,12 @@ func (h *Hub) Run() {
 		case client := <-h.Register:
 			message := <-h.Broadcast
 			user := &models.RegUser{}
-			user.UnmarshalJSON(message)
+			err := user.UnmarshalJSON(message)
+			if err != nil {
+				println(err)
+			}
 			h.Clients[client] = user.UserID
+			client.Send <- []byte(`"message":"Status Ok""`)
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client]; ok {
 				delete(h.Clients, client)
