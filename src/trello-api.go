@@ -40,7 +40,19 @@ import (
 )
 
 var (
-	securityService security.HandlerSecurity
+	securityService   security.HandlerSecurity
+	sessionService    security.SessionHandler
+	userService       user.HandlerUserService
+	photoService      photo.HandlerPhotoService
+	boardService      board.HandlerBoardService
+	boardUsersService boardUsers.HandlerBoardUsersService
+	cardUsersService  сardUsers.HandlerCardUsersService
+	cardService       card.HandlerCardService
+	cardGroupService  cardGroup.HandlerCardGroupService
+	commentService    comment.HandlerCommentService
+	checkListService  checkList.HandlerCheckListService
+	tagService        tag.HandlerTagService
+	cardTagsService   cardTags.HandlerCardTagsService
 )
 
 func main() {
@@ -158,18 +170,18 @@ func checkCSRF(h echo.HandlerFunc) echo.HandlerFunc {
 }
 
 func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config, sessService session.SecurityClient, fileService file.IFileLoaderManagerClient) {
-	sessionService := security.NewSessionManager(&sessService)
-	userService := user.CreateInstance(db)
-	photoService := photo.CreateInstance(db, conf, fileService)
-	boardService := board.CreateInstance(db)
-	boardUsersService := boardUsers.CreateInstance(db)
-	cardUsersService := сardUsers.CreateInstance(db)
-	cardService := card.CreateInstance(db, fileService)
-	cardGroupService := cardGroup.CreateInstance(db)
-	commentService := comment.CreateInstance(db)
-	checkListService := checkList.CreateInstance(db)
-	tagService := tag.CreateInstance(db)
-	cardTagsService := cardTags.CreateInstance(db)
+	sessionService = security.NewSessionManager(&sessService)
+	userService = user.CreateInstance(db)
+	photoService = photo.CreateInstance(db, conf, fileService)
+	boardService = board.CreateInstance(db)
+	boardUsersService = boardUsers.CreateInstance(db)
+	cardUsersService = сardUsers.CreateInstance(db)
+	cardService = card.CreateInstance(db, fileService)
+	cardGroupService = cardGroup.CreateInstance(db)
+	commentService = comment.CreateInstance(db)
+	checkListService = checkList.CreateInstance(db)
+	tagService = tag.CreateInstance(db)
+	cardTagsService = cardTags.CreateInstance(db)
 	securityService = security.CreateInstance(sessionService)
 	user.NewUserHandler(e, userService, boardUsersService, cardUsersService, securityService)
 	photo.NewPhotoHandler(e, photoService, userService, securityService)
