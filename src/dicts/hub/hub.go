@@ -10,7 +10,7 @@ import (
 // clients.
 type Hub struct {
 	// Registered clients.
-	Clients map[*Client]customType.StringUUID
+	Clients map[customType.StringUUID]*Client
 
 	// Inbound messages from the clients.
 	Broadcast chan []byte
@@ -29,7 +29,7 @@ func NewHub(cardUsersService сardUsers.HandlerCardUsersService) *Hub {
 		Broadcast:        make(chan []byte),
 		Register:         make(chan *Client),
 		Unregister:       make(chan *Client),
-		Clients:          make(map[*Client]customType.StringUUID),
+		Clients:          make(map[customType.StringUUID]*Client),
 		cardUsersService: cardUsersService,
 	}
 }
@@ -44,12 +44,16 @@ func (h *Hub) Run() {
 			if err != nil {
 				println(err)
 			}
-			h.Clients[client] = user.UserID
-			client.Send <- []byte(`"message":"Status Ok""`)
+			h.Clients[user.UserID] = client
+			client.Send <- []byte(`"message":"Status Ok"`)
 		case client := <-h.Unregister:
-			if _, ok := h.Clients[client]; ok {
-				delete(h.Clients, client)
-				close(client.Send)
+			for userID, cli := range h.Clients {
+				if cli == client {
+					delete(h.Clients, userID)
+					close(client.Send)
+				}
+				//if _, ok := h.Clients[client]; ok {
+				//}
 			}
 		case message := <-h.Broadcast:
 			attachRequest := &models.CardsUserAttachRequest{}
@@ -61,14 +65,14 @@ func (h *Hub) Run() {
 			if err != nil {
 				println(err)
 			}
-			for client, userID := range h.Clients {
+			for userID, client := range h.Clients {
 				println(userID)
 				if _, ok := userIDs[userID.String()]; ok {
 					select {
 					case client.Send <- message:
 					default:
 						close(client.Send)
-						delete(h.Clients, client)
+						delete(h.Clients, userID)
 					}
 				}
 			}
