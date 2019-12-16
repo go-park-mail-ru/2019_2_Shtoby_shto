@@ -157,6 +157,7 @@ func newServer(e *echo.Echo, httpAddr string) {
 
 func checkCSRF(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) (err error) {
+		ctx.Response().Header().Set(echo.HeaderAccessControlAllowOrigin, config.GetInstance().FrontendURL)
 		csrfRequest := ctx.Request().Header.Get(echo.HeaderXCSRFToken)
 		csrfCurrent := ctx.Get("csrf_token")
 		if ctx.Get("not_security") == "done" {
