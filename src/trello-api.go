@@ -136,6 +136,7 @@ func newServer(e *echo.Echo, httpAddr string) {
 	apiURL := config.GetInstance().FrontendURL
 	e.Use(
 		middleware.Logger(),
+		setCors,
 		middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins:     []string{apiURL},
 			AllowCredentials: true,
@@ -152,6 +153,13 @@ func newServer(e *echo.Echo, httpAddr string) {
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
+	}
+}
+
+func setCors(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) (err error) {
+		ctx.Response().Header().Set(echo.HeaderAccessControlAllowOrigin, config.GetInstance().FrontendURL)
+		return h(ctx)
 	}
 }
 
