@@ -137,19 +137,6 @@ func (s *service) FetchUserIDsByCardID(cardID customType.StringUUID) (userIDs ma
 	where := []string{"card_id in (?)"}
 	whereArgs := []string{cardID.String()}
 	_, err = s.db.FetchDictBySlice(&cUsers, "card_users", 10000, 0, where, whereArgs)
-
-	//rows, err := s.db.ExecuteQuery("select user_id from card_users where card_id = $1", cardID.String())
-	//if err != nil {
-	//	return userIDs, err
-	//}
-	//for rows.Next() {
-	//	var id string
-	//	err = rows.Scan(&id)
-	//	if err != nil {
-	//		return userIDs, err
-	//	}
-	//	userIDs = append(userIDs, id)
-	//}
 	for _, cardUser := range cUsers {
 		userIDs[cardUser.UserID.String()] = struct{}{}
 	}
