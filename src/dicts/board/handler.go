@@ -208,6 +208,7 @@ func (h Handler) Post(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
 		return err
 	}
+
 	newBoardUsersID, err := utils.GenerateUUID()
 	if err != nil {
 		ctx.Logger().Error(err)
@@ -220,20 +221,38 @@ func (h Handler) Post(ctx echo.Context) error {
 		ctx.Logger().Error(err)
 		return err
 	}
+
 	userID, ok := ctx.Get("user_id").(customType.StringUUID)
 	if !ok {
 		ctx.Logger().Error("get user_id failed")
 		errorsLib.ErrorHandler(ctx.Response(), "get user_id failed", http.StatusInternalServerError, errors.New("download fail"))
 		return errors.New("get user_id failed")
 	}
+
 	boardUser, err := h.boardUsersService.CreateBoardUsers(customType.StringUUID(newBoardUsersID.String()), userID, newBoard.ID)
 	if err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "Create error", http.StatusInternalServerError, err)
 		ctx.Logger().Error(err)
 		return err
 	}
+
 	newBoard.BoardUsersID = boardUser.ID
+
 	newBoard.Users = append(newBoard.Users, userID.String())
+
+	//event := &models.EventMessage{
+	//	Event: "event",
+	//}
+	//
+	//e, err := event.MarshalJSON()
+	//if err != nil {
+	//	errorsLib.ErrorHandler(ctx.Response(), "event.MarshalJSON", http.StatusInternalServerError, err)
+	//	ctx.Logger().Error(err)
+	//	return err
+	//}
+	//
+	//h.hub.Broadcast <- e
+
 	return ctx.JSON(http.StatusOK, newBoard)
 }
 
@@ -245,22 +264,26 @@ func (h Handler) GetShortURL(ctx echo.Context) error {
 		ctx.Logger().Error(err)
 		return err
 	}
+
 	userID, ok := ctx.Get("user_id").(customType.StringUUID)
 	if !ok {
 		ctx.Logger().Error("get user_id failed")
 		errorsLib.ErrorHandler(ctx.Response(), "get user_id failed", http.StatusInternalServerError, errors.New("download fail"))
 		return errors.New("get user_id failed")
 	}
+
 	count, _ := h.boardUsersService.FindBoardUsersByIDs(userID, board.ID)
 	if count != 0 {
 		return ctx.JSON(http.StatusOK, "already exist")
 	}
+
 	userBoard, err := h.boardUsersService.CreateBoardUsers("", userID, board.ID)
 	if err != nil {
 		errorsLib.ErrorHandler(ctx.Response(), "Create error", http.StatusInternalServerError, err)
 		ctx.Logger().Error(err)
 		return err
 	}
+
 	return ctx.JSON(http.StatusOK, userBoard)
 }
 
@@ -271,22 +294,26 @@ func (h Handler) Put(ctx echo.Context) error {
 		errorsLib.ErrorHandler(ctx.Response(), "Invalid body error", http.StatusInternalServerError, err)
 		return err
 	}
+
 	board, err := h.boardService.UpdateBoard(body, customType.StringUUID(ctx.Param("id")))
 	if err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "UpdateBoard error", http.StatusInternalServerError, err)
 		return err
 	}
+
 	if err := h.fillBoardFields(board); err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "fillBoardFields error", http.StatusInternalServerError, err)
 		return err
 	}
+
 	if err := h.fillBoardUsers(board); err != nil {
 		ctx.Logger().Error(err)
 		errorsLib.ErrorHandler(ctx.Response(), "fillBoardUsers error", http.StatusInternalServerError, err)
 		return err
 	}
+
 	return ctx.JSON(http.StatusOK, board)
 }
 

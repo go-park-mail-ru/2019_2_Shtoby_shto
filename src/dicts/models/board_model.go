@@ -29,3 +29,8 @@ func (b Board) IsValid() bool {
 type ShortURL struct {
 	ShortURL string `json:"short_url"`
 }
+
+//easyjson:json
+type EventMessage struct {
+	Event string `json:"event"`
+}

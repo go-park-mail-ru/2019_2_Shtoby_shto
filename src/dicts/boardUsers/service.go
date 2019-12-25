@@ -19,6 +19,7 @@ type HandlerBoardUsersService interface {
 	DeleteBoardUsersByIDs(userID, boardID customType.StringUUID) error
 	FetchBoardUsersByUserID(userID customType.StringUUID) (boardUsers []models.BoardUsers, err error)
 	FetchBoardUsersByBoardID(boardID customType.StringUUID) (boardUsers []models.BoardUsers, err error)
+	FetchUserIDsByBoardID(boardID customType.StringUUID) (userIDs map[string]struct{}, err error)
 }
 
 type service struct {
@@ -109,4 +110,17 @@ func (s service) FetchBoardUsersByBoardID(boardID customType.StringUUID) (boardU
 	}
 	_, err = s.db.FetchDict(&boardUsers, boardUserModel, 10000, 0)
 	return boardUsers, err
+}
+
+func (s *service) FetchUserIDsByBoardID(boardID customType.StringUUID) (userIDs map[string]struct{}, err error) {
+	userIDs = make(map[string]struct{}, 0)
+	cUsers := make([]models.CardUsers, 0)
+
+	where := []string{"board_id in (?)"}
+	whereArgs := []string{boardID.String()}
+	_, err = s.db.FetchDictBySlice(&cUsers, "board_users", 10000, 0, where, whereArgs)
+	for _, cardUser := range cUsers {
+		userIDs[cardUser.UserID.String()] = struct{}{}
+	}
+	return userIDs, nil
 }

@@ -201,7 +201,7 @@ func InitServices(e *echo.Echo, db database.IDataManager, conf *config.Config, s
 	checkList.NewCheckListHandler(e, userService, checkListService, securityService)
 	tag.NewTagHandler(e, userService, tagService, cardTagsService, securityService)
 	// register ws channel
-	h := hub.NewHub(cardUsersService)
+	h := hub.NewHub(cardUsersService, boardUsersService)
 	go h.Run()
 	hub.NewWsHandler(e, h)
 }

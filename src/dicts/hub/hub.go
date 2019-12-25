@@ -2,6 +2,7 @@ package hub
 
 import (
 	"2019_2_Shtoby_shto/src/customType"
+	"2019_2_Shtoby_shto/src/dicts/boardUsers"
 	сardUsers "2019_2_Shtoby_shto/src/dicts/cardUsers"
 	"2019_2_Shtoby_shto/src/dicts/models"
 )
@@ -21,16 +22,19 @@ type Hub struct {
 	// Unregister requests from clients.
 	Unregister chan *Client
 
-	cardUsersService сardUsers.HandlerCardUsersService
+	cardUsersService  сardUsers.HandlerCardUsersService
+	boardUsersService boardUsers.HandlerBoardUsersService
 }
 
-func NewHub(cardUsersService сardUsers.HandlerCardUsersService) *Hub {
+func NewHub(cardUsersService сardUsers.HandlerCardUsersService,
+	boardUsersService boardUsers.HandlerBoardUsersService) *Hub {
 	return &Hub{
-		Broadcast:        make(chan []byte),
-		Register:         make(chan *Client),
-		Unregister:       make(chan *Client),
-		Clients:          make(map[customType.StringUUID]*Client),
-		cardUsersService: cardUsersService,
+		Broadcast:         make(chan []byte),
+		Register:          make(chan *Client),
+		Unregister:        make(chan *Client),
+		Clients:           make(map[customType.StringUUID]*Client),
+		cardUsersService:  cardUsersService,
+		boardUsersService: boardUsersService,
 	}
 }
 
@@ -52,29 +56,47 @@ func (h *Hub) Run() {
 					delete(h.Clients, userID)
 					close(client.Send)
 				}
-				//if _, ok := h.Clients[client]; ok {
-				//}
 			}
 		case message := <-h.Broadcast:
-			attachRequest := &models.CardsUserAttachRequest{}
-			err := attachRequest.UnmarshalJSON(message)
+			attachBoardRequest := &models.BoardsUserAttachRequest{}
+
+			if err := attachBoardRequest.UnmarshalJSON(message); err == nil {
+				println(err)
+			}
+
+			userIDs, err := h.boardUsersService.FetchUserIDsByBoardID(attachBoardRequest.BoardID)
 			if err != nil {
 				println(err)
 			}
-			userIDs, err := h.cardUsersService.FetchUserIDsByCardID(attachRequest.CardID)
+
+			h.sendUserMessage(userIDs, message)
+
+			attachCardRequest := &models.CardsUserAttachRequest{}
+			err = attachCardRequest.UnmarshalJSON(message)
 			if err != nil {
 				println(err)
 			}
-			for userID, client := range h.Clients {
-				println(userID)
-				if _, ok := userIDs[userID.String()]; ok {
-					select {
-					case client.Send <- message:
-					default:
-						close(client.Send)
-						delete(h.Clients, userID)
-					}
-				}
+
+			userIDs, err = h.cardUsersService.FetchUserIDsByCardID(attachCardRequest.CardID)
+			if err != nil {
+				println(err)
+			}
+
+			h.sendUserMessage(userIDs, message)
+		}
+	}
+}
+
+func (h *Hub) sendUserMessage(userIDs map[string]struct{}, message []byte) {
+	for userID, client := range h.Clients {
+		println(userID)
+		if _, ok := userIDs[userID.String()]; ok {
+			select {
+			case client.Send <- message:
+
+			default:
+				close(client.Send)
+				delete(h.Clients, userID)
 			}
 		}
 	}
